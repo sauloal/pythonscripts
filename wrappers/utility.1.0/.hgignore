@@ -1,0 +1,11 @@
+syntax: glob
+.svn/
+
+# Python-specific build output
+*.pyd
+*.pyc
+*.pyo
+#pictures
+*.png
+#output
+run*
