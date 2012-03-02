@@ -1,0 +1,4 @@
+git config --global user.name "saulo"
+git config --global user.email sauloal@yahoo.com.br
+git remote add github  git@github.com:sauloal/pythonscripts.git
+git push github master:gamma
