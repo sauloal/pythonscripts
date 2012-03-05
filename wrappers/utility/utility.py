@@ -112,7 +112,7 @@ class Utility:
                     try:
                         filename = options['output'+str(i)]
                     except KeyError, err:
-                        raise ('The options "%s" is not defined, \
+                        raise UtilityError('The options "%s" is not defined, \
                         please correct this \n %s -- %s \n %s' % (
                         'output'+str(i), len(matrix), type(matrix),
                         options) )

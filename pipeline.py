@@ -3,6 +3,7 @@ import os
 from techs    import *
 from wrappers import *
 from tools    import *
+from gnosis.xml.pickle import XML_Pickler
 import setup
 
 
@@ -41,6 +42,12 @@ data = {'f0': f0,
         'f6': f6,
         'l2': l2,
         'd1': d1}
+
+
+f0 = XML_Pickler(f0)
+# this o1 also knows how to dump itself
+str = f0.dumps()
+#o2 = XML_Pickler().loads(xml_str)
 
 
 joblaunch.mainLib(data, verbose=True)
