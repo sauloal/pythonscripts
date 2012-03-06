@@ -29,8 +29,8 @@ class sampleWrapper():
         self.status = joblaunch.FINISH
         print "GOT STATUS " + str(status) + " RETURNING STATUS " + str(self.status)
         print "EXIT STATUS ORIGINAL " + str(self.exitStatus) + " NEW " + str(0)
-        self.exitStatus=0
-        return self.exitStatus
+        self.exitStatus = 0
+        return (self.exitStatus, self.status)
 
 
 
@@ -43,7 +43,7 @@ def sample(writeOut, writeErr, status, err):
     print "GOT STATUS " + str(status) + " RETURNIN STATUS " + str(status)
     print "EXIT STATUS ORIGINAL " + str(exitStatus) + " NEW " + str(0)
     exitStatus=1
-    return exitStatus
+    return (exitStatus, status)
 
 #sample = sampleWrapper("watever0")
 

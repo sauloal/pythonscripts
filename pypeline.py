@@ -36,14 +36,14 @@ sw = sampleWrapper.sampleWrapper("watever0")
 #TODO. MUST HAVE A __RUN__ FUNCTION TO BE CALLED WHEN RUN. CANT SENT INSTANTIATED 
 #FUNCTION ANYMORE DUE TO PICLKING
 #                  ID,   COMMAND                      SELFTEST=               DEPS=
-f0 = joblaunch.Job('f0', [sampleWrapper.sampleWrapper     ] )
+f0 = joblaunch.Job('f0', [sampleWrapper.sampleWrapper('f0')     ] )
 #f0 = joblaunch.Job('f0', [sampleWrapper.sample     ] )
 #f0 = joblaunch.Job('f0', [sw                      ] )
 #f0 = joblaunch.Job('f0', [['sleep 55;', 'echo f0']] )
 f1 = joblaunch.Job('f1', [['sleep 55;', 'echo f1']], deps=[f0] )
 f2 = joblaunch.Job('f2', [['sleep 34;', 'echo f2']], deps=[f0] )
 f3 = joblaunch.Job('f3', [['sleep 21;', 'echo f3']], deps=[f0] )
-l1 = joblaunch.Job('l1', [['sleep 13;', 'echo l1']], deps=[f1, f2, f3] )
+l1 = joblaunch.Job('l1', [['sleep 13;', 'echo l1 err;', 'exit 1']], deps=[f1, f2, f3] )
 f4 = joblaunch.Job('f4', [['sleep  8;', 'echo f4']], deps=[f0] )
 f5 = joblaunch.Job('f5', [['sleep  5;', 'echo f5']], deps=[f0] )
 f6 = joblaunch.Job('f6', [['sleep  3;', 'echo f6']], deps=[f0] )
