@@ -19,7 +19,8 @@ for lib in setup.ldataset:
             
 sw = sampleWrapper.sampleWrapper("watever0")
 
-f0 = joblaunch.Job('f0', [sw.sample], joblaunch.checkOut, deps=[] )
+f0 = joblaunch.Job('f0', [sw.sample               ], joblaunch.checkOut, deps=[] )
+#f0 = joblaunch.Job('f0', [['sleep 55;', 'echo f0']], joblaunch.checkOut, deps=[] )
 f1 = joblaunch.Job('f1', [['sleep 55;', 'echo f1']], joblaunch.checkOut, deps=[f0] )
 f2 = joblaunch.Job('f2', [['sleep 34;', 'echo f2']], joblaunch.checkOut, deps=[f0] )
 f3 = joblaunch.Job('f3', [['sleep 21;', 'echo f3']], joblaunch.checkOut, deps=[f0] )
@@ -46,9 +47,12 @@ data = {'f0': f0,
 #p = pickle.dumps(data)
 #print p
 
-import yaml
-str   = str(yaml.dump(data))
-print str
-data2 = yaml.load(str)
+#import yaml
+#str   = str(yaml.dump(data))
+#print str
+#data2 = yaml.load(str)
 
-#joblaunch.mainLib(data, verbose=True)
+
+import jsonpickle
+
+#joblaunch.mainLib(data2, verbose=True)
