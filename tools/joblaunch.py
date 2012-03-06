@@ -634,26 +634,48 @@ def parseArguments(args):
 
     return options
 
-def printG(G):
+def printG(G, jobs):
     #https://docs.google.com/viewer?url=http://www.graphviz.org/pdf/dotguide.pdf
     #http://pythonhaven.wordpress.com/2009/12/09/generating_graphs_with_pydot/
-    str = """
-digraph G {
-    size ="4,4";
-    main [shape=box]; /* this is a comment */
-    main -> parse [weight=8];
-    parse -> execute;
-    main -> init [style=dotted];
-    main -> cleanup;
-    execute -> { make_string; printf}
-    init -> make_string;
-    edge [color=red]; // so is this
-    main -> printf [style=bold,label="100 times"];
-    make_string [label="make a\\nstring"];
-    node [shape=box,style=filled,color=".7 .3 1.0"];
-    execute -> compare;
-}
-"""
+    import pydot
+    graph = pydot.Dot(graph_type='digraph')
+
+    nodes = {}
+    for jobId in jobs:
+        job          = jobs[jobId]
+        node         = pydot.Node(jobId, style="filled", fillcolor="green")
+        nodes[jobId] = node
+
+    for jobId in jobs:
+        node = nodes[jobId]
+        graph.add_node(node)
+
+        DEPS = job.getDeps()
+        for DEP in DEPS:
+            depId   = DEP.getId()
+            depNode = nodes[depId]
+            graph.add_edge(pydot.Edge(node, depNode))
+
+    graph.write_png('joblaunch.png')
+#    str = """
+#digraph G {
+#    size ="4,4";
+#    main [shape=box]; /* this is a comment */
+#    main -> parse [weight=8];
+#    parse -> execute;
+#    main -> init [style=dotted];
+#    main -> cleanup;
+#    execute -> { make_string; printf}
+#    init -> make_string;
+#    edge [color=red]; // so is this
+#    main -> printf [style=bold,label="100 times"];
+#    make_string [label="make a\\nstring"];
+#    node [shape=box,style=filled,color=".7 .3 1.0"];
+#    execute -> compare;
+#}
+#"""
+
+#dot -T svg nato 
 
 #digraph G {
 #subgraph cluster0 {
@@ -680,7 +702,7 @@ digraph G {
 #end [shape=Msquare];
 #}
 
-#dot -T svg nato 
+
 
     return str
 
@@ -714,7 +736,7 @@ def main():
     # begin working
     start(jobs, options.numThreads)
     
-    gGraph = printG(G)
+    gGraph = printG(G, jobs)
     print gGraph
 
 
@@ -770,7 +792,7 @@ def mainLib(jobs, **kwargs):
     # begin working
     start(jobs, numThreads)
 
-    gGraph = printG(G)
+    gGraph = printG(G, jobs)
     print gGraph
 
     return jobs
