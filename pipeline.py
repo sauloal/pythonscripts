@@ -3,7 +3,6 @@ import os
 from techs    import *
 from wrappers import *
 from tools    import *
-from gnosis.xml.pickle import XML_Pickler
 import setup
 
 
@@ -43,11 +42,13 @@ data = {'f0': f0,
         'l2': l2,
         'd1': d1}
 
+#import cPickle as pickle
+#p = pickle.dumps(data)
+#print p
 
-f0 = XML_Pickler(f0)
-# this o1 also knows how to dump itself
-str = f0.dumps()
-#o2 = XML_Pickler().loads(xml_str)
+import yaml
+str   = str(yaml.dump(data))
+print str
+data2 = yaml.load(str)
 
-
-joblaunch.mainLib(data, verbose=True)
+#joblaunch.mainLib(data, verbose=True)
