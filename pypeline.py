@@ -35,8 +35,9 @@ for lib in setup.ldataset:
 sw = sampleWrapper.sampleWrapper("watever0")
 #TODO. MUST HAVE A __RUN__ FUNCTION TO BE CALLED WHEN RUN. CANT SENT INSTANTIATED 
 #FUNCTION ANYMORE DUE TO PICLKING
-f0 = joblaunch.Job('f0', [sw                      ], joblaunch.checkOut, deps=[] )
-f0 = joblaunch.Job('f0', [['sleep 55;', 'echo f0']], joblaunch.checkOut, deps=[] )
+f0 = joblaunch.Job('f0', [sampleWrapper.sample     ], joblaunch.checkOut, deps=[] )
+#f0 = joblaunch.Job('f0', [sw                      ], joblaunch.checkOut, deps=[] )
+#f0 = joblaunch.Job('f0', [['sleep 55;', 'echo f0']], joblaunch.checkOut, deps=[] )
 f1 = joblaunch.Job('f1', [['sleep 55;', 'echo f1']], joblaunch.checkOut, deps=[f0] )
 f2 = joblaunch.Job('f2', [['sleep 34;', 'echo f2']], joblaunch.checkOut, deps=[f0] )
 f3 = joblaunch.Job('f3', [['sleep 21;', 'echo f3']], joblaunch.checkOut, deps=[f0] )
@@ -62,7 +63,7 @@ all=[sw, data]
 
 
 
-str   = str(dump(setup.ldataset, Dumper=Dumper))
+str   = str(dump(data, Dumper=Dumper))
 #print str
 data2 = load(str, Loader=Loader)
 

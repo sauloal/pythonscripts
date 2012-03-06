@@ -19,7 +19,7 @@ class sampleWrapper():
         self.name       = name
         self.exitStatus = 255 #not run
 
-    def __run__(self, writeOut, writeErr, status, err):
+    def __call__(self, writeOut, writeErr, status, err):
         self.status     = status
         self.err        = err
         self.writeOut   = writeOut
@@ -27,27 +27,23 @@ class sampleWrapper():
 
         print "RUNNING WRAPPER NAMED " + self.name
         self.status = joblaunch.FINISH
-        print "GOT STATUS " + str(status) + " RETURNIN STATUS " + str(self.status)
+        print "GOT STATUS " + str(status) + " RETURNING STATUS " + str(self.status)
         print "EXIT STATUS ORIGINAL " + str(self.exitStatus) + " NEW " + str(0)
         self.exitStatus=1
         return self.exitStatus
 
 
 
-def sample(self, name, writeOut, writeErr, status, err):
-    self.name       = name
-    self.exitStatus = 255 #not run
-    self.status     = status
-    self.err        = err
-    self.writeOut   = writeOut
-    self.writeErr   = writeErr
+def sample(writeOut, writeErr, status, err):
+    exitStatus = 255 #not run
+    name       = "SaMpLeFuNcTiOn"
 
-    print "RUNNING SAMPLE FUNCTION NAMED " + self.name
-    self.status = joblaunch.FINISH
-    print "GOT STATUS " + str(status) + " RETURNIN STATUS " + str(self.status)
-    print "EXIT STATUS ORIGINAL " + str(self.exitStatus) + " NEW " + str(0)
-    self.exitStatus=1
-    return self.exitStatus
+    print "RUNNING SAMPLE FUNCTION NAMED " + name
+    status = joblaunch.FINISH
+    print "GOT STATUS " + str(status) + " RETURNIN STATUS " + str(status)
+    print "EXIT STATUS ORIGINAL " + str(exitStatus) + " NEW " + str(0)
+    exitStatus=1
+    return exitStatus
 
 #sample = sampleWrapper("watever0")
 
