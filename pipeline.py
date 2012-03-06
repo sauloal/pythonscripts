@@ -19,8 +19,8 @@ for lib in setup.ldataset:
             
 sw = sampleWrapper.sampleWrapper("watever0")
 
-f0 = joblaunch.Job('f0', [sw.sample               ], joblaunch.checkOut, deps=[] )
-#f0 = joblaunch.Job('f0', [['sleep 55;', 'echo f0']], joblaunch.checkOut, deps=[] )
+f0 = joblaunch.Job('f0', [sw                      ], joblaunch.checkOut, deps=[] )
+f0 = joblaunch.Job('f0', [['sleep 55;', 'echo f0']], joblaunch.checkOut, deps=[] )
 f1 = joblaunch.Job('f1', [['sleep 55;', 'echo f1']], joblaunch.checkOut, deps=[f0] )
 f2 = joblaunch.Job('f2', [['sleep 34;', 'echo f2']], joblaunch.checkOut, deps=[f0] )
 f3 = joblaunch.Job('f3', [['sleep 21;', 'echo f3']], joblaunch.checkOut, deps=[f0] )
@@ -30,7 +30,6 @@ f5 = joblaunch.Job('f5', [['sleep  5;', 'echo f5']], joblaunch.checkOut, deps=[f
 f6 = joblaunch.Job('f6', [['sleep  3;', 'echo f6']], joblaunch.checkOut, deps=[f0] )
 l2 = joblaunch.Job('l2', [['sleep  2;', 'echo l2']], joblaunch.checkOut, deps=[f4, f5, f6] )
 d1 = joblaunch.Job('d1', [['sleep  1;', 'echo d1']], joblaunch.checkOut, deps=[l1, l2] )
-
 
 data = {'f0': f0,
         'f1': f1,
@@ -43,16 +42,16 @@ data = {'f0': f0,
         'l2': l2,
         'd1': d1}
 
+all=[sw, data]
+
 #import cPickle as pickle
-#p = pickle.dumps(data)
+#p = pickle.dumps(all)
 #print p
 
-#import yaml
-#str   = str(yaml.dump(data))
-#print str
-#data2 = yaml.load(str)
+import yaml
+str   = str(yaml.dump(data))
+print str
+data2 = yaml.load(str)
 
 
-import jsonpickle
-
-#joblaunch.mainLib(data2, verbose=True)
+joblaunch.mainLib(data2, verbose=True)
