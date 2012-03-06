@@ -19,7 +19,7 @@ class sampleWrapper():
         self.name       = name
         self.exitStatus = 255 #not run
 
-    def sample(self, writeOut, writeErr, status, err):
+    def __run__(self, writeOut, writeErr, status, err):
         self.status     = status
         self.err        = err
         self.writeOut   = writeOut

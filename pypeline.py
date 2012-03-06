@@ -1,9 +1,24 @@
 #!/usr/bin/python
 import os
+
+import yaml
+from yaml import load, dump
+try:
+    from yaml import CLoader as Loader, CDumper as Dumper
+    print "USING YAML C VERSION"
+except ImportError:
+    from yaml import Loader, Dumper
+    print "USING YAML PYTHON VERSION"
+
+
 from techs    import *
 from wrappers import *
 from tools    import *
+
 import setup
+
+
+
 
 
 print "DATASET\n" + str(setup.ldataset)
@@ -46,19 +61,10 @@ data = {'f0': f0,
 all=[sw, data]
 
 
-import yaml
-from yaml import load, dump
-try:
-    from yaml import CLoader as Loader, CDumper as Dumper
-    print "USING YAML C VERSION"
-except ImportError:
-    from yaml import Loader, Dumper
-    print "USING YAML PYTHON VERSION"
-
 
 str   = str(dump(setup.ldataset, Dumper=Dumper))
-print str
+#print str
 data2 = load(str, Loader=Loader)
 
 
-#joblaunch.mainLib(data2, verbose=True)
+joblaunch.mainLib(data2, verbose=True)
