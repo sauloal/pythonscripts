@@ -636,6 +636,7 @@ def parseArguments(args):
 
 def printG(G):
     #https://docs.google.com/viewer?url=http://www.graphviz.org/pdf/dotguide.pdf
+    #http://pythonhaven.wordpress.com/2009/12/09/generating_graphs_with_pydot/
     str = """
 digraph G {
     size ="4,4";

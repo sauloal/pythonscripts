@@ -63,9 +63,10 @@ all=[sw, data]
 
 
 
-str   = str(dump(data, Dumper=Dumper))
+#str   = str(dump(data, Dumper=Dumper))
 #print str
-data2 = load(str, Loader=Loader)
+#data2 = load(str, Loader=Loader)
+#joblaunch.mainLib(data2, verbose=True)
 
 
-joblaunch.mainLib(data2, verbose=True)
+joblaunch.mainLib(data, verbose=True)
