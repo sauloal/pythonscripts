@@ -199,17 +199,18 @@ class Job:
 
     outputFileWriter = None
 
-    def __init__(self, id_, commandsList, selfTest, **kwargs):
+    def __init__(self, id_, commandsList, **kwargs):
         self.id           = id_
         self.commands     = commandsList
         assert len(self.commands) > 0
         self.predecessors = set()
         self.successors   = set()
         #saulo
-        self.selfTest     = selfTest
         self.status       = NOT_RUN
+        self.selfTester   = kwargs.get('selfTest', self.getStatus)
         self.priority     = kwargs.get('priority', getPriority())
         self.deps         = kwargs.get('deps',     [])
+        self.ret          = -1
 
     def __call__(self):
         assert not self.predecessors
@@ -227,6 +228,9 @@ class Job:
     def getStatus(self):
         return self.status
 
+    def getReturn(self):
+        return self.ret
+
     def getCommands(self):
         return self.commands
 
@@ -243,38 +247,44 @@ class Job:
         return self.id
 
     def selfTest(self):
-        return self.selfTest()
+        return self.selfTester()
 
     def __repr__(self):
         return "Job %s" % self.id
 
     def __launch(self):
+        print "JOB :: " + self.id + " :: COMMANDS " + str(self.commands) + " (" + str(len(self.commands))+ ")"
         # IMPORTANT: In UNIX, Popen uses /bin/sh, whatever the user shell is
         for cmd in self.commands:
-            cmdFinal = ""
-            
+            print "JOB :: " + self.id + " :: CMD " + str(cmd)
             if   isinstance(cmd, types.FunctionType):
+                print "JOB :: " + self.id + " :: CMD " + str(cmd) + " :: IS FUNCTION"
                 self.ret = cmd(Job.outputFileWriter.writelnOut, Job.outputFileWriter.writelnErr, self.status, self.error)
                 if self.ret:
-                    print "JOB :: CMD " + str(cmd) + " :: IS FUNCTION :: RETURNED: " + str(self.ret) + " THEREFORE FAILED "
+                    print "JOB :: " + self.id + " :: CMD " + str(cmd) + " :: IS FUNCTION :: RETURNED: " + str(self.ret) + " THEREFORE FAILED "
                     self.status = FAILED
                     return
                 return
             elif isinstance(cmd, types.InstanceType):
+                print "JOB :: " + self.id + " :: CMD " + str(cmd) + " :: IS INSTANCE"
                 self.ret = cmd(Job.outputFileWriter.writelnOut, Job.outputFileWriter.writelnErr, self.status, self.error)
                 if self.ret:
-                    print "JOB :: CMD " + str(cmd) + " :: IS FUNCTION :: RETURNED: " + str(self.ret) + " THEREFORE FAILED "
+                    print "JOB :: " + self.id + " :: CMD " + str(cmd) + " :: IS FUNCTION :: RETURNED: " + str(self.ret) + " THEREFORE FAILED "
                     self.status = FAILED
                     return
                 return
             elif isinstance(cmd, types.MethodType):
+                print "JOB :: " + self.id + " :: CMD " + str(cmd) + " :: IS METHOD"
                 self.ret = cmd(Job.outputFileWriter.writelnOut, Job.outputFileWriter.writelnErr, self.status, self.error)
                 if self.ret:
-                    print "JOB :: CMD " + str(cmd) + " :: IS FUNCTION :: RETURNED: " + str(self.ret) + " THEREFORE FAILED "
+                    print "JOB :: " + self.id + " :: CMD " + str(cmd) + " :: IS FUNCTION :: RETURNED: " + str(self.ret) + " THEREFORE FAILED "
                     self.status = FAILED
                     return
                 return
             elif isinstance(cmd, types.ListType):
+                cmdFinal = ""
+                print "JOB :: " + self.id + " :: CMD " + str(cmd) + " :: IS LIST"
+
                 for part in cmd:
                     #print "  PART  '" + str(part) + "'"
     
@@ -296,7 +306,7 @@ class Job:
                 #print "  CMD F '" + str(cmdFinal) + "'"
     
                 try:
-                    print "OPENING PROCESS FOR CMD '" + cmdFinal + "'"
+                    print "JOB :: " + self.id + " :: OPENING PROCESS FOR CMD '" + cmdFinal + "'"
                     p = subprocess.Popen(cmdFinal, shell = True, executable="/bin/bash", stdout = subprocess.PIPE,
                         stderr = subprocess.STDOUT)
     
@@ -315,7 +325,7 @@ class Job:
                         #print "WAITING"
                         self.ret = p.wait()
                         if self.ret:
-                            print "JOB :: CMD " + str(cmd) + " :: IS FUNCTION :: RETURNED: " + str(self.ret) + " THEREFORE FAILED "
+                            print "JOB :: " + self.id + " :: CMD " + str(cmd) + " :: IS FUNCTION :: RETURNED: " + str(self.ret) + " THEREFORE FAILED "
                             self.status = FAILED
                             return
                         #print "FINISHED"
@@ -327,22 +337,27 @@ class Job:
                     except Exception, e:
                         print "Exception (Job__launch_out): ", e
                         self.status = FAILED
-                        self.error  = "JOB :: FAILED TO RUN " + cmdFinal + " EXCEPTION " + str(e)
+                        self.error  = "JOB :: " + self.id + " :: FAILED TO RUN " + cmdFinal + " EXCEPTION " + str(e)
                         self.ret    = 252
                         return
     
                 except Exception, e:
                     print "Exception (Job__launch): ", e
                     self.status = FAILED
-                    self.error  = "JOB :: FAILED TO RUN " + cmdFinal + " EXCEPTION " + str(e)
+                    self.error  = "JOB :: " + self.id + " :: FAILED TO RUN " + cmdFinal + " EXCEPTION " + str(e)
                     self.ret    = 253
                     return
     
                 if self.ret:
                     self.status = FAILED
-                    self.error  = "JOB :: FAILED TO RUN " + cmdFinal
+                    self.error  = "JOB :: " + self.id + " :: FAILED TO RUN " + cmdFinal
                     return
-            #print " REACHED END. FINISHING WITH STATUS " + str(self.status)
+            else:
+                self.status = FAILED
+                self.error  = "JOB :: " + self.id + " :: NOTHING TO RUN " + str(cmd)
+                return
+
+            print "JOB :: " + self.id + " :: REACHED END. FINISHING WITH STATUS " + str(self.status) + " " + str(self.ret)
             self.status = FINISH
             self.ret    = 0
 
@@ -674,10 +689,10 @@ def printG(G, jobs):
         job  = jobs[jobId]
         node = nodes[jobId]
         DEPS = job.getDeps()
-        print "ADDING NODE " + jobId
+        #print "ADDING NODE " + jobId + " STATUS: " + str(job.getStatus()) + " RETURN VALUE: " + str(job.getReturn())
         for DEP in DEPS:
             depId   = DEP.getId()
-            print "  DEP " + depId
+            #print "  DEP " + depId
             depNode = nodes[depId]
             graph.add_edge(pydot.Edge(depNode, node))
 
@@ -726,8 +741,6 @@ def printG(G, jobs):
 #start [shape=Mdiamond];
 #end [shape=Msquare];
 #}
-
-
 
     return str
 
@@ -832,13 +845,13 @@ if __name__ == "__main__":
         if False:
             main()
         else:
-            f1 = Job('f1', [['sleep 1; echo f1']], checkOut, deps=[] )
-            f2 = Job('f2', [['sleep 1; echo f2']], checkOut, deps=[] )
-            f3 = Job('f3', [['sleep 1; echo f3']], checkOut, deps=[] )
+            f1 = Job('f1', [['sleep 1; echo f1']] )
+            f2 = Job('f2', [['sleep 1; echo f2']] )
+            f3 = Job('f3', [['sleep 1; echo f3']] )
             l1 = Job('l1', [['sleep 1; echo l1']], checkOut, deps=[f1, f2, f3] )
-            f4 = Job('f4', [['sleep 1; echo f4']], checkOut, deps=[] )
-            f5 = Job('f5', [['sleep 1; echo f5']], checkOut, deps=[] )
-            f6 = Job('f6', [['sleep 1; echo f6']], checkOut, deps=[] )
+            f4 = Job('f4', [['sleep 1; echo f4']] )
+            f5 = Job('f5', [['sleep 1; echo f5']] )
+            f6 = Job('f6', [['sleep 1; echo f6']] )
             l2 = Job('l2', [['sleep 1; echo l2']], checkOut, deps=[f4, f5, f6] )
             d1 = Job('d1', [['sleep 1; echo d1']], checkOut, deps=[l1, l2] )
 

@@ -29,7 +29,7 @@ class sampleWrapper():
         self.status = joblaunch.FINISH
         print "GOT STATUS " + str(status) + " RETURNING STATUS " + str(self.status)
         print "EXIT STATUS ORIGINAL " + str(self.exitStatus) + " NEW " + str(0)
-        self.exitStatus=1
+        self.exitStatus=0
         return self.exitStatus
 
 
