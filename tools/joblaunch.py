@@ -255,12 +255,24 @@ class Job:
             
             if   isinstance(cmd, types.FunctionType):
                 self.ret = cmd(Job.outputFileWriter.writelnOut, Job.outputFileWriter.writelnErr, self.status, self.error)
+                if self.ret:
+                    print "JOB :: CMD " + str(cmd) + " :: IS FUNCTION :: RETURNED: " + str(self.ret) + " THEREFORE FAILED "
+                    self.status = FAILED
+                    return
                 return
             elif isinstance(cmd, types.InstanceType):
                 self.ret = cmd(Job.outputFileWriter.writelnOut, Job.outputFileWriter.writelnErr, self.status, self.error)
+                if self.ret:
+                    print "JOB :: CMD " + str(cmd) + " :: IS FUNCTION :: RETURNED: " + str(self.ret) + " THEREFORE FAILED "
+                    self.status = FAILED
+                    return
                 return
             elif isinstance(cmd, types.MethodType):
                 self.ret = cmd(Job.outputFileWriter.writelnOut, Job.outputFileWriter.writelnErr, self.status, self.error)
+                if self.ret:
+                    print "JOB :: CMD " + str(cmd) + " :: IS FUNCTION :: RETURNED: " + str(self.ret) + " THEREFORE FAILED "
+                    self.status = FAILED
+                    return
                 return
             elif isinstance(cmd, types.ListType):
                 for part in cmd:
@@ -303,6 +315,8 @@ class Job:
                         #print "WAITING"
                         self.ret = p.wait()
                         if self.ret:
+                            print "JOB :: CMD " + str(cmd) + " :: IS FUNCTION :: RETURNED: " + str(self.ret) + " THEREFORE FAILED "
+                            self.status = FAILED
                             return
                         #print "FINISHED"
     
@@ -313,24 +327,24 @@ class Job:
                     except Exception, e:
                         print "Exception (Job__launch_out): ", e
                         self.status = FAILED
-                        self.error  = "FAILED TO RUN " + cmdFinal + " EXCEPTION " + str(e)
+                        self.error  = "JOB :: FAILED TO RUN " + cmdFinal + " EXCEPTION " + str(e)
                         self.ret    = 252
                         return
     
                 except Exception, e:
                     print "Exception (Job__launch): ", e
                     self.status = FAILED
-                    self.error  = "FAILED TO RUN " + cmdFinal + " EXCEPTION " + str(e)
+                    self.error  = "JOB :: FAILED TO RUN " + cmdFinal + " EXCEPTION " + str(e)
                     self.ret    = 253
                     return
     
                 if self.ret:
                     self.status = FAILED
-                    self.error  = "FAILED TO RUN " + cmdFinal
+                    self.error  = "JOB :: FAILED TO RUN " + cmdFinal
                     return
             #print " REACHED END. FINISHING WITH STATUS " + str(self.status)
             self.status = FINISH
-            self.ret = 0
+            self.ret    = 0
 
 class Core(threading.Thread):
     """
@@ -361,7 +375,7 @@ class Core(threading.Thread):
                 #print "CORE :: RUN ::  QUEUE CORRECTED"
                 self.numJobsLeft.decrement()
             else:
-                print "CORE :: RUN ::  QUEUE NOT CORRECTED. JOB " + job.getId() + " RETURNED " + str(job.ret)
+                print "CORE :: RUN ::  QUEUE NOT CORRECTED. JOB " + job.getId() + " RETURNED " + str(job.ret) + " STATUS " + str(job.getStatus())
                 pass
         #print "CORE :: RUN :: FINISHED RUNNING"
 
@@ -536,8 +550,8 @@ def createQueue(jobs):
     check(not q.empty(), "no initial job found to launch due to dependency cycles")
     return q
 
-def checkOut():
-    return FINISH
+#def checkOut():
+#    return FINISH
 
 def start(jobs, numThreads):
     """
@@ -640,21 +654,32 @@ def printG(G, jobs):
     import pydot
     graph = pydot.Dot(graph_type='digraph')
 
+    statusColors = { NOT_RUN: ["white",  "black"],
+                     RUNNING: ["yellow", "black"],
+                     FAILED:  ["red",    "black"],
+                     FINISH:  ["green",  "black"]
+                   }
+
+
     nodes = {}
     for jobId in jobs:
         job          = jobs[jobId]
-        node         = pydot.Node(jobId, style="filled", fillcolor="green")
+        status       = job.getStatus()
+        statusColor  = statusColors[status]
+        node         = pydot.Node(jobId, style="filled", fillcolor=statusColor[0], fontcolor=statusColor[1])
+        graph.add_node(node)
         nodes[jobId] = node
 
     for jobId in jobs:
+        job  = jobs[jobId]
         node = nodes[jobId]
-        graph.add_node(node)
-
         DEPS = job.getDeps()
+        print "ADDING NODE " + jobId
         for DEP in DEPS:
             depId   = DEP.getId()
+            print "  DEP " + depId
             depNode = nodes[depId]
-            graph.add_edge(pydot.Edge(node, depNode))
+            graph.add_edge(pydot.Edge(depNode, node))
 
     graph.write_png('joblaunch.png')
 #    str = """
