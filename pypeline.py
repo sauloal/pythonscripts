@@ -37,11 +37,10 @@ sw = sampleWrapper.sampleWrapper("watever0")
 #FUNCTION ANYMORE DUE TO PICLKING
 
 #                  ID,   COMMAND                      SELFTEST=               DEPS=
-#f0 = joblaunch.Job('f0', [sampleWrapper.sampleWrapper('f0')     ] )
-#sf0 = joblaunch.Job('f0', [sampleWrapper.sample     ] )
+
+
 f0 = joblaunch.Job('f0', [sw                      ], selfTester=sw )
-#f0 = joblaunch.Job('f0', [['sleep 1;', 'echo f0']] )
-f1 = joblaunch.Job('f1', [['sleep  2;', 'echo f1']], deps=[f0] )
+f1 = joblaunch.Job('f1', [sampleWrapper.sample    ], deps=[f0] )
 f2 = joblaunch.Job('f2', [['sleep  3;', 'echo f2']], deps=[f0] )
 f3 = joblaunch.Job('f3', [['sleep  4;', 'echo f3']], deps=[f0] )
 l1 = joblaunch.Job('l1', [['sleep  5;', 'echo l1 err;', 'exit 1']], deps=[f1, f2, f3] )

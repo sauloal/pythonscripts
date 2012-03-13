@@ -19,6 +19,12 @@ NOT_RUN         = 0
 RUNNING         = 1
 FAILED          = 2
 FINISH          = 3
+STATUSES = {}
+STATUSES[NOT_RUN] = "'NOT RUN'"
+STATUSES[RUNNING] = "'RUNNING'"
+STATUSES[FAILED ] = "'FAILED'"
+STATUSES[FINISH ] = "'FINISH'"
+
 debug           = True
 global_priority = 0
 
@@ -264,29 +270,26 @@ class Job:
                 print "JOB :: " + self.id + " :: CMD " + str(cmd) + " :: IS FUNCTION"
                 (self.ret, self.status) = cmd(Job.outputFileWriter.writelnOut, Job.outputFileWriter.writelnErr, self.status, self.error)
                 if self.ret:
-                    print "JOB :: " + self.id + " :: CMD " + str(cmd) + " :: IS FUNCTION :: RETURNED: " + str(self.ret) + " THEREFORE FAILED "
+                    print "JOB :: " + self.id + " :: CMD " + str(cmd) + " :: RETURNED: " + str(self.ret) + " THEREFORE FAILED "
                     self.status = FAILED
-                    self.error  = self.id + " :: FAILED TO RUN FUNCTION " + cmd 
-                    return
-                return
+                    self.error  = self.id + " :: FAILED TO RUN FUNCTION " + str(cmd )
+                    return self.ret
             elif isinstance(cmd, types.InstanceType):
                 print "JOB :: " + self.id + " :: CMD " + str(cmd) + " :: IS INSTANCE"
                 (self.ret, self.status) = cmd(Job.outputFileWriter.writelnOut, Job.outputFileWriter.writelnErr, self.status, self.error)
                 if self.ret:
-                    print "JOB :: " + self.id + " :: CMD " + str(cmd) + " :: IS FUNCTION :: RETURNED: " + str(self.ret) + " THEREFORE FAILED "
+                    print "JOB :: " + self.id + " :: CMD " + str(cmd) + " :: RETURNED: " + str(self.ret) + " THEREFORE FAILED "
                     self.status = FAILED
                     self.error  = self.id + " :: FAILED TO RUN INSTANCE " + cmd 
-                    return
-                return
+                    return self.ret
             elif isinstance(cmd, types.MethodType):
                 print "JOB :: " + self.id + " :: CMD " + str(cmd) + " :: IS METHOD"
                 (self.ret, self.status) = cmd(Job.outputFileWriter.writelnOut, Job.outputFileWriter.writelnErr, self.status, self.error)
                 if self.ret:
-                    print "JOB :: " + self.id + " :: CMD " + str(cmd) + " :: IS FUNCTION :: RETURNED: " + str(self.ret) + " THEREFORE FAILED "
+                    print "JOB :: " + self.id + " :: CMD " + str(cmd) + " :: RETURNED: " + str(self.ret) + " THEREFORE FAILED "
                     self.status = FAILED
                     self.error  = self.id + " :: FAILED TO RUN METHOD " + cmd 
-                    return
-                return
+                    return self.ret
             elif isinstance(cmd, types.ListType):
                 cmdFinal = ""
                 #print "JOB :: " + self.id + " :: CMD " + str(cmd) + " :: IS LIST"
@@ -331,10 +334,10 @@ class Job:
                         #print "WAITING"
                         self.ret = p.wait()
                         if self.ret:
-                            print "JOB :: " + self.id + " :: CMD " + str(cmd) + " [" + cmdFinal + "] :: RETURNED: " + str(self.ret) + " THEREFORE FAILED "
+                            print "JOB :: " + self.id + " :: CMD ARR {" + str(cmd) + "} STR {" + cmdFinal + "} :: RETURNED: " + str(self.ret) + " THEREFORE FAILED "
                             self.status = FAILED
                             self.error  = self.id + " :: FAILED TO RUN " + cmdFinal + " :: RETURNED: " + str(self.ret) + " THEREFORE FAILED "
-                            return
+                            return self.ret
                         #print "FINISHED"
     
                         #print "FINISHED RUNNING CMD " + cmdFinal + " WRITING"
@@ -346,28 +349,29 @@ class Job:
                         self.status = FAILED
                         self.error  = self.id + " :: FAILED TO RUN " + cmdFinal + " EXCEPTION " + str(e)
                         self.ret    = 252
-                        return
+                        return self.ret
     
                 except Exception, e:
                     print "Exception (Job__launch): ", e
                     self.status = FAILED
                     self.error  = self.id + " :: FAILED TO RUN " + cmdFinal + " EXCEPTION " + str(e)
                     self.ret    = 253
-                    return
+                    return self.ret
     
                 if self.ret:
                     self.status = FAILED
                     self.error  = self.id + " :: FAILED TO RUN " + cmdFinal
-                    return
+                    return self.ret
             else:
                 print "JOB :: " + self.id + " :: CMD " + str(cmd) + " :: IS UNKOWN TYPE"
                 self.status = FAILED
                 self.error  = self.id + " :: NOTHING TO RUN " + str(cmd)
-                return
+                return self.ret
 
-        print "JOB :: " + self.id + " :: REACHED END. FINISHING WITH STATUS " + str(self.status) + " " + str(self.ret)
+        print "JOB :: " + self.id + " :: REACHED END. FINISHING WITH STATUS " + STATUSES[self.status] + " " + str(self.ret)
         self.status = FINISH
         self.ret    = 0
+        return self.ret
 
 class Core(threading.Thread):
     """

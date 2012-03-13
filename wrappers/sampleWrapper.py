@@ -4,6 +4,8 @@ if __name__ == "__main__":
 
     fullpath=os.getcwd()
 
+    # add parent folder to path
+    
     #print "CURRENT PATH " + fullpath
     fullpath=os.path.abspath(fullpath + "/..")
     #print "PREVIOUS PATH " + fullpath
@@ -11,7 +13,26 @@ if __name__ == "__main__":
     #print "PATH " + str(sys.path)
 
 from tools import *
-
+"""
+    sample class showing how to create a sample program wrapper
+    the class/function has to accept:
+        writeOut [file handler to print to stdout]
+        writeErr [file handler to print to stderr]
+        status [ variable containing current running status]
+        err [variable containing the current error message]
+    and should return:
+        status
+        err
+    status can be found on the header of joblaunch.py
+        NOT_RUN         = 0
+        RUNNING         = 1
+        FAILED          = 2
+        FINISH          = 3
+    
+    Optionally (if used), a class can contain a function called
+    "selfTest" which will be called by the end of the execution
+    by the job scheduler.
+"""
 
 
 class sampleWrapper():
@@ -46,9 +67,9 @@ def sample(writeOut, writeErr, status, err):
 
     print "RUNNING SAMPLE FUNCTION NAMED " + name
     status = joblaunch.FINISH
-    print "GOT STATUS " + str(status) + " RETURNIN STATUS " + str(status)
+    print "GOT STATUS " + str(status) + " RETURNING STATUS " + str(status)
     print "EXIT STATUS ORIGINAL " + str(exitStatus) + " NEW " + str(0)
-    exitStatus=1
+    exitStatus=0
     return (exitStatus, status)
 
 #sample = sampleWrapper("watever0")
