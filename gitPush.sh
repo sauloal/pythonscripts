@@ -14,4 +14,4 @@ if [[ ! -z $(git ls-files --deleted) ]]; then
 fi
 
 git commit -m "$NAME"
-git push -u github pypeline
+git push -u github master:pypeline
