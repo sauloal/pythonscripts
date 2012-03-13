@@ -1,3 +1,14 @@
+branch=gamma
+gituser=sauloal
+gitemail=sauloal@yahoo.com.br
+gitrepo=pythonscripts
+gitnick=github_$gitrepo
+
+git config --global user.name "$gituser" 2>/dev/null
+git config --global user.email $gitemail 2>/dev/null
+git remote add $gitnick git@github.com:$gituser/$gitrepo.git
+git push $gitnick master:$branch
+
 #echo '*.gz'     >  .gitignore
 #echo '*komodo*' >> .gitignore
 
@@ -14,4 +25,5 @@ if [[ ! -z $(git ls-files --deleted) ]]; then
 fi
 
 git commit -m "$NAME"
-git push -u github master:pypeline
+git push -u $gitnick master:$branch
+
