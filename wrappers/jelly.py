@@ -84,9 +84,25 @@ def sample(messaging):
 
 exe="/home/aflit001/bin/jellyfish"
 
+class parameters():
+    def __init__(self):
+        self.pairs = []
+        pass
+
+    def add(self, pos, name, value, type):
+        pair = [name, value, type]
+        self.pairs[pos] = pair
+
+    def append(self, name, value, type):
+        pair = [name, value, type]
+        self.pairs.append(pair)
+
+    def getCmd(self):
+        
+
 
 class jellyCount():
-    def __init__(self, input=None, output=None, buffer_size=10000000, out_counter_len=4, out_buffer_size=10000000, verbose=False):
+    def __init__(self, input=None, output=None, buffer_size=None, out_counter_len=4, out_buffer_size=10000000, verbose=False):
         """
         Usage: jellyfish merge [options] input:c_string+
 
@@ -105,21 +121,33 @@ class jellyCount():
         assert input  is not None
         assert output is not None
 
-        self.function        = "count"
-        parameters = {}
-        parameter{self.function} = ""
-        parameter{input}         = ""
-        parameter{'--buffer-size='} = buffer_size if buffer_size 
-        self.buffer_size     = buffer_size
-        self.output          = output
-        self.out_counter_len = out_counter_len
-        self.out_buffer_size = out_buffer_size
-        self.verbose         = verbose
-        self.output          = input + "_mer_counts"
+        function  = "count"
 
-    def genCmd(self):
-        cmd = [exe, self.function, "--output='"+self.output+"'"]
-        
+        if output is not None:
+            output          = input + "_mer_counts" 
+
+        parameter = parameters()
+        parameter.append(exe,           True,   'bool')
+        parameter.append(self.function, True,   'bool')
+        parameter.append(input,         True,   'bool')
+        parameter.append('--output=',   output, 'text')
+
+        if buffer_size      is not None:
+            parameter.append('--buffer-size=',    buffer_size,      'num') 
+
+
+        if cout_counter_len is not None:
+            parameter.append('--out-counter-len=', out_counter_len, 'num')
+
+        if out_buffer_size  is not None:
+            parameter.append('--out-buffer-size=', out_buffer_size, 'num') 
+
+        if verbose:
+            parameter.append('--verbose',          verbose,         'bool') 
+
+        self.parameter = parameter
+        self.cmd       = parameter.getCmd()
+
         
 class jellyStats():
     def __init__(self, input, lower_count=None, upper_count=None, output="-", verbose=False):
