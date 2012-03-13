@@ -15,14 +15,13 @@ if __name__ == "__main__":
 from tools import *
 """
     sample class showing how to create a sample program wrapper
-    the class/function has to accept:
-        writeOut [file handler to print to stdout]
-        writeErr [file handler to print to stderr]
-        status [ variable containing current running status]
-        err [variable containing the current error message]
-    and should return:
-        status
-        err
+    the class/function has to accept a messaging class which contains:
+        stdout   [function to print to stdout]
+        stderr   [function to print to stderr]
+        addError [function to add error messages]
+        status   [variable containing current running status]
+        exitCode [variable containing current exit code]
+
     status can be found on the header of joblaunch.py
         NOT_RUN         = 0
         RUNNING         = 1
@@ -37,40 +36,46 @@ from tools import *
 
 class sampleWrapper():
     def __init__(self, name):
-        self.name       = name
-        self.exitStatus = 255 #not run
+        self.name     = name
+        self.exitCode = 255 #not run
 
-    def __call__(self, writeOut, writeErr, status, err):
-        self.status     = status
-        self.err        = err
-        self.writeOut   = writeOut
-        self.writeErr   = writeErr
+    def __call__(self, messaging):
+        self.messaging = messaging
 
         print "RUNNING WRAPPER NAMED " + self.name
-        self.status = joblaunch.FINISH
-        print "GOT STATUS " + str(status) + " RETURNING STATUS " + str(self.status)
-        print "EXIT STATUS ORIGINAL " + str(self.exitStatus) + " NEW " + str(0)
-        self.exitStatus = 0
-        return (self.exitStatus, self.status)
+        print "GOT STATUS " + str(self.messaging.status)
+        self.messaging.status = joblaunch.FINISH
+        print "RETURNING STATUS " + str(self.messaging.status)
+        print "EXIT STATUS ORIGINAL " + str(self.messaging.exitCode)
+        self.messaging.exitCode = 0
+        print "EXIT STATUS NEW " + str(self.messaging.exitCode)
         
-    def selfTest(self):
-        print "SAMPLE WRAPPER"
-        print "  SELF TESTING: "
-        print self
-        return joblaunch.FINISH
+    def selfTest(self, messaging):
+        messaging.addError("SAMPLE WRAPPER")
+        messaging.addError("  SAMPLE SELF TEST")
+        messaging.addError("    " + str(self))
+        messaging.stdout(self.name, "SAMPLE WRAPPER\n")
+        messaging.stderr(self.name, "  SELF TESTING\n")
+        messaging.stdout(self.name, str(self) + "\n")
+        messaging.status = joblaunch.FINISH
 
 
 
-def sample(writeOut, writeErr, status, err):
-    exitStatus = 255 #not run
+def sample(messaging):
     name       = "SaMpLeFuNcTiOn"
 
-    print "RUNNING SAMPLE FUNCTION NAMED " + name
-    status = joblaunch.FINISH
-    print "GOT STATUS " + str(status) + " RETURNING STATUS " + str(status)
-    print "EXIT STATUS ORIGINAL " + str(exitStatus) + " NEW " + str(0)
-    exitStatus=0
-    return (exitStatus, status)
+    messaging.stdout(name, "RUNNING SAMPLE FUNCTION NAMED " + name + "\n")
+
+    messaging.stdout(name, "GOT STATUS " + str(messaging.status) + "\n")
+    messaging.status = joblaunch.FINISH
+    messaging.stdout(name, "RETURNING STATUS " + str(messaging.status) + "\n")
+
+    
+    messaging.stdout(name, "EXIT STATUS ORIGINAL " + str(messaging.exitCode) + "\n")
+    messaging.exitCode = 255 #not run
+    messaging.exitCode = 0
+    messaging.stdout(name, "EXIT STATUS NEW " + str(messaging.exitCode) + "\n")
+
 
 #sample = sampleWrapper("watever0")
 

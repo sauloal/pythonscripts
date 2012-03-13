@@ -52,9 +52,9 @@ class sampleWrapper():
         print "EXIT STATUS NEW " + str(self.messaging.exitCode)
         
     def selfTest(self, messaging):
-        messaging.error.append("SAMPLE WRAPPER")
-        messaging.error.append("  SAMPLE SELF TEST")
-        messaging.error.append("    " + str(self))
+        messaging.addError("SAMPLE WRAPPER")
+        messaging.addError("  SAMPLE SELF TEST")
+        messaging.addError("    " + str(self))
         messaging.stdout(self.name, "SAMPLE WRAPPER\n")
         messaging.stderr(self.name, "  SELF TESTING\n")
         messaging.stdout(self.name, str(self) + "\n")
@@ -65,17 +65,17 @@ class sampleWrapper():
 def sample(messaging):
     name       = "SaMpLeFuNcTiOn"
 
-    print "RUNNING SAMPLE FUNCTION NAMED " + name
+    messaging.stdout(name, "RUNNING SAMPLE FUNCTION NAMED " + name + "\n")
 
-    print "GOT STATUS " + str(messaging.status)
+    messaging.stdout(name, "GOT STATUS " + str(messaging.status) + "\n")
     messaging.status = joblaunch.FINISH
-    print "RETURNING STATUS " + str(messaging.status)
+    messaging.stdout(name, "RETURNING STATUS " + str(messaging.status) + "\n")
 
     
-    print "EXIT STATUS ORIGINAL " + str(messaging.exitCode)
+    messaging.stdout(name, "EXIT STATUS ORIGINAL " + str(messaging.exitCode) + "\n")
     messaging.exitCode = 255 #not run
     messaging.exitCode = 0
-    print "EXIT STATUS NEW " + str(messaging.exitCode)
+    messaging.stdout(name, "EXIT STATUS NEW " + str(messaging.exitCode) + "\n")
 
 
 #sample = sampleWrapper("watever0")
