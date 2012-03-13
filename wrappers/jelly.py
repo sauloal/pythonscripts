@@ -155,6 +155,30 @@ class jellyHisto():
          -V, --version                            Version
         """
 
+
+class jellyMerge():
+    def __init__(self, input, column=False, tab=False, lower_count=None, upper_count=None):
+        """
+        Usage: jellyfish stats [options] db:path
+
+        Dump k-mer counts
+
+        By default, dump in a fasta format where the header is the count and
+        the sequence is the sequence of the k-mer. The column format is a 2
+        column output: k-mer count.
+
+        Options (default value in (), *required):
+         -c, --column                             Column format (false)
+         -t, --tab                                Tab separator (false)
+         -L, --lower-count=uint64                 Don't output k-mer with count < lower-count
+         -U, --upper-count=uint64                 Don't output k-mer with count > upper-count
+         -o, --output=c_string                    Output file
+             --usage                              Usage
+         -h, --help                               This message
+         -V, --version                            Version
+        """
+
+
 """
 count, stats, histo, dump, merge, query, cite, qhisto, qdump, qmerge, jf
 
