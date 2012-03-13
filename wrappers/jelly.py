@@ -107,6 +107,28 @@ class parameters():
         pair.type  = type 
         self.pairs.append(pair)
 
+    def parse(self, name, type, dashes, equal, res):
+        str    = '-'*dashes + name
+
+        if equal:
+            str += '='
+
+
+        if res is not None:
+            self.append(str, res, type)
+
+
+    def parseList(self, data, kwargs):
+        for key in data.keys():
+            values = data[key]
+            #'buffer_size':     { 'name': 'buffer-size',     'type': 'num',  'dashes': 2, 'equal': True  },
+            name   = values['name']
+            type   = values['type']
+            dashes = values['dashes']
+            equal  = values['equal']
+            res    = kwargs.get(key, None)
+            self.parse(name, type, dashes, equal, res)
+
     def getCmd(self):
         cmd = []
         for pair in self.pairs:
@@ -159,39 +181,19 @@ class jellyCount():
         parameter = parameters()
         parameter.append(exe,           True,   'bool')
         parameter.append(function,      True,   'bool')
+        parameter.append('--output=',   output, 'text')
 
-
-        params = 
-        {
-            'output':          {},
-            'buffer_size':     {}, 
-            'out_counter_len': {}, 
-            'out_buffer_size': {}, 
-            'verbose':         {}
+        params = {
+            #'output':          { 'name': 'output',          'type': 'text', 'dashes': 2, 'equal': True  },
+            'buffer_size':     { 'name': 'buffer-size',     'type': 'num',  'dashes': 2, 'equal': True  }, 
+            'out_counter_len': { 'name': 'out-counter-len', 'type': 'num',  'dashes': 2, 'equal': True  }, 
+            'out_buffer_size': { 'name': 'out-buffer-size', 'type': 'num',  'dashes': 2, 'equal': True  }, 
+            'verbose':         { 'name': 'verbose',         'type': 'bool', 'dashes': 2, 'equal': False }
         }
 
 
-        parameter.append('--output=',   output, 'text')
-
-
-        buffer_size = kwargs.get('buffer_size', None)
-        if buffer_size      is not None:
-            parameter.append('--buffer-size=',    buffer_size,      'num') 
-
-
-        out_counter_len = kwargs.get('out_counter_len', None)
-        if out_counter_len is not None:
-            parameter.append('--out-counter-len=', out_counter_len, 'num')
-
-        out_buffer_size = kwargs.get('out_buffer_size', None)
-        if out_buffer_size  is not None:
-            parameter.append('--out-buffer-size=', out_buffer_size, 'num') 
-
-        verbose = kwargs.get('verbose', False)
-        if verbose:
-            parameter.append('--verbose',          verbose,         'bool') 
-
-        parameter.append(input,         True,   'glob')
+        parameter.parseList(params, kwargs)
+        parameter.append(input,      True,   'glob')
 
         self.parameter = parameter
         self.cmd       = parameter.getCmd()
