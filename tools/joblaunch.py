@@ -214,6 +214,7 @@ class Job:
 
     def __call__(self):
         assert not self.predecessors
+        print " CALL "
         logging.info("%s started %s", self.id, threading.currentThread().name)
         begin       = time.time()
         self.ret    = 255
@@ -326,14 +327,14 @@ class Job:
                             #sys.stderr.write("LINE<2> "+str(stdErr))
                             Job.outputFileWriter.writelnErr(self.id, str(stdErr))
     
-                        #print "WAITING"
+                        print "JOB :: " + self.id + " :: WAITING"
                         self.ret = p.wait()
                         if self.ret:
                             print "JOB :: " + self.id + " :: CMD " + str(cmd) + " [" + cmdFinal + "] :: RETURNED: " + str(self.ret) + " THEREFORE FAILED "
                             self.status = FAILED
                             self.error  = self.id + " :: FAILED TO RUN " + cmdFinal + " :: RETURNED: " + str(self.ret) + " THEREFORE FAILED "
                             return
-                        #print "FINISHED"
+                        print "JOB :: " + self.id + " :: FINISHED"
     
                         #print "FINISHED RUNNING CMD " + cmdFinal + " WRITING"
                         #Job.outputFileWriter.write(self.id, p.stdout)
@@ -366,6 +367,7 @@ class Job:
         print "JOB :: " + self.id + " :: REACHED END. FINISHING WITH STATUS " + str(self.status) + " " + str(self.ret)
         self.status = FINISH
         self.ret    = 0
+        return
 
 class Core(threading.Thread):
     """
@@ -377,6 +379,7 @@ class Core(threading.Thread):
         super(Core, self).__init__()
         self.queue       = queue
         self.numJobsLeft = numJobsLeft
+        self.seen        = []
 
     def run(self):
         """
@@ -384,21 +387,28 @@ class Core(threading.Thread):
         """
         #while self.numJobsLeft.decrement():
         while self.queue.qsize():
-            #print "CORE :: RUN :: THERE ARE JOBS LEFT: " + str(self.queue.qsize())
-            job = self.queue.get()
-            self.last = job
-            #print "CORE :: RUN ::  JUST GOT JOB " + str(job) + " RUNNING NOW"
-            job()
-            #print "CORE :: RUN ::  FINISHED. CHECKING. RES: " + str(job.ret)
-            
-            if not job.ret:
-                self.__addPreparedJobsToQueue(job)
-                #print "CORE :: RUN ::  QUEUE CORRECTED"
-                self.numJobsLeft.decrement()
+            print "CORE :: RUN :: THERE ARE JOBS LEFT: " + str(self.queue.qsize())
+            job       = self.queue.get()
+            if job not in self.seen:
+                self.seen.append(job)
+                #self.last = job
+                print "CORE :: RUN ::  JUST GOT JOB " + str(job) + " RUNNING NOW"
+                job()
+                print "CORE :: RUN ::  FINISHED. CHECKING. RES: " + str(job.ret)
+                
+                if not job.ret:
+                    self.__addPreparedJobsToQueue(job)
+                    #print "CORE :: RUN ::  QUEUE CORRECTED"
+                    self.numJobsLeft.decrement()
+                    self.queue.task_done()
+                else:
+                    print "CORE :: RUN ::  QUEUE NOT CORRECTED. JOB " + job.getId() + " RETURNED " + str(job.ret) + " STATUS " + str(job.getStatus())
+                    self.numJobsLeft.decrement()
+                    self.queue.task_done()
+                    pass
             else:
-                print "CORE :: RUN ::  QUEUE NOT CORRECTED. JOB " + job.getId() + " RETURNED " + str(job.ret) + " STATUS " + str(job.getStatus())
-                pass
-        #print "CORE :: RUN :: FINISHED RUNNING"
+                self.numJobsLeft.decrement()
+        print "CORE :: RUN :: FINISHED RUNNING"
 
     def __addPreparedJobsToQueue(self, job):
         """
@@ -588,12 +598,12 @@ def start(jobs, numThreads):
         maxThreads = len(jobs)
 
     print "START :: CREATING THREADS " + str(maxThreads)
-    for i in range(maxThreads):
+    #for i in range(maxThreads):
         #print "START :: FOR I " + str(i) + " IN RANGE " + str(numThreads)
-        core = Core(jobsQueue, numJobsLeft)
-        cores.append(core)
-        core.start()
-        time.sleep(1)
+    core = Core(jobsQueue, numJobsLeft)
+    cores.append(core)
+    core.start()
+    time.sleep(1)
     print "START :: THREADS CREATED"
 
     print "START :: FINISHED RUNNING. JOINING CORES"
@@ -608,8 +618,9 @@ def start(jobs, numThreads):
 
     for core in cores:
         #print "START ::   JOINING " + str(core)
-        core.join()
+        #core.join()
         #print "START ::   JOINED  " + str(core)
+        pass
     print "START ::   FINISHED JOINING "
     pass
 
