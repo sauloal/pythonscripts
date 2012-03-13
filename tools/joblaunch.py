@@ -207,7 +207,7 @@ class Job:
         self.successors   = set()
         #saulo
         self.status       = NOT_RUN
-        self.selfTester   = kwargs.get('selfTest', self.getStatus)
+        self.selfTester   = kwargs.get('selfTester', self)
         self.priority     = kwargs.get('priority', getPriority())
         self.deps         = kwargs.get('deps',     [])
         self.ret          = -1
@@ -222,8 +222,12 @@ class Job:
         res         = self.__launch()
         end         = time.time()
         logging.info("%s finished %f", self.id, end - begin)
-        self.status = self.selfTest()
+        if self.status == FINISH:
+            if self.selfTester:
+                self.status = self.selfTester.selfTester()
 
+    def selfTester(self):
+        pass
 
     def getStatus(self):
         return self.status
@@ -245,9 +249,6 @@ class Job:
 
     def getId(self):
         return self.id
-
-    def selfTest(self):
-        return self.selfTester()
 
     def __repr__(self):
         return "Job %s" % self.id

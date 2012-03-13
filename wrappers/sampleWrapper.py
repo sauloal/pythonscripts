@@ -31,6 +31,12 @@ class sampleWrapper():
         print "EXIT STATUS ORIGINAL " + str(self.exitStatus) + " NEW " + str(0)
         self.exitStatus = 0
         return (self.exitStatus, self.status)
+        
+    def selfTester(self):
+        print "SAMPLE WRAPPER"
+        print "  SELF TESTING: "
+        print self
+        return joblaunch.FINISH
 
 
 
