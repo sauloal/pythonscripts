@@ -1,7 +1,46 @@
 #!/usr/bin/python
 __version__ = "0.11.01"
 __autor__   = "Yassin Ezbakhe <yassin@ezbakhe.es> | Saulo Aflitos <sauloal@gmail.com>"
-#http://code.google.com/p/joblaunch/
+"""
+    Based in the works of Yassin Ezbakhe ( http://code.google.com/p/joblaunch/ )
+    and extrapolated to be used as a module. It now has extended capabilities
+    such as:
+        - stopping branched which have failed to run
+        - graphical output of the result
+        - standard status nomenclature
+        - allows to run classes, functions or strings
+        - priority is still the order of the parameters but now it can be
+            obtained automatically
+        - the number of threads is now limited to the number of requests if
+            there are not enough requests
+            
+    To initialize the mainLib function takes a list of jobs and parameters (
+        the same from command line ).
+    Each job should be initialized as such:
+                        NAME  LIST OF classes/function/strings  PARAMETERS
+    f0 = joblaunch.Job('f0', [sw                      ],        selfTester=sw )
+    f1 = joblaunch.Job('f1', [sampleWrapper.sample    ],        deps=[f0] )
+    f2 = joblaunch.Job('f2', [['sleep  3;', 'echo f2']],        deps=[f0] )
+    
+    classes have to be callable:
+        compulsory:
+            def __call__(self, writeOut, writeErr, status, err)
+                where:
+                    writeOut FH prints to stdout
+                    writeErr FH prints to stderr
+                    status contains the current status of the process
+                    err contains the current error message
+                status and err should be returned 
+        optionally:
+            def selfTest(self)
+    functions mush receive the same parameters:
+        def sample(writeOut, writeErr, status, err)
+    strings 
+    
+    
+"""
+
+
 
 import sys
 import time
@@ -268,7 +307,7 @@ class Job:
             #print "JOB :: " + self.id + " :: CMD " + str(cmd)
             if   isinstance(cmd, types.FunctionType):
                 print "JOB :: " + self.id + " :: CMD " + str(cmd) + " :: IS FUNCTION"
-                (self.ret, self.status) = cmd(Job.outputFileWriter.writelnOut, Job.outputFileWriter.writelnErr, self.status, self.error)
+                (self.ret, self.status, self.err) = cmd(Job.outputFileWriter.writelnOut, Job.outputFileWriter.writelnErr, self.status, self.error)
                 if self.ret:
                     print "JOB :: " + self.id + " :: CMD " + str(cmd) + " :: RETURNED: " + str(self.ret) + " THEREFORE FAILED "
                     self.status = FAILED
@@ -276,7 +315,7 @@ class Job:
                     return self.ret
             elif isinstance(cmd, types.InstanceType):
                 print "JOB :: " + self.id + " :: CMD " + str(cmd) + " :: IS INSTANCE"
-                (self.ret, self.status) = cmd(Job.outputFileWriter.writelnOut, Job.outputFileWriter.writelnErr, self.status, self.error)
+                (self.ret, self.status, self.err) = cmd(Job.outputFileWriter.writelnOut, Job.outputFileWriter.writelnErr, self.status, self.error)
                 if self.ret:
                     print "JOB :: " + self.id + " :: CMD " + str(cmd) + " :: RETURNED: " + str(self.ret) + " THEREFORE FAILED "
                     self.status = FAILED
@@ -284,7 +323,7 @@ class Job:
                     return self.ret
             elif isinstance(cmd, types.MethodType):
                 print "JOB :: " + self.id + " :: CMD " + str(cmd) + " :: IS METHOD"
-                (self.ret, self.status) = cmd(Job.outputFileWriter.writelnOut, Job.outputFileWriter.writelnErr, self.status, self.error)
+                (self.ret, self.status, self.err) = cmd(Job.outputFileWriter.writelnOut, Job.outputFileWriter.writelnErr, self.status, self.error)
                 if self.ret:
                     print "JOB :: " + self.id + " :: CMD " + str(cmd) + " :: RETURNED: " + str(self.ret) + " THEREFORE FAILED "
                     self.status = FAILED
