@@ -82,8 +82,11 @@ def sample(messaging):
 #sample = sampleWrapper("watever0")
 
 
+exe="/home/aflit001/bin/jellyfish"
+
+
 class jellyCount():
-    def __init__(self, name, input, buffer_size=10000000, output="mer_counts_merged.jf", out_counter_len=4, out_buffer_size=10000000, verbose=False):
+    def __init__(self, input=None, output=None, buffer_size=10000000, out_counter_len=4, out_buffer_size=10000000, verbose=False):
         """
         Usage: jellyfish merge [options] input:c_string+
 
@@ -99,6 +102,24 @@ class jellyCount():
         -h, --help                               This message
         -V, --version                            Version
         """
+        assert input  is not None
+        assert output is not None
+
+        self.function        = "count"
+        parameters = {}
+        parameter{self.function} = ""
+        parameter{input}         = ""
+        parameter{'--buffer-size='} = buffer_size if buffer_size 
+        self.buffer_size     = buffer_size
+        self.output          = output
+        self.out_counter_len = out_counter_len
+        self.out_buffer_size = out_buffer_size
+        self.verbose         = verbose
+        self.output          = input + "_mer_counts"
+
+    def genCmd(self):
+        cmd = [exe, self.function, "--output='"+self.output+"'"]
+        
         
 class jellyStats():
     def __init__(self, input, lower_count=None, upper_count=None, output="-", verbose=False):
