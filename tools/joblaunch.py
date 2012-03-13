@@ -383,7 +383,7 @@ class Job:
         pass
 
     def getStatus(self):
-        return self.messaging.status or -1
+        return self.messaging.status
 
     def getReturn(self):
         return self.messaging.exitCode
