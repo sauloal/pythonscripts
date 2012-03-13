@@ -214,7 +214,6 @@ class Job:
 
     def __call__(self):
         assert not self.predecessors
-        print " CALL "
         logging.info("%s started %s", self.id, threading.currentThread().name)
         begin       = time.time()
         self.ret    = 255
@@ -225,10 +224,12 @@ class Job:
         logging.info("%s finished %f", self.id, end - begin)
         if self.status == FINISH:
             if self.selfTester:
-                self.status = self.selfTester.selfTester()
+                self.status = self.selfTester.selfTest()
+        return res
 
-    def selfTester(self):
-        pass
+    def selfTest(self):
+        #print "  LOCAL SELF TESTER"
+        return self.status
 
     def getStatus(self):
         return self.status
@@ -255,10 +256,10 @@ class Job:
         return "Job %s" % self.id
 
     def __launch(self):
-        print "JOB :: " + self.id + " :: COMMANDS " + str(self.commands) + " (" + str(len(self.commands))+ ")"
+        #print "JOB :: " + self.id + " :: COMMANDS " + str(self.commands) + " (" + str(len(self.commands))+ ")"
         # IMPORTANT: In UNIX, Popen uses /bin/sh, whatever the user shell is
         for cmd in self.commands:
-            print "JOB :: " + self.id + " :: CMD " + str(cmd)
+            #print "JOB :: " + self.id + " :: CMD " + str(cmd)
             if   isinstance(cmd, types.FunctionType):
                 print "JOB :: " + self.id + " :: CMD " + str(cmd) + " :: IS FUNCTION"
                 (self.ret, self.status) = cmd(Job.outputFileWriter.writelnOut, Job.outputFileWriter.writelnErr, self.status, self.error)
@@ -288,7 +289,7 @@ class Job:
                 return
             elif isinstance(cmd, types.ListType):
                 cmdFinal = ""
-                print "JOB :: " + self.id + " :: CMD " + str(cmd) + " :: IS LIST"
+                #print "JOB :: " + self.id + " :: CMD " + str(cmd) + " :: IS LIST"
 
                 for part in cmd:
                     #print "  PART  '" + str(part) + "'"
@@ -327,14 +328,14 @@ class Job:
                             #sys.stderr.write("LINE<2> "+str(stdErr))
                             Job.outputFileWriter.writelnErr(self.id, str(stdErr))
     
-                        print "JOB :: " + self.id + " :: WAITING"
+                        #print "WAITING"
                         self.ret = p.wait()
                         if self.ret:
                             print "JOB :: " + self.id + " :: CMD " + str(cmd) + " [" + cmdFinal + "] :: RETURNED: " + str(self.ret) + " THEREFORE FAILED "
                             self.status = FAILED
                             self.error  = self.id + " :: FAILED TO RUN " + cmdFinal + " :: RETURNED: " + str(self.ret) + " THEREFORE FAILED "
                             return
-                        print "JOB :: " + self.id + " :: FINISHED"
+                        #print "FINISHED"
     
                         #print "FINISHED RUNNING CMD " + cmdFinal + " WRITING"
                         #Job.outputFileWriter.write(self.id, p.stdout)
@@ -367,7 +368,6 @@ class Job:
         print "JOB :: " + self.id + " :: REACHED END. FINISHING WITH STATUS " + str(self.status) + " " + str(self.ret)
         self.status = FINISH
         self.ret    = 0
-        return
 
 class Core(threading.Thread):
     """
@@ -379,7 +379,6 @@ class Core(threading.Thread):
         super(Core, self).__init__()
         self.queue       = queue
         self.numJobsLeft = numJobsLeft
-        self.seen        = []
 
     def run(self):
         """
@@ -387,28 +386,21 @@ class Core(threading.Thread):
         """
         #while self.numJobsLeft.decrement():
         while self.queue.qsize():
-            print "CORE :: RUN :: THERE ARE JOBS LEFT: " + str(self.queue.qsize())
-            job       = self.queue.get()
-            if job not in self.seen:
-                self.seen.append(job)
-                #self.last = job
-                print "CORE :: RUN ::  JUST GOT JOB " + str(job) + " RUNNING NOW"
-                job()
-                print "CORE :: RUN ::  FINISHED. CHECKING. RES: " + str(job.ret)
-                
-                if not job.ret:
-                    self.__addPreparedJobsToQueue(job)
-                    #print "CORE :: RUN ::  QUEUE CORRECTED"
-                    self.numJobsLeft.decrement()
-                    self.queue.task_done()
-                else:
-                    print "CORE :: RUN ::  QUEUE NOT CORRECTED. JOB " + job.getId() + " RETURNED " + str(job.ret) + " STATUS " + str(job.getStatus())
-                    self.numJobsLeft.decrement()
-                    self.queue.task_done()
-                    pass
-            else:
+            #print "CORE :: RUN :: THERE ARE JOBS LEFT: " + str(self.queue.qsize())
+            job = self.queue.get()
+            self.last = job
+            #print "CORE :: RUN ::  JUST GOT JOB " + str(job) + " RUNNING NOW"
+            job()
+            #print "CORE :: RUN ::  FINISHED. CHECKING. RES: " + str(job.ret)
+            
+            if not job.ret:
+                self.__addPreparedJobsToQueue(job)
+                #print "CORE :: RUN ::  QUEUE CORRECTED"
                 self.numJobsLeft.decrement()
-        print "CORE :: RUN :: FINISHED RUNNING"
+            else:
+                #print "CORE :: RUN ::  QUEUE NOT CORRECTED. JOB " + job.getId() + " RETURNED " + str(job.ret) + " STATUS " + str(job.getStatus())
+                pass
+        #print "CORE :: RUN :: FINISHED RUNNING"
 
     def __addPreparedJobsToQueue(self, job):
         """
@@ -429,7 +421,7 @@ class Core(threading.Thread):
                     #print "CORE :: RUN :: __addPreparedJobsToQueue ::      PREDECESSORS STILL TO BE RUN TO THIS JOB. WAITING"
                     pass
         else:
-            print "CORE :: RUN :: __addPreparedJobsToQueue :: JOB "+job.getId()+" RETURNED "+str(job.ret)+" BUT STATUS IS NOT FINISHED. STATUS: " + str(job.getStatus())
+            #print "CORE :: RUN :: __addPreparedJobsToQueue :: JOB "+job.getId()+" RETURNED "+str(job.ret)+" BUT STATUS IS NOT FINISHED. STATUS: " + str(job.getStatus())
             pass
 
 def check(condition, errorMsg):
@@ -598,12 +590,12 @@ def start(jobs, numThreads):
         maxThreads = len(jobs)
 
     print "START :: CREATING THREADS " + str(maxThreads)
-    #for i in range(maxThreads):
+    for i in range(maxThreads):
         #print "START :: FOR I " + str(i) + " IN RANGE " + str(numThreads)
-    core = Core(jobsQueue, numJobsLeft)
-    cores.append(core)
-    core.start()
-    time.sleep(1)
+        core = Core(jobsQueue, numJobsLeft)
+        cores.append(core)
+        core.start()
+        time.sleep(1)
     print "START :: THREADS CREATED"
 
     print "START :: FINISHED RUNNING. JOINING CORES"
@@ -614,13 +606,12 @@ def start(jobs, numThreads):
         time.sleep(1)
 
     time.sleep(1)
-    print "START :: FINISHED RUNNING. CORES JOINED"
+    print "START :: FINISHED RUNNING. JOINING CORES"
 
     for core in cores:
         #print "START ::   JOINING " + str(core)
-        #core.join()
+        core.join()
         #print "START ::   JOINED  " + str(core)
-        pass
     print "START ::   FINISHED JOINING "
     pass
 
@@ -713,6 +704,7 @@ def printG(G, jobs):
             depNode = nodes[depId]
             graph.add_edge(pydot.Edge(depNode, node))
 
+
     #    str = """
     #digraph G {
     #    size ="4,4";
@@ -759,7 +751,6 @@ def printG(G, jobs):
     #}
     graph.write_png('joblaunch.png')
 
-
 def main():
     print "RUNNING MAIN"
     options   = parseArguments(sys.argv[1:])
@@ -790,8 +781,7 @@ def main():
     # begin working
     start(jobs, options.numThreads)
     
-    gGraph = printG(G, jobs)
-    print gGraph
+    printG(G, jobs)
 
 
 

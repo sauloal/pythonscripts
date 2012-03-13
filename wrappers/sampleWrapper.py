@@ -32,7 +32,7 @@ class sampleWrapper():
         self.exitStatus = 0
         return (self.exitStatus, self.status)
         
-    def selfTester(self):
+    def selfTest(self):
         print "SAMPLE WRAPPER"
         print "  SELF TESTING: "
         print self
