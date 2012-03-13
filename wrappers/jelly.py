@@ -101,32 +101,41 @@ class parameters():
         self.pairs[pos] = pair
 
     def append(self, name, value, type):
+        #print " appending name " + str(name) + " value " + str(value) + " type " + str(type)
         pair       = self.paramPair()
         pair.name  = name
         pair.value = value
         pair.type  = type 
         self.pairs.append(pair)
 
+
+
     def parse(self, name, type, dashes, equal, res):
-        str    = '-'*dashes + name
+        text    = '-'*dashes
+        text   += name
 
         if equal:
-            str += '='
-
+            text += '='
+        else:
+            text += ' '
 
         if res is not None:
-            self.append(str, res, type)
+            self.append(text, res, type)
+        else:
+            #print "RES IS NONE FOR NAME " + str(name)
+            #exit(1)
+            pass
 
 
     def parseList(self, data, kwargs):
         for key in data.keys():
             values = data[key]
             #'buffer_size':     { 'name': 'buffer-size',     'type': 'num',  'dashes': 2, 'equal': True  },
-            name   = values['name']
-            type   = values['type']
-            dashes = values['dashes']
-            equal  = values['equal']
-            res    = kwargs.get(key, None)
+            name   = values.get('name',   None)
+            type   = values.get('type',   None)
+            dashes = values.get('dashes', None)
+            equal  = values.get('equal',  None)
+            res    = kwargs.get(key,      None)
             self.parse(name, type, dashes, equal, res)
 
     def getCmd(self):
@@ -141,8 +150,10 @@ class parameters():
                 cmd.append(name + "'" + str(value) + "'")
             elif type == 'num':
                 cmd.append(name + str(value))
-            elif type == 'glob':
+            elif type == 'name':
                 cmd.append(name)
+            elif type == 'value':
+                cmd.append(value)
             else:
                 print "type " + str(type) + " is unknown"
         return " ".join(cmd)
@@ -183,17 +194,16 @@ class jellyCount():
         parameter.append(function,      True,   'bool')
 
         params = {
-            #'output':          { 'name': 'output',          'type': 'text', 'dashes': 2, 'equal': True  },
             'buffer_size':     { 'name': 'buffer-size',     'type': 'num',  'dashes': 2, 'equal': True  }, 
             'out_counter_len': { 'name': 'out-counter-len', 'type': 'num',  'dashes': 2, 'equal': True  }, 
             'out_buffer_size': { 'name': 'out-buffer-size', 'type': 'num',  'dashes': 2, 'equal': True  }, 
             'verbose':         { 'name': 'verbose',         'type': 'bool', 'dashes': 2, 'equal': False }
         }
 
-
         parameter.parseList(params, kwargs)
-        #def parse(self, name,    type,   dashes, equal, res):
-        parameter.parse('output', 'glob', 2,      True, output)
+        #def parse(self, name,    type,     dashes, equal, res):
+        parameter.parse( 'output', 'text',  2,      True,  output )
+        parameter.parse( '',       'value', 0,      False, input  )
 
         self.parameter = parameter
         self.cmd       = parameter.getCmd()
