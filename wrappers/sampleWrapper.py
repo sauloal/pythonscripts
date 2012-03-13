@@ -52,9 +52,12 @@ class sampleWrapper():
         print "EXIT STATUS NEW " + str(self.messaging.exitCode)
         
     def selfTest(self, messaging):
-        print "SAMPLE WRAPPER"
-        print "  SELF TESTING: "
-        print self
+        messaging.error.append("SAMPLE WRAPPER")
+        messaging.error.append("  SAMPLE SELF TEST")
+        messaging.error.append("    " + str(self))
+        messaging.stdout(self.name, "SAMPLE WRAPPER\n")
+        messaging.stderr(self.name, "  SELF TESTING\n")
+        messaging.stdout(self.name, str(self) + "\n")
         messaging.status = joblaunch.FINISH
 
 

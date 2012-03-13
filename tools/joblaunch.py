@@ -24,12 +24,13 @@ __autor__   = "Yassin Ezbakhe <yassin@ezbakhe.es> | Saulo Aflitos <sauloal@gmail
     
     classes have to be callable:
         compulsory:
-            def __call__(self, writeOut, writeErr, status, err)
-                where:
-                    writeOut FH prints to stdout
-                    writeErr FH prints to stderr
-                    status contains the current status of the process
-                    err contains the current error message
+            def __call__(self, messaging)
+                where messaging contains:
+                    stdout   = function prints to stdout
+                    stderr   = function prints to stderr
+                    status   = contains the current status of the process
+                    exitCode = contains the current error message
+                    error    = LIST containing all taceback of errors
                 status and err should be returned 
         optionally:
             def selfTest(self)
@@ -68,12 +69,12 @@ debug           = True
 global_priority = 0
 
 class programMessaging():
-    def __init__(self, stdout, stderr, status, error, exitCode):
-        self.stdout   = stdout
-        self.stderr   = stderr
-        self.status   = status
-        self.error    = error
-        self.exitCode = exitCode
+    def __init__(self, stdout, stderr, stdoutInt, stderrInt, status, error, exitCode):
+        self.stdout    = stdout
+        self.stderr    = stderr
+        self.status    = status
+        self.error     = error
+        self.exitCode  = exitCode
 
 def getPriority():
     global global_priority
@@ -242,6 +243,43 @@ class OutputFileWriter:
     def close(self):
         self.outputFile.close()
 
+class OutputJobWriter():
+    def __init__(self, className, writer):
+        self.className = className
+        self.writer    = writer
+        
+    def write(self, jobId, stdout, **kwargs):
+        internal = kwargs.get('internal', None)
+        if internal:
+            self.writer.write(jobId, stdout)
+        else:
+            self.writer.write(self.className + " :: " + jobId, stdout)
+        
+    def writeln(self, jobId, stream, line, **kwargs):
+        internal = kwargs.get('internal', None)
+        if internal:
+            pass
+        else:
+            self.writer.writeln(self.className + " :: " + jobId, stream, line)
+    
+    def writelnOut(self, jobId, line, **kwargs):
+        internal = kwargs.get('internal', None)
+        if internal:
+            pass
+        else:
+            self.writer.writelnOut(self.className + "<1> :: " + jobId, line)
+        
+    def writelnErr(self, jobId, line, **kwargs):
+        internal = kwargs.get('internal', None)
+        if internal:
+            pass
+        else:
+            self.writer.writelnErr(self.className + "<2> :: " + jobId, line)
+        
+    def close(self):
+        self.writer.close()
+        
+
 class Job:
     """
     Class that encapsulates a job. Each job consists of an id, a priority
@@ -271,8 +309,10 @@ class Job:
         assert not self.predecessors
         logging.info("%s started %s", self.id, threading.currentThread().name)
         begin       = time.time()
-        self.messaging.stdout   = Job.outputFileWriter.writelnOut
-        self.messaging.stderr   = Job.outputFileWriter.writelnErr
+        self.fileWritter         = OutputJobWriter(self.id, Job.outputFileWriter)
+        self.messaging.stdout    = self.fileWritter.writelnOut
+        self.messaging.stderr    = self.fileWritter.writelnErr
+        
         self.messaging.exitCode = 256
         self.messaging.status   = RUNNING
         res         = self.__launch()
@@ -292,6 +332,9 @@ class Job:
 
     def getReturn(self):
         return self.messaging.exitCode
+    
+    def getError(self):
+        return "\n".join(self.messaging.error)
 
     def getCommands(self):
         return self.commands
@@ -373,11 +416,11 @@ class Job:
     
                         if stdOut:
                             #sys.stdout.write("LINE<1> "+str(stdOut))
-                            self.messaging.stdout(self.id, str(stdOut))
+                            self.messaging.stdout(self.id, str(stdOut), internal=True)
     
                         if stdErr:
                             #sys.stderr.write("LINE<2> "+str(stdErr))
-                            self.messaging.stderr(self.id, str(stdErr))
+                            self.messaging.stderr(self.id, str(stdErr), internal=True)
     
                         #print "WAITING"
                         self.messaging.exitCode = p.wait()
@@ -452,6 +495,7 @@ class Core(threading.Thread):
                 #print "CORE :: RUN ::  QUEUE CORRECTED"
                 self.numJobsLeft.decrement()
             else:
+                print job.getError()
                 #print "CORE :: RUN ::  QUEUE NOT CORRECTED. JOB " + job.getId() + " RETURNED " + str(job.ret) + " STATUS " + str(job.getStatus())
                 pass
         #print "CORE :: RUN :: FINISHED RUNNING"
