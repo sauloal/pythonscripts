@@ -172,7 +172,7 @@ class jellyCount():
 
         function  = "count"
 
-        
+
 
         output = kwargs.get('output', None)
         if output is None:
@@ -181,7 +181,6 @@ class jellyCount():
         parameter = parameters()
         parameter.append(exe,           True,   'bool')
         parameter.append(function,      True,   'bool')
-        parameter.append('--output=',   output, 'text')
 
         params = {
             #'output':          { 'name': 'output',          'type': 'text', 'dashes': 2, 'equal': True  },
@@ -193,7 +192,8 @@ class jellyCount():
 
 
         parameter.parseList(params, kwargs)
-        parameter.append(input,      True,   'glob')
+        #def parse(self, name,    type,   dashes, equal, res):
+        parameter.parse('output', 'glob', 2,      True, output)
 
         self.parameter = parameter
         self.cmd       = parameter.getCmd()
