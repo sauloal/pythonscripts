@@ -37,40 +37,43 @@ from tools import *
 
 class sampleWrapper():
     def __init__(self, name):
-        self.name       = name
-        self.exitStatus = 255 #not run
+        self.name     = name
+        self.exitCode = 255 #not run
 
-    def __call__(self, writeOut, writeErr, status, err):
-        self.status     = status
-        self.err        = err
-        self.writeOut   = writeOut
-        self.writeErr   = writeErr
+    def __call__(self, messaging):
+        self.messaging = messaging
 
         print "RUNNING WRAPPER NAMED " + self.name
-        self.status = joblaunch.FINISH
-        print "GOT STATUS " + str(status) + " RETURNING STATUS " + str(self.status)
-        print "EXIT STATUS ORIGINAL " + str(self.exitStatus) + " NEW " + str(0)
-        self.exitStatus = 0
-        return (self.exitStatus, self.status, self.err)
+        print "GOT STATUS " + str(self.messaging.status)
+        self.messaging.status = joblaunch.FINISH
+        print "RETURNING STATUS " + str(self.messaging.status)
+        print "EXIT STATUS ORIGINAL " + str(self.messaging.exitCode)
+        self.messaging.exitCode = 0
+        print "EXIT STATUS NEW " + str(self.messaging.exitCode)
         
-    def selfTest(self):
+    def selfTest(self, messaging):
         print "SAMPLE WRAPPER"
         print "  SELF TESTING: "
         print self
-        return joblaunch.FINISH
+        messaging.status = joblaunch.FINISH
 
 
 
-def sample(writeOut, writeErr, status, err):
-    exitStatus = 255 #not run
+def sample(messaging):
     name       = "SaMpLeFuNcTiOn"
 
     print "RUNNING SAMPLE FUNCTION NAMED " + name
-    status = joblaunch.FINISH
-    print "GOT STATUS " + str(status) + " RETURNING STATUS " + str(status)
-    print "EXIT STATUS ORIGINAL " + str(exitStatus) + " NEW " + str(0)
-    exitStatus=0
-    return (exitStatus, status, err)
+
+    print "GOT STATUS " + str(messaging.status)
+    messaging.status = joblaunch.FINISH
+    print "RETURNING STATUS " + str(messaging.status)
+
+    
+    print "EXIT STATUS ORIGINAL " + str(messaging.exitCode)
+    messaging.exitCode = 255 #not run
+    messaging.exitCode = 0
+    print "EXIT STATUS NEW " + str(messaging.exitCode)
+
 
 #sample = sampleWrapper("watever0")
 
