@@ -37,8 +37,6 @@ __autor__   = "Yassin Ezbakhe <yassin@ezbakhe.es> | Saulo Aflitos <sauloal@gmail
     functions mush receive the same parameters:
         def sample(writeOut, writeErr, status, err)
     strings 
-    
-    
 """
 
 
@@ -55,11 +53,11 @@ import Queue
 import traceback
 import types
 
-NOT_RUN         = 0
-RUNNING         = 1
-FAILED          = 2
-FINISH          = 3
-STATUSES = {}
+NOT_RUN           = 0
+RUNNING           = 1
+FAILED            = 2
+FINISH            = 3
+STATUSES          = {}
 STATUSES[NOT_RUN] = "'NOT RUN'"
 STATUSES[RUNNING] = "'RUNNING'"
 STATUSES[FAILED ] = "'FAILED'"
@@ -74,30 +72,53 @@ class programMessaging():
     needed to report execution status. As it can be passed as reference, any sub-
     process can update the parents result without the need to return anything
     """
-    def __init__(self, id, fileWriter, status, exitCode):
+    def __init__(self, id, status, exitCode):
         """
         Initialized the id (which will be printed before any message)
+        the satus (defined in the header), and the exit code. Create a empty
+        error messages list
         """
         self.id          = id
-        self.fileWritter = fileWriter
-        self.jobWritter  = OutputJobWriter(id, fileWriter)
         self.status      = status
-        self.error       = []
         self.exitCode    = exitCode
-        
+        self.error       = []
+    
+    def setFileWriter(self, fileWriter):
+        """
+        sets a filewriter and creates a job writer which prepends each message
+        with the parent id
+        """
+        self.fileWritter = fileWriter
+        self.jobWritter  = OutputJobWriter(self.id, fileWriter)
+    
     def addError(self, message):
+        """
+        append de error array with a message prepended with the id
+        """
         self.error.append(self.id + " :: " + message)
         
     def getError(self):
+        """
+        get the error string
+        """
         return "\n".join(self.error)
         
     def stdout(self, id, message, **kwargs):
+        """
+        prints a message to stdout prepending with the parent id and the caller id
+        """
         self.jobWritter.writelnOut(id, message, **kwargs)
         
     def stderr(self, id, message, **kwargs):
+        """
+        prints a message to stderr prepending with the parent id and the caller id
+        """
         self.jobWritter.writelnErr(id, message, **kwargs)
 
 def getPriority():
+    """
+    counter to give priorities to the jobs in the order they are created
+    """
     global global_priority
     global_priority       += 1
     return global_priority - 1
@@ -244,6 +265,9 @@ class OutputFileWriter:
             self.outputFile.writelines(output)
 
     def writeln(self, jobId, stream, line):
+        """
+        Automatically prepend the message with jobid and stream
+        """
         if self.verbose:
             # this is very inefficient if there are too much lines to write
             #output = [ "RUNNING %s\n" % jobId ]
@@ -257,14 +281,26 @@ class OutputFileWriter:
             self.outputFile.writelines(output)
 
     def writelnOut(self, jobId, line):
+        """
+        Automatically prepend with the jobid and the stream out
+        """
         self.writeln(jobId, "<1>", line)
+
     def writelnErr(self, jobId, line):
+        """
+        Automatically prepend with the jobid and the stream err
+        """
         self.writeln(jobId, "<2>", line)
 
     def close(self):
         self.outputFile.close()
 
 class OutputJobWriter():
+    """
+    Wrapper to OutputFileWriter which stores the jobid and prepends it to the
+    job id of the caller (think subprocess) unless the named parameter "internal"
+    is passed
+    """
     def __init__(self, className, writer):
         self.className = className
         self.writer    = writer
@@ -311,7 +347,7 @@ class Job:
         256 not launched
     """
 
-    outputFileWriter = None
+    outputFileWriter = OutputFileWriter
 
     def __init__(self, id_, commandsList, **kwargs):
         self.id           = id_
@@ -319,7 +355,7 @@ class Job:
         assert len(self.commands) > 0
         self.predecessors = set()
         self.successors   = set()
-
+        self.messaging    = programMessaging(self.id, NOT_RUN, -1)
         self.selfTester   = kwargs.get('selfTester', self)
         self.priority     = kwargs.get('priority', getPriority())
         self.deps         = kwargs.get('deps',     [])
@@ -329,7 +365,9 @@ class Job:
         assert not self.predecessors
         logging.info("%s started %s", self.id, threading.currentThread().name)
         begin                   = time.time()
-        self.messaging          = programMessaging(self.id, Job.outputFileWriter, NOT_RUN, -1)
+        
+        self.messaging.setFileWriter(Job.outputFileWriter)
+        
         self.messaging.exitCode = 256
         self.messaging.status   = RUNNING
         res                     = self.__launch()
@@ -496,26 +534,19 @@ class Core(threading.Thread):
 
     def run(self):
         """
-        Run in a thread while there are jobs left
+        Run in a thread while there are POSSIBLE jobs left
         """
-        #while self.numJobsLeft.decrement():
+
         while self.queue.qsize():
-            #print "CORE :: RUN :: THERE ARE JOBS LEFT: " + str(self.queue.qsize())
             job = self.queue.get()
             self.last = job
-            #print "CORE :: RUN ::  JUST GOT JOB " + str(job) + " RUNNING NOW"
             job()
-            #print "CORE :: RUN ::  FINISHED. CHECKING. RES: " + str(job.ret)
             
             if not job.getReturn():
                 self.__addPreparedJobsToQueue(job)
-                #print "CORE :: RUN ::  QUEUE CORRECTED"
                 self.numJobsLeft.decrement()
             else:
                 print job.getError()
-                #print "CORE :: RUN ::  QUEUE NOT CORRECTED. JOB " + job.getId() + " RETURNED " + str(job.ret) + " STATUS " + str(job.getStatus())
-                pass
-        #print "CORE :: RUN :: FINISHED RUNNING"
 
     def __addPreparedJobsToQueue(self, job):
         """
@@ -523,20 +554,15 @@ class Core(threading.Thread):
         to put in the queue the jobs that were waiting for it (sucessors) and
         are not waiting for any other job.
         """
-        #saulo
+
         if job.getStatus() == FINISH:
-            #print "CORE :: RUN :: __addPreparedJobsToQueue ::  STATUS IS FINISHED"
             for succ in job.successors:
-                #print "CORE :: RUN :: __addPreparedJobsToQueue ::    CHECKING SUCCESSOR " + str(succ) + " AND REMOVING CURRENT JOB"
                 succ.predecessors.remove(job)
                 if not succ.predecessors:
-                    #print "CORE :: RUN :: __addPreparedJobsToQueue ::      NOT PREDECESSORS TO THIS JOB. RUNNING"
                     self.queue.put(succ)
                 else:
-                    #print "CORE :: RUN :: __addPreparedJobsToQueue ::      PREDECESSORS STILL TO BE RUN TO THIS JOB. WAITING"
                     pass
         else:
-            #print "CORE :: RUN :: __addPreparedJobsToQueue :: JOB "+job.getId()+" RETURNED "+str(job.ret)+" BUT STATUS IS NOT FINISHED. STATUS: " + str(job.getStatus())
             pass
 
 def check(condition, errorMsg):
@@ -688,9 +714,6 @@ def createQueue(jobs):
     check(not q.empty(), "no initial job found to launch due to dependency cycles")
     return q
 
-#def checkOut():
-#    return FINISH
-
 def start(jobs, numThreads):
     """
     Launch threads and begin working. The function waits for all jobs to end.
@@ -706,7 +729,6 @@ def start(jobs, numThreads):
 
     print "START :: CREATING THREADS " + str(maxThreads)
     for i in range(maxThreads):
-        #print "START :: FOR I " + str(i) + " IN RANGE " + str(numThreads)
         core = Core(jobsQueue, numJobsLeft)
         cores.append(core)
         core.start()
@@ -724,11 +746,8 @@ def start(jobs, numThreads):
     print "START :: FINISHED RUNNING. JOINING CORES"
 
     for core in cores:
-        #print "START ::   JOINING " + str(core)
         core.join()
-        #print "START ::   JOINED  " + str(core)
     print "START ::   FINISHED JOINING "
-    pass
 
 def getCPUCount():
     """
@@ -787,6 +806,11 @@ def parseArguments(args):
     return options
 
 def printG(G, jobs):
+    """
+    Prints a png image of the process and the states they are
+    TODO:   Allow to change the name
+            Allow to append timestamp to create a series of snapshots
+    """
     #https://docs.google.com/viewer?url=http://www.graphviz.org/pdf/dotguide.pdf
     #http://pythonhaven.wordpress.com/2009/12/09/generating_graphs_with_pydot/
     import pydot
@@ -906,6 +930,10 @@ def main():
 # LIBRARY IMPLEMENTATION
 ###############
 def checkGraph(jobs, **kwargs):
+    """
+    Check if graph contains cycle
+    """
+    
     force      = kwargs.get('force')
     G = Graph()
 
@@ -929,6 +957,16 @@ def checkGraph(jobs, **kwargs):
 
 
 def mainLib(jobs, **kwargs):
+    """
+    takes a list of job classes and run them
+    accepts as kwargs:
+        verbose    - print job name before each line (unused now)
+        force      - execute even if there's cycle in the graph
+        numThreads - max number of threads
+        outputFile - output file name (default: stdout)
+        logFile    - log file name (default: none)
+    TODO: explain whole process
+    """
     print "RUNNING MAIN LIB"
     verbose    = kwargs.get('verbose',    False)
     force      = kwargs.get('force',      False)
@@ -968,12 +1006,12 @@ if __name__ == "__main__":
             f1 = Job('f1', [['sleep 1; echo f1']] )
             f2 = Job('f2', [['sleep 1; echo f2']] )
             f3 = Job('f3', [['sleep 1; echo f3']] )
-            l1 = Job('l1', [['sleep 1; echo l1']], checkOut, deps=[f1, f2, f3] )
+            l1 = Job('l1', [['sleep 1; echo l1']], deps=[f1, f2, f3] )
             f4 = Job('f4', [['sleep 1; echo f4']] )
             f5 = Job('f5', [['sleep 1; echo f5']] )
             f6 = Job('f6', [['sleep 1; echo f6']] )
-            l2 = Job('l2', [['sleep 1; echo l2']], checkOut, deps=[f4, f5, f6] )
-            d1 = Job('d1', [['sleep 1; echo d1']], checkOut, deps=[l1, l2] )
+            l2 = Job('l2', [['sleep 1; echo l2']], deps=[f4, f5, f6] )
+            d1 = Job('d1', [['sleep 1; echo d1']], deps=[l1, l2] )
 
             data = {'f1': f1,
                     'f2': f2,
