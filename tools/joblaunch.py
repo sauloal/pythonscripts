@@ -701,53 +701,52 @@ def printG(G, jobs):
             depNode = nodes[depId]
             graph.add_edge(pydot.Edge(depNode, node))
 
+    #    str = """
+    #digraph G {
+    #    size ="4,4";
+    #    main [shape=box]; /* this is a comment */
+    #    main -> parse [weight=8];
+    #    parse -> execute;
+    #    main -> init [style=dotted];
+    #    main -> cleanup;
+    #    execute -> { make_string; printf}
+    #    init -> make_string;
+    #    edge [color=red]; // so is this
+    #    main -> printf [style=bold,label="100 times"];
+    #    make_string [label="make a\\nstring"];
+    #    node [shape=box,style=filled,color=".7 .3 1.0"];
+    #    execute -> compare;
+    #}
+    #"""
+    
+    #dot -T svg nato 
+    
+    #digraph G {
+    #subgraph cluster0 {
+    #node [style=filled,color=white];
+    #style=filled;
+    #color=lightgrey;
+    #a0 -> a1 -> a2 -> a3;
+    #label = "process #1";
+    #}
+    #subgraph cluster1 {
+    #node [style=filled];
+    #b0 -> b1 -> b2 -> b3;
+    #label = "process #2";
+    #color=blue
+    #}
+    #start -> a0;
+    #start -> b0;
+    #a1 -> b3;
+    #b2 -> a3;
+    #a3 -> a0;
+    #a3 -> end;
+    #b3 -> end;
+    #start [shape=Mdiamond];
+    #end [shape=Msquare];
+    #}
     graph.write_png('joblaunch.png')
-#    str = """
-#digraph G {
-#    size ="4,4";
-#    main [shape=box]; /* this is a comment */
-#    main -> parse [weight=8];
-#    parse -> execute;
-#    main -> init [style=dotted];
-#    main -> cleanup;
-#    execute -> { make_string; printf}
-#    init -> make_string;
-#    edge [color=red]; // so is this
-#    main -> printf [style=bold,label="100 times"];
-#    make_string [label="make a\\nstring"];
-#    node [shape=box,style=filled,color=".7 .3 1.0"];
-#    execute -> compare;
-#}
-#"""
 
-#dot -T svg nato 
-
-#digraph G {
-#subgraph cluster0 {
-#node [style=filled,color=white];
-#style=filled;
-#color=lightgrey;
-#a0 -> a1 -> a2 -> a3;
-#label = "process #1";
-#}
-#subgraph cluster1 {
-#node [style=filled];
-#b0 -> b1 -> b2 -> b3;
-#label = "process #2";
-#color=blue
-#}
-#start -> a0;
-#start -> b0;
-#a1 -> b3;
-#b2 -> a3;
-#a3 -> a0;
-#a3 -> end;
-#b3 -> end;
-#start [shape=Mdiamond];
-#end [shape=Msquare];
-#}
-
-    return str
 
 def main():
     print "RUNNING MAIN"
@@ -835,8 +834,7 @@ def mainLib(jobs, **kwargs):
     # begin working
     start(jobs, numThreads)
 
-    gGraph = printG(G, jobs)
-    print gGraph
+    printG(G, jobs)
 
     return jobs
 

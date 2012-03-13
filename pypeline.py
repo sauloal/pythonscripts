@@ -33,12 +33,13 @@ for lib in setup.ldataset:
 
             
 sw = sampleWrapper.sampleWrapper("watever0")
-#TODO. MUST HAVE A __RUN__ FUNCTION TO BE CALLED WHEN RUN. CANT SENT INSTANTIATED 
+#TODO. MUST HAVE A __RUN__ FUNCTION TO BE CALLED WHEN RUN. CANT BE SENT INSTANTIATED 
 #FUNCTION ANYMORE DUE TO PICLKING
+
 #                  ID,   COMMAND                      SELFTEST=               DEPS=
-f0 = joblaunch.Job('f0', [sampleWrapper.sampleWrapper('f0')     ] )
+#f0 = joblaunch.Job('f0', [sampleWrapper.sampleWrapper('f0')     ] )
 #f0 = joblaunch.Job('f0', [sampleWrapper.sample     ] )
-#f0 = joblaunch.Job('f0', [sw                      ] )
+f0 = joblaunch.Job('f0', [sw                      ] )
 #f0 = joblaunch.Job('f0', [['sleep 55;', 'echo f0']] )
 f1 = joblaunch.Job('f1', [['sleep 55;', 'echo f1']], deps=[f0] )
 f2 = joblaunch.Job('f2', [['sleep 34;', 'echo f2']], deps=[f0] )
@@ -65,10 +66,10 @@ all=[sw, data]
 
 
 
-#str   = str(dump(data, Dumper=Dumper))
-#print str
-#data2 = load(str, Loader=Loader)
-#joblaunch.mainLib(data2, verbose=True)
+dataDump = str(dump(data, Dumper=Dumper))
+print dataDump
+data2 = load(dataDump, Loader=Loader)
+joblaunch.mainLib(data2, verbose=True)
 
 
-joblaunch.mainLib(data, verbose=True)
+#joblaunch.mainLib(data, verbose=True)
