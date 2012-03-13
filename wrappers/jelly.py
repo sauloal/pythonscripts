@@ -98,11 +98,27 @@ class parameters():
         self.pairs.append(pair)
 
     def getCmd(self):
-        
+        cmd = []
+        for pair in self.pairs:
+            name  = pair.name
+            value = pair.value
+            type  = pair.type
+            if   type == 'bool':
+                cmd.append(name)
+            elif type == 'text':
+                cmd.append(name + "'" + value + "'")
+            elif type == 'num':
+                cmd.append(name + value)
+            elif type == 'glob':
+                cmd.append(name)
+            else:
+                print "type " + str(type) + " is unknown"
+        return " ".join(cmd)
+                
 
 
 class jellyCount():
-    def __init__(self, input=None, output=None, buffer_size=None, out_counter_len=4, out_buffer_size=10000000, verbose=False):
+    def __init__(self, input=None, **kwargs):
         """
         Usage: jellyfish merge [options] input:c_string+
 
@@ -119,31 +135,38 @@ class jellyCount():
         -V, --version                            Version
         """
         assert input  is not None
-        assert output is not None
+
+        #output=None, buffer_size=None, out_counter_len=4, out_buffer_size=10000000, verbose=False):
 
         function  = "count"
 
-        if output is not None:
-            output          = input + "_mer_counts" 
+        output = kwargs.get('output', None)
+        if output is None:
+            output          = input + "_mer_counts"
 
         parameter = parameters()
         parameter.append(exe,           True,   'bool')
-        parameter.append(self.function, True,   'bool')
-        parameter.append(input,         True,   'bool')
+        parameter.append(function,      True,   'bool')
         parameter.append('--output=',   output, 'text')
 
+
+        buffer_size = kwargs.get('buffer-size', None)
         if buffer_size      is not None:
             parameter.append('--buffer-size=',    buffer_size,      'num') 
 
 
-        if cout_counter_len is not None:
+        out_counter_len = kwargs.get('out-counter-len', None)
+        if out_counter_len is not None:
             parameter.append('--out-counter-len=', out_counter_len, 'num')
 
+        out_buffer_size = kwargs.get('out-buffer-size', None)
         if out_buffer_size  is not None:
             parameter.append('--out-buffer-size=', out_buffer_size, 'num') 
 
         if verbose:
             parameter.append('--verbose',          verbose,         'bool') 
+
+        parameter.append(input,         True,   'glob')
 
         self.parameter = parameter
         self.cmd       = parameter.getCmd()
@@ -226,6 +249,16 @@ class jellyMerge():
          -h, --help                               This message
          -V, --version                            Version
         """
+
+if __name__ == "__main__":
+    fn = '/mnt/nexenta/aflit001/nobackup/Data/F5/F5_Illumina/F5_Illumina_GOG18L3_pairedend_300/110126_SN132_B_s_3_1_seq_GOG-18.fastq'
+    ou = '/tmp/110126_SN132_B_s_3_1_seq_GOG-18.fastq'
+    #count = jellyCount(input=None, output=None, buffer_size=None, out_counter_len=4, out_buffer_size=10000000, verbose=False)
+    count  = jellyCount(fn,         ou,                      1000,                 4,                 10000000, False)
+    count  = jellyCount(fn,         ou,                      1000,                 4,                 10000000, True)
+    count  = jellyCount(fn,           ,                      1000,                 4,                 10000000, True)
+    count  = jellyCount(fn,           ,                          ,                 4,                 10000000, True)
+
 
 
 """
