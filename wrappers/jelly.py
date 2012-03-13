@@ -84,17 +84,27 @@ def sample(messaging):
 
 exe="/home/aflit001/bin/jellyfish"
 
+
 class parameters():
     def __init__(self):
         self.pairs = []
-        pass
+
+    class paramPair():
+        def __init__(self):
+            self.name  = ""
+            self.value = ""
+            self.type  = ""
+
 
     def add(self, pos, name, value, type):
         pair = [name, value, type]
         self.pairs[pos] = pair
 
     def append(self, name, value, type):
-        pair = [name, value, type]
+        pair       = self.paramPair()
+        pair.name  = name
+        pair.value = value
+        pair.type  = type 
         self.pairs.append(pair)
 
     def getCmd(self):
@@ -106,9 +116,9 @@ class parameters():
             if   type == 'bool':
                 cmd.append(name)
             elif type == 'text':
-                cmd.append(name + "'" + value + "'")
+                cmd.append(name + "'" + str(value) + "'")
             elif type == 'num':
-                cmd.append(name + value)
+                cmd.append(name + str(value))
             elif type == 'glob':
                 cmd.append(name)
             else:
@@ -136,9 +146,11 @@ class jellyCount():
         """
         assert input  is not None
 
-        #output=None, buffer_size=None, out_counter_len=4, out_buffer_size=10000000, verbose=False):
+
 
         function  = "count"
+
+        
 
         output = kwargs.get('output', None)
         if output is None:
@@ -147,22 +159,35 @@ class jellyCount():
         parameter = parameters()
         parameter.append(exe,           True,   'bool')
         parameter.append(function,      True,   'bool')
+
+
+        params = 
+        {
+            'output':          {},
+            'buffer_size':     {}, 
+            'out_counter_len': {}, 
+            'out_buffer_size': {}, 
+            'verbose':         {}
+        }
+
+
         parameter.append('--output=',   output, 'text')
 
 
-        buffer_size = kwargs.get('buffer-size', None)
+        buffer_size = kwargs.get('buffer_size', None)
         if buffer_size      is not None:
             parameter.append('--buffer-size=',    buffer_size,      'num') 
 
 
-        out_counter_len = kwargs.get('out-counter-len', None)
+        out_counter_len = kwargs.get('out_counter_len', None)
         if out_counter_len is not None:
             parameter.append('--out-counter-len=', out_counter_len, 'num')
 
-        out_buffer_size = kwargs.get('out-buffer-size', None)
+        out_buffer_size = kwargs.get('out_buffer_size', None)
         if out_buffer_size  is not None:
             parameter.append('--out-buffer-size=', out_buffer_size, 'num') 
 
+        verbose = kwargs.get('verbose', False)
         if verbose:
             parameter.append('--verbose',          verbose,         'bool') 
 
@@ -254,10 +279,12 @@ if __name__ == "__main__":
     fn = '/mnt/nexenta/aflit001/nobackup/Data/F5/F5_Illumina/F5_Illumina_GOG18L3_pairedend_300/110126_SN132_B_s_3_1_seq_GOG-18.fastq'
     ou = '/tmp/110126_SN132_B_s_3_1_seq_GOG-18.fastq'
     #count = jellyCount(input=None, output=None, buffer_size=None, out_counter_len=4, out_buffer_size=10000000, verbose=False)
-    count  = jellyCount(fn,         ou,                      1000,                 4,                 10000000, False)
-    count  = jellyCount(fn,         ou,                      1000,                 4,                 10000000, True)
-    count  = jellyCount(fn,           ,                      1000,                 4,                 10000000, True)
-    count  = jellyCount(fn,           ,                          ,                 4,                 10000000, True)
+    count  = jellyCount(fn,         output=ou,   buffer_size=1000, out_counter_len=4, out_buffer_size=10000000, verbose=False)
+    print count.cmd
+    count  = jellyCount(fn,         output=ou,                                                                  verbose=True)
+    print count.cmd
+    count  = jellyCount(fn)
+    print count.cmd
 
 
 
