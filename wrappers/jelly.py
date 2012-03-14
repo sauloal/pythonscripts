@@ -65,7 +65,9 @@ class jellyCount(sampleWrapper):
 
 
         function  = "count"
-        sampleWrapper.__init__(self, className + "_" + function + "_" + input)
+        nickName  = className + "_" + function + "_" + input
+        print "  INITING JELLY COUNT " + nickName
+        sampleWrapper.__init__(self, nickName)
 
 
         output = kwargs.get('output', None)
@@ -90,6 +92,10 @@ class jellyCount(sampleWrapper):
 
         self.parameter = parameter
         self.cmd       = parameter.getCmd()
+        print "  INITING JELLY COUNT CMD " + self.cmd
+
+#    def __call__(self, messaging):
+#        return super(jellyCount, self).__call__(messaging)
 
         
 class jellyStats(sampleWrapper):

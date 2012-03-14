@@ -39,15 +39,23 @@ from tools import constants
 
 class sampleWrapper():
     def __init__(self, name):
+        print "INITING SAMPLE WRAPPER " + name
         self.name     = name
         self.exitCode = 255 #not run
+        self.cmd      = 'echo ' + name
 
     def __call__(self, messaging):
         self.messaging = messaging
 
         print "RUNNING WRAPPER NAMED " + self.name
-        print "GOT STATUS " + str(self.messaging.status)
-        run.runString()
+        print "GOT STATUS " + str(messaging.status)
+
+
+        #def runString(id, cmdFinal, messaging):
+        run.runString(self.name, self.cmd, messaging)
+
+
+
         self.messaging.status = constants.FINISH
         print "RETURNING STATUS " + str(self.messaging.status)
         print "EXIT STATUS ORIGINAL " + str(self.messaging.exitCode)

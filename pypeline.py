@@ -49,6 +49,7 @@ jellyCount = jelly.jellyCount(fn,         output=ou,   buffer_size=1000, out_cou
 f0 = joblaunch.Job('f0', [sw                      ], selfTester=sw )
 f1 = joblaunch.Job('f1', [sampleWrapper.sample    ], deps=[f0] )
 f2 = joblaunch.Job('f2', [jellyCount              ], deps=[f0] )
+#f2 = joblaunch.Job('f2', [['sleep  3;', 'echo f2']], deps=[f0] )
 f3 = joblaunch.Job('f3', [['sleep  4;', 'echo f3']], deps=[f0] )
 l1 = joblaunch.Job('l1', [['sleep  5;', 'echo l1 err;', 'exit 1']], deps=[f1, f2, f3] )
 f4 = joblaunch.Job('f4', [['sleep  6;', 'echo f4']], deps=[f0] )
