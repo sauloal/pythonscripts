@@ -14,6 +14,7 @@ if __name__ == "__main__":
 
 from tools import *
 from tools.parameters import parameters
+from tools.parameters import io
 from sampleWrapper    import sampleWrapper
 
 """
@@ -104,14 +105,14 @@ class jellyCount(sampleWrapper):
             'min-quality'     : { 'type': 'num',  'dashes': 2, 'equal': True  },
             'lower-count'     : { 'type': 'num',  'dashes': 2, 'equal': True  },
             'upper-count'     : { 'type': 'num',  'dashes': 2, 'equal': True  },
-            'matrix'          : { 'type': 'text', 'dashes': 2, 'equal': True  },
-            'timing'          : { 'type': 'text', 'dashes': 2, 'equal': True  },
-            'stats'           : { 'type': 'text', 'dashes': 2, 'equal': True  },
+            'matrix'          : { 'type': 'file', 'dashes': 2, 'equal': True  },
+            'timing'          : { 'type': 'file', 'dashes': 2, 'equal': True  },
+            'stats'           : { 'type': 'file', 'dashes': 2, 'equal': True  },
         }
 
         parameter.parseList(params, kwargs)
-        parameter.parse( 'output', 'text',  2,      True,  output )
-        parameter.parse( '',       'value', 0,      False, input  )
+        parameter.parse( 'output', 'glob',  2,      True,  output )
+        parameter.parse( '',       'glob',  0,      False, input  )
 
         self.parameter = parameter
         self.cmd       = parameter.getCmd()

@@ -1,6 +1,8 @@
 import glob
 import os
 
+__all__ = ["io", "parameters"]
+
 class io():
     def __init__(self, fileName, glob=None):
         self.fileName = fileName
@@ -69,6 +71,12 @@ class parameters():
         elif type == 'name':
             pair.cmd = name
         elif type == 'value':
+            pair.cmd = value
+        elif type == 'file':
+            pair.cmd = value
+        elif type == 'glob':
+            pair.cmd = value
+        elif type == 'fileList':
             pair.cmd = value
         else:
             print "type " + str(type) + " is unknown"
