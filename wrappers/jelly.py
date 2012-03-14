@@ -91,10 +91,22 @@ class jellyCount(sampleWrapper):
         parameter.append(function,      True,   'name')
 
         params = {
-            'buffer_size':     { 'name': 'buffer-size',     'type': 'num',  'dashes': 2, 'equal': True  },
-            'out_counter_len': { 'name': 'out-counter-len', 'type': 'num',  'dashes': 2, 'equal': True  },
-            'out_buffer_size': { 'name': 'out-buffer-size', 'type': 'num',  'dashes': 2, 'equal': True  },
-            'verbose':         { 'name': 'verbose',         'type': 'bool', 'dashes': 2, 'equal': None  }
+            'mer_len'         : { 'type': 'num',  'dashes': 2, 'equal': True  },
+            'size'            : { 'type': 'num',  'dashes': 2, 'equal': True  },
+            'threads'         : { 'type': 'num',  'dashes': 2, 'equal': True  },
+            'counter-len'     : { 'type': 'num',  'dashes': 2, 'equal': True  },
+            'out_counter-len' : { 'type': 'num',  'dashes': 2, 'equal': True  },
+            'both-strands'    : { 'type': 'bool'                              },
+            'reprobes'        : { 'type': 'num',  'dashes': 2, 'equal': True  },
+            'raw'             : { 'type': 'bool'                              },
+            'quake'           : { 'type': 'bool'                              },
+            'quality-start'   : { 'type': 'num',  'dashes': 2, 'equal': True  },
+            'min-quality'     : { 'type': 'num',  'dashes': 2, 'equal': True  },
+            'lower-count'     : { 'type': 'num',  'dashes': 2, 'equal': True  },
+            'upper-count'     : { 'type': 'num',  'dashes': 2, 'equal': True  },
+            'matrix'          : { 'type': 'text', 'dashes': 2, 'equal': True  },
+            'timing'          : { 'type': 'text', 'dashes': 2, 'equal': True  },
+            'stats'           : { 'type': 'text', 'dashes': 2, 'equal': True  },
         }
 
         parameter.parseList(params, kwargs)

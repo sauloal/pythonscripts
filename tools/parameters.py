@@ -20,7 +20,7 @@ class parameters():
         pair       = paramPair()
         pair.name  = name
         pair.value = value
-        pair.type  = type 
+        pair.type  = type
 
         if   type == 'bool':
             pair.cmd = name
@@ -40,15 +40,15 @@ class parameters():
 
 
     def parse(self, name, type, dashes, equal, res):
-        text    = '-'*dashes
+        text    = ''
+        if dashes is not None:
+            text    = '-'*dashes
         text   += name
 
         if equal is True:
             text += '='
         if equal is False:
             text += ' '
-        else:
-            text += ''
 
         if res is not None:
             self.append(text, res, type)
@@ -71,4 +71,3 @@ class parameters():
 
     def getCmd(self):
         return " ".join(self.cmd)
-
