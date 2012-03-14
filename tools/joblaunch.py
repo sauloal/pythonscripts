@@ -51,6 +51,7 @@ import collections
 import Queue
 import traceback
 import types
+import pydot
 from run   import runString
 import constants
 
@@ -635,7 +636,22 @@ def parseInput(inputFilePath):
 
 class jobsList():
     def __init__(self):
+        self.items = {}
         pass
+
+    def __setitem__(self, key, item):
+        print "SETTING " + str(key) + " item " + str(item)
+        self.items[key] = item
+
+    def __iter__(self):
+        return self.items.__iter__()
+
+    def __getitem__(self, key):
+        return self.items[key]
+
+    def __len__(self):
+        return len(self.items)
+
 
 def createJobs(commands, G, jobsOrder, checks):
     """
@@ -644,19 +660,16 @@ def createJobs(commands, G, jobsOrder, checks):
     and the value is the Job object.
     """
 
-    jobs           = jobsList()
-    jobs.G         = G
-    jobs.commands  = commands
-    jobs.jobsOrder = jobsOrder
-    jobs.checks    = checks
-    printer        = printG(G, jobs)
-    jobs.printer   = printer
-
     def getJob(jobId):
         # create a new job or return the existing one
         if jobId not in jobs:
             jobs[jobId] = Job(jobId, commands[jobId], checks[jobId], priority=jobsOrder[jobId])
         return jobs[jobId]
+
+    jobs           = jobsList()
+    jobs.G         = G
+    printer        = printG(G, jobs)
+    jobs.printer   = printer
 
     for (u, v) in G:
         uJob = getJob(u)
@@ -786,7 +799,6 @@ class printG:
         """
         #https://docs.google.com/viewer?url=http://www.graphviz.org/pdf/dotguide.pdf
         #http://pythonhaven.wordpress.com/2009/12/09/generating_graphs_with_pydot/
-        import pydot
 
         self.G        = G
         self.jobs     = jobs
@@ -804,7 +816,7 @@ class printG:
         for jobId in self.jobs:
             job          = self.jobs[jobId]
             status       = job.getStatus()
-            statusColor  = statusColors[status]
+            statusColor  = self.statusColors[status]
             node         = pydot.Node(jobId, style="filled", fillcolor=statusColor[0], fontcolor=statusColor[1])
             self.graph.add_node(node)
             nodes[jobId] = node
@@ -866,7 +878,7 @@ class printG:
         #end [shape=Msquare];
         #}
 
-        graph.write_png(fileName)
+        self.graph.write_png(fileName)
 
 def main():
     print "RUNNING MAIN"
@@ -934,7 +946,7 @@ def checkGraph(jobs, **kwargs):
     return G
 
 
-def mainLib(jobs, **kwargs):
+def mainLib(jobsData, **kwargs):
     """
     takes a list of job classes and run them
     accepts as kwargs:
@@ -962,21 +974,24 @@ def mainLib(jobs, **kwargs):
                             datefmt  = "%Y-%m-%d %H:%M:%S")
 
     # parse input file
+
+    #jobs  = jobsList()
+    jobs  = jobsList()
+    for jobId in jobsData.keys():
+        job         = jobsData[jobId]
+        jobs[jobId] = job
+
     G = checkGraph(jobs, force=force)
 
-    jobs           = jobsList()
     jobs.G         = G
-    jobs.commands  = commands
-    jobs.jobsOrder = jobsOrder
-    jobs.checks    = checks
     printer        = printG(G, jobs)
     jobs.printer   = printer
 
+    jobs.printer.printGraph()
     # begin working
     start(jobs, numThreads)
 
-    graphPrinter = printG(G, jobs)
-    graphPrinter.printGraph()
+    jobs.printer.printGraph()
 
     return jobs
 

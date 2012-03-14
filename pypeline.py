@@ -58,6 +58,8 @@ f6 = joblaunch.Job('f6', [['sleep  8;', 'echo f6']], deps=[f0] )
 l2 = joblaunch.Job('l2', [['sleep  9;', 'echo l2']], deps=[f4, f5, f6] )
 d1 = joblaunch.Job('d1', [['sleep 10;', 'echo d1']], deps=[l1, l2] )
 
+
+
 data = {'f0': f0,
         'f1': f1,
         'f2': f2,
@@ -74,7 +76,7 @@ all=[sw, data]
 
 
 dataDump = str(dump(data, Dumper=Dumper))
-print dataDump
+#print dataDump
 data2 = load(dataDump, Loader=Loader)
 
 
