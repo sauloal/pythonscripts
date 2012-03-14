@@ -55,6 +55,7 @@ import pydot
 from run   import runString
 import constants
 
+
 debug           = True
 global_priority = 0
 
@@ -502,8 +503,10 @@ class Core(threading.Thread):
         while self.queue.qsize():
             job = self.queue.get()
             self.last = job
+
             job()
-            job.printer.printGraph()
+            job.printer.printGraph(None, job.getId())
+
             if not job.getReturn():
                 self.__addPreparedJobsToQueue(job)
                 self.numJobsLeft.decrement()
@@ -811,7 +814,7 @@ class printG:
                                 constants.FINISH:  ["green",  "black"]
                             }
 
-    def printGraph(self, fileName='joblaunch_'+constants.timestamp+'.png'):
+    def printGraph(self, fileName=None, id=None):
         self.graph = pydot.Dot(graph_type='digraph')
 
         nodes = {}
@@ -880,6 +883,13 @@ class printG:
         #end [shape=Msquare];
         #}
 
+        if fileName is None:
+            idStr = ""
+            if id is not None:
+                idStr = '_' + id
+            fileName = 'joblaunch/joblaunch_' + constants.timestamp + '_' + constants.getTimestamp() + idStr + '.png'
+
+        print "EXPORTING GRAPH PNG " + fileName
         self.graph.write_png(fileName)
 
 def main():
