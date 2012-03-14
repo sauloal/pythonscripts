@@ -116,6 +116,11 @@ class jellyCount(sampleWrapper):
 
         self.parameter = parameter
         self.cmd       = parameter.getCmd()
+
+        self.inputs  = [io(input)]
+        self.outputs = [io(output)]
+        if ()
+
         print "  INITING JELLY COUNT CMD " + self.cmd
 
 

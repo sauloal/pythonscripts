@@ -73,11 +73,11 @@ class parameters():
         elif type == 'value':
             pair.cmd = value
         elif type == 'file':
-            pair.cmd = value
+            pair.cmd = name + str(value)
         elif type == 'glob':
-            pair.cmd = value
+            pair.cmd = name + str(value)
         elif type == 'fileList':
-            pair.cmd = value
+            pair.cmd = name + " ".join(value)
         else:
             print "type " + str(type) + " is unknown"
 
@@ -119,3 +119,9 @@ class parameters():
 
     def getCmd(self):
         return " ".join(self.cmd)
+
+    def hasParam(self, qry):
+        for pair in self.pairs:
+            if pair.name == qry:
+                return True
+        return False
