@@ -3,6 +3,10 @@ import os
 
 __all__ = ["io", "parameters"]
 
+def timestamp():
+    today = date.today()
+    return  today.strftime("%Y_%m_%d_%H_%M_%S")
+
 class io():
     def __init__(self, fileName, glob=None):
         self.fileName = fileName

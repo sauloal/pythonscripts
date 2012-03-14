@@ -792,11 +792,11 @@ class printG:
             status       = job.getStatus()
             statusColor  = statusColors[status]
             node         = pydot.Node(jobId, style="filled", fillcolor=statusColor[0], fontcolor=statusColor[1])
-            graph.add_node(node)
+            self.graph.add_node(node)
             nodes[jobId] = node
 
-        for jobId in jobs:
-            job  = jobs[jobId]
+        for jobId in self.jobs:
+            job  = self.jobs[jobId]
             node = nodes[jobId]
             DEPS = job.getDeps()
             #print "ADDING NODE " + jobId + " STATUS: " + str(job.getStatus()) + " RETURN VALUE: " + str(job.getReturn())
@@ -804,7 +804,7 @@ class printG:
                 depId   = DEP.getId()
                 #print "  DEP " + depId
                 depNode = nodes[depId]
-                graph.add_edge(pydot.Edge(depNode, node))
+                self.graph.add_edge(pydot.Edge(depNode, node))
 
 
         #    str = """
@@ -884,7 +884,8 @@ def main():
     # begin working
     start(jobs, options.numThreads)
 
-    printG(G, jobs)
+    graphPrinter = printG(G, jobs)
+    graphPrinter.printGraph()
 
 
 
@@ -953,7 +954,8 @@ def mainLib(jobs, **kwargs):
     # begin working
     start(jobs, numThreads)
 
-    printG(G, jobs)
+    graphPrinter = printG(G, jobs)
+    graphPrinter.printGraph()
 
     return jobs
 
