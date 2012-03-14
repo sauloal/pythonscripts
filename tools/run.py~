@@ -1,0 +1,57 @@
+#!/usr/bin/python
+
+
+def runString(self):
+    try:
+        print "JOB :: " + self.id + " :: OPENING PROCESS FOR CMD '" + cmdFinal + "'"
+        p = subprocess.Popen(cmdFinal, shell = True, executable="/bin/bash", stdout = subprocess.PIPE,
+            stderr = subprocess.STDOUT)
+
+        try:
+            (stdOut, stdErr) = p.communicate(input=None)
+
+            if stdOut:
+                #sys.stdout.write("LINE<1> "+str(stdOut))
+                self.messaging.stdout(self.id, str(stdOut), internal=True)
+
+            if stdErr:
+                #sys.stderr.write("LINE<2> "+str(stdErr))
+                self.messaging.stderr(self.id, str(stdErr), internal=True)
+
+            #print "WAITING"
+            self.messaging.exitCode = p.wait()
+            if self.messaging.exitCode:
+                print "JOB :: " + self.id + " :: CMD ARR {" + str(cmd) + "} STR {" + cmdFinal + "} :: RETURNED: " + str(self.messaging.exitCode) + " THEREFORE FAILED "
+                self.messaging.status = FAILED
+                self.messaging.addError("FAILED TO RUN " + cmdFinal + " :: RETURNED: " + str(self.messaging.exitCode) + " THEREFORE FAILED ")
+                return self.messaging.exitCode
+            #print "FINISHED"
+
+            #print "FINISHED RUNNING CMD " + cmdFinal + " WRITING"
+            #Job.outputFileWriter.write(self.id, p.stdout)
+            #print "FINISHED RUNNING CMD " + cmdFinal + " WROTE"
+            print "JOB :: " + self.id + " :: REACHED END. FINISHING WITH STATUS " + STATUSES[self.messaging.status] + " " + str(self.messaging.exitCode)
+            self.messaging.status   = FINISH
+            self.messaging.exitCode = 0
+            return self.messaging.exitCode
+
+        except Exception, e:
+            print "Exception (Job__launch_out): ", e
+            self.messaging.status = FAILED
+            self.messaging.addError("FAILED TO RUN " + cmdFinal + " EXCEPTION " + str(e))
+            self.messaging.exitCode = 252
+            return self.messaging.exitCode
+
+    except Exception, e:
+        print "Exception (Job__launch): ", e
+        self.messaging.status = FAILED
+        self.messaging.addError("FAILED TO RUN " + cmdFinal + " EXCEPTION " + str(e))
+        self.messaging.exitCode = 253
+        return self.messaging.exitCode
+
+    if self.messaging.exitCode:
+        self.messaging.status = FAILED
+        self.messaging.addError("FAILED TO RUN " + cmdFinal)
+        self.messaging.exitCode = 251
+            return self.messaging.exitCode
+

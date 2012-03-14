@@ -13,6 +13,8 @@ if __name__ == "__main__":
     #print "PATH " + str(sys.path)
 
 from tools import *
+from tools import constants
+
 """
     sample class showing how to create a sample program wrapper
     the class/function has to accept:
@@ -45,7 +47,7 @@ class sampleWrapper():
 
         print "RUNNING WRAPPER NAMED " + self.name
         print "GOT STATUS " + str(self.messaging.status)
-        self.messaging.status = joblaunch.FINISH
+        self.messaging.status = constants.FINISH
         print "RETURNING STATUS " + str(self.messaging.status)
         print "EXIT STATUS ORIGINAL " + str(self.messaging.exitCode)
         self.messaging.exitCode = 0
@@ -58,7 +60,7 @@ class sampleWrapper():
         messaging.stdout(self.name, "SAMPLE WRAPPER\n")
         messaging.stderr(self.name, "  SELF TESTING\n")
         messaging.stdout(self.name, str(self) + "\n")
-        messaging.status = joblaunch.FINISH
+        messaging.status = constants.FINISH
 
 
 
@@ -68,7 +70,7 @@ def sample(messaging):
     messaging.stdout(name, "RUNNING SAMPLE FUNCTION NAMED " + name + "\n")
 
     messaging.stdout(name, "GOT STATUS " + str(messaging.status) + "\n")
-    messaging.status = joblaunch.FINISH
+    messaging.status = constants.FINISH
     messaging.stdout(name, "RETURNING STATUS " + str(messaging.status) + "\n")
 
     

@@ -52,16 +52,8 @@ import collections
 import Queue
 import traceback
 import types
-
-NOT_RUN           = 0
-RUNNING           = 1
-FAILED            = 2
-FINISH            = 3
-STATUSES          = {}
-STATUSES[NOT_RUN] = "'NOT RUN'"
-STATUSES[RUNNING] = "'RUNNING'"
-STATUSES[FAILED ] = "'FAILED'"
-STATUSES[FINISH ] = "'FINISH'"
+from run   import runString
+import constants
 
 debug           = True
 global_priority = 0
@@ -355,7 +347,7 @@ class Job:
         assert len(self.commands) > 0
         self.predecessors = set()
         self.successors   = set()
-        self.messaging    = programMessaging(self.id, NOT_RUN, -1)
+        self.messaging    = programMessaging(self.id, constants.NOT_RUN, -1)
         self.selfTester   = kwargs.get('selfTester', self)
         self.priority     = kwargs.get('priority', getPriority())
         self.deps         = kwargs.get('deps',     [])
@@ -369,11 +361,11 @@ class Job:
         self.messaging.setFileWriter(Job.outputFileWriter)
         
         self.messaging.exitCode = 256
-        self.messaging.status   = RUNNING
+        self.messaging.status   = constants.RUNNING
         res                     = self.__launch()
         end                     = time.time()
         logging.info("%s finished %f", self.id, end - begin)
-        if self.messaging.status == FINISH:
+        if self.messaging.status == constants.FINISH:
             if self.selfTester:
                 self.selfTester.selfTest(self.messaging)
         return res
@@ -419,7 +411,7 @@ class Job:
                 cmd(self.messaging)
                 if self.messaging.exitCode:
                     print "JOB :: " + self.id + " :: CMD " + str(cmd) + " :: RETURNED: " + str(self.messaging.exitCode) + " THEREFORE FAILED "
-                    self.messaging.status = FAILED
+                    self.messaging.status = constants.FAILED
                     self.messaging.addError("FAILED TO RUN FUNCTION " + str(cmd))
                     return self.messaging.exitCode
             elif isinstance(cmd, types.InstanceType):
@@ -427,14 +419,14 @@ class Job:
                 cmd(self.messaging)
                 if self.messaging.exitCode:
                     print "JOB :: " + self.id + " :: CMD " + str(cmd) + " :: RETURNED: " + str(self.ret) + " THEREFORE FAILED "
-                    self.messaging.status = FAILED
+                    self.messaging.status = constants.FAILED
                     self.messaging.addError("FAILED TO RUN INSTANCE " + str(cmd))
                     return self.messaging.exitCode
             elif isinstance(cmd, types.MethodType):
                 print "JOB :: " + self.id + " :: CMD " + str(cmd) + " :: IS METHOD"
                 cmd(self.messaging)
                 if self.messaging.exitCode:
-                    self.messaging.status = FAILED
+                    self.messaging.status = constants.FAILED
                     self.messaging.addError("FAILED TO RUN METHOD " + str(cmd))
                     return self.messaging.exitCode
             elif isinstance(cmd, types.ListType):
@@ -462,62 +454,29 @@ class Job:
                 #print "  CMD F '" + str(cmdFinal) + "'"
     
                 try:
-                    print "JOB :: " + self.id + " :: OPENING PROCESS FOR CMD '" + cmdFinal + "'"
-                    p = subprocess.Popen(cmdFinal, shell = True, executable="/bin/bash", stdout = subprocess.PIPE,
-                        stderr = subprocess.STDOUT)
-    
-                    try:
-                        (stdOut, stdErr) = p.communicate(input=None)
-    
-                        if stdOut:
-                            #sys.stdout.write("LINE<1> "+str(stdOut))
-                            self.messaging.stdout(self.id, str(stdOut), internal=True)
-    
-                        if stdErr:
-                            #sys.stderr.write("LINE<2> "+str(stdErr))
-                            self.messaging.stderr(self.id, str(stdErr), internal=True)
-    
-                        #print "WAITING"
-                        self.messaging.exitCode = p.wait()
-                        if self.messaging.exitCode:
-                            print "JOB :: " + self.id + " :: CMD ARR {" + str(cmd) + "} STR {" + cmdFinal + "} :: RETURNED: " + str(self.messaging.exitCode) + " THEREFORE FAILED "
-                            self.messaging.status = FAILED
-                            self.messaging.addError("FAILED TO RUN " + cmdFinal + " :: RETURNED: " + str(self.messaging.exitCode) + " THEREFORE FAILED ")
-                            return self.messaging.exitCode
-                        #print "FINISHED"
-    
-                        #print "FINISHED RUNNING CMD " + cmdFinal + " WRITING"
-                        #Job.outputFileWriter.write(self.id, p.stdout)
-                        #print "FINISHED RUNNING CMD " + cmdFinal + " WROTE"
-    
-                    except Exception, e:
-                        print "Exception (Job__launch_out): ", e
-                        self.messaging.status = FAILED
-                        self.messaging.addError("FAILED TO RUN " + cmdFinal + " EXCEPTION " + str(e))
-                        self.messaging.exitCode = 252
-                        return self.messaging.exitCode
-    
+                    runString(self.id, cmdFinal, self.messaging)    
+                    return self.messaging.exitCode
                 except Exception, e:
                     print "Exception (Job__launch): ", e
-                    self.messaging.status = FAILED
+                    self.messaging.status = constants.FAILED
                     self.messaging.addError("FAILED TO RUN " + cmdFinal + " EXCEPTION " + str(e))
                     self.messaging.exitCode = 253
                     return self.messaging.exitCode
     
                 if self.messaging.exitCode:
-                    self.messaging.status = FAILED
+                    self.messaging.status = constants.FAILED
                     self.messaging.addError("FAILED TO RUN " + cmdFinal)
                     self.messaging.exitCode = 251
                     return self.messaging.exitCode
 
             else:
                 print "JOB :: " + self.id + " :: CMD " + str(cmd) + " :: IS UNKOWN TYPE"
-                self.messaging.status = FAILED
+                self.messaging.status = constants.FAILED
                 self.messaging.addError("NOTHING TO RUN " + str(cmd))
                 return self.messaging.exitCode
 
-        print "JOB :: " + self.id + " :: REACHED END. FINISHING WITH STATUS " + STATUSES[self.messaging.status] + " " + str(self.messaging.exitCode)
-        self.messaging.status   = FINISH
+        print "JOB :: " + self.id + " :: REACHED END. FINISHING WITH STATUS " + constants.STATUSES[self.messaging.status] + " " + str(self.messaging.exitCode)
+        self.messaging.status   = constants.FINISH
         self.messaging.exitCode = 0
         return self.messaging.exitCode
 
@@ -555,7 +514,7 @@ class Core(threading.Thread):
         are not waiting for any other job.
         """
 
-        if job.getStatus() == FINISH:
+        if job.getStatus() == constants.FINISH:
             for succ in job.successors:
                 succ.predecessors.remove(job)
                 if not succ.predecessors:
@@ -816,10 +775,10 @@ def printG(G, jobs):
     import pydot
     graph = pydot.Dot(graph_type='digraph')
 
-    statusColors = { NOT_RUN: ["white",  "black"],
-                     RUNNING: ["yellow", "black"],
-                     FAILED:  ["red",    "black"],
-                     FINISH:  ["green",  "black"]
+    statusColors = { constants.NOT_RUN: ["white",  "black"],
+                     constants.RUNNING: ["yellow", "black"],
+                     constants.FAILED:  ["red",    "black"],
+                     constants.FINISH:  ["green",  "black"]
                    }
 
 

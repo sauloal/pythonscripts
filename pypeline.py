@@ -3,6 +3,7 @@ import os
 
 import yaml
 from yaml import load, dump
+
 try:
     from yaml import CLoader as Loader, CDumper as Dumper
     print "USING YAML C VERSION"
@@ -14,6 +15,7 @@ except ImportError:
 from techs    import *
 from wrappers import *
 from tools    import *
+from tools    import constants
 
 import setup
 
