@@ -1,8 +1,18 @@
-from time import gmtime, strftime
+from datetime import datetime
+
+
+def getTimestampHighRes():
+    tday = datetime.now()
+    return tday.strftime("%Y_%m_%d_%H_%M_%S_%f")
+
 
 def getTimestamp():
-    return  strftime("%Y_%m_%d_%H_%M_%S", gmtime())
+    tday = datetime.now()
+    return tday.strftime("%Y_%m_%d_%H_%M_%S")
 
+def getDatestamp():
+    tday = datetime.now()
+    return tday.strftime("%Y_%m_%d")
 
 timestamp = getTimestamp()
 

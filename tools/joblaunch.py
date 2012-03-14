@@ -886,8 +886,8 @@ class printG:
         if fileName is None:
             idStr = ""
             if id is not None:
-                idStr = '_' + id
-            fileName = 'joblaunch/joblaunch_' + constants.timestamp + '_' + constants.getTimestamp() + idStr + '.png'
+                idStr = '_' + constants.getTimestampHighRes() + '_' + id
+            fileName = 'joblaunch/joblaunch_' + constants.timestamp + idStr + '.png'
 
         print "EXPORTING GRAPH PNG " + fileName
         self.graph.write_png(fileName)
