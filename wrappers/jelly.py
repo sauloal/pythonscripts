@@ -87,6 +87,15 @@ class jellyCount(sampleWrapper):
         if output is None:
             output          = input + "_mer_counts"
 
+        mer_len = kwargs.get('mer_len', None)
+        if mer_len is None:
+            kwargs['mer_len'] = 31
+
+
+        mer_len = kwargs.get('mer_len', None)
+        if mer_len is None:
+            mer_len          = 31
+
         parameter = parameters()
         parameter.append(exe,           True,   'name')
         parameter.append(function,      True,   'name')
