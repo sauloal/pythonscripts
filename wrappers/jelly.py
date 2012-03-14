@@ -88,12 +88,14 @@ exe="/home/aflit001/bin/jellyfish"
 class parameters():
     def __init__(self):
         self.pairs = []
+        self.cmd   = []
 
     class paramPair():
         def __init__(self):
             self.name  = ""
             self.value = ""
             self.type  = ""
+            self.cmd   = ""
 
 
     def add(self, pos, name, value, type):
@@ -106,18 +108,34 @@ class parameters():
         pair.name  = name
         pair.value = value
         pair.type  = type 
-        self.pairs.append(pair)
 
+        if   type == 'bool':
+            pair.cmd = name
+        elif type == 'text':
+            pair.cmd = name + "'" + str(value) + "'"
+        elif type == 'num':
+            pair.cmd = name + str(value)
+        elif type == 'name':
+            pair.cmd = name
+        elif type == 'value':
+            pair.cmd = value
+        else:
+            print "type " + str(type) + " is unknown"
+
+        self.pairs.append(pair)
+        self.cmd.append(pair.cmd)
 
 
     def parse(self, name, type, dashes, equal, res):
         text    = '-'*dashes
         text   += name
 
-        if equal:
+        if equal is True:
             text += '='
-        else:
+        if equal is False:
             text += ' '
+        else:
+            text += ''
 
         if res is not None:
             self.append(text, res, type)
@@ -139,25 +157,7 @@ class parameters():
             self.parse(name, type, dashes, equal, res)
 
     def getCmd(self):
-        cmd = []
-        for pair in self.pairs:
-            name  = pair.name
-            value = pair.value
-            type  = pair.type
-            if   type == 'bool':
-                cmd.append(name)
-            elif type == 'text':
-                cmd.append(name + "'" + str(value) + "'")
-            elif type == 'num':
-                cmd.append(name + str(value))
-            elif type == 'name':
-                cmd.append(name)
-            elif type == 'value':
-                cmd.append(value)
-            else:
-                print "type " + str(type) + " is unknown"
-        return " ".join(cmd)
-                
+        return " ".join(self.cmd)
 
 
 class jellyCount():
@@ -190,14 +190,14 @@ class jellyCount():
             output          = input + "_mer_counts"
 
         parameter = parameters()
-        parameter.append(exe,           True,   'bool')
-        parameter.append(function,      True,   'bool')
+        parameter.append(exe,           True,   'name')
+        parameter.append(function,      True,   'name')
 
         params = {
             'buffer_size':     { 'name': 'buffer-size',     'type': 'num',  'dashes': 2, 'equal': True  }, 
             'out_counter_len': { 'name': 'out-counter-len', 'type': 'num',  'dashes': 2, 'equal': True  }, 
             'out_buffer_size': { 'name': 'out-buffer-size', 'type': 'num',  'dashes': 2, 'equal': True  }, 
-            'verbose':         { 'name': 'verbose',         'type': 'bool', 'dashes': 2, 'equal': False }
+            'verbose':         { 'name': 'verbose',         'type': 'bool', 'dashes': 2, 'equal': None  }
         }
 
         parameter.parseList(params, kwargs)
@@ -210,7 +210,7 @@ class jellyCount():
 
         
 class jellyStats():
-    def __init__(self, input, lower_count=None, upper_count=None, output="-", verbose=False):
+    def __init__(self, input=None, **kwargs):
         """
         Usage: jellyfish stats [options] db:path
 
@@ -234,8 +234,41 @@ class jellyStats():
         -V, --version                            Version
         """
 
+
+        assert input  is not None
+
+
+
+        function  = "stats"
+
+        output = kwargs.get('output', None)
+        if output is not None:
+            parameter.parse( 'output', 'text',  2,      True,  output )
+
+
+
+        parameter = parameters()
+        parameter.append(exe,           True,   'name')
+        parameter.append(function,      True,   'name')
+
+        params = {
+            'lower_count': { 'name': 'lower_count', 'type': 'num',  'dashes': 2, 'equal': True  }, 
+            'upper_count': { 'name': 'upper_count', 'type': 'num',  'dashes': 2, 'equal': True  }, 
+            'verbose':     { 'name': 'verbose',     'type': 'bool', 'dashes': 2, 'equal': None  }
+        }
+
+        parameter.parseList(params, kwargs)
+        #def parse(self, name,    type,     dashes, equal, res):
+        parameter.parse( '',       'value', 0,      False, input  )
+
+        self.parameter = parameter
+        self.cmd       = parameter.getCmd()
+
+
+
+
 class jellyHisto():
-    def __init__(self, input, low=1, high=10000, increment=1, threads=1, full=False, output="-", verbose=False):
+    def __init__(self, input=None, **kwargs):
         """
         Usage: jellyfish histo [options] db:path
 
@@ -264,9 +297,41 @@ class jellyHisto():
          -V, --version                            Version
         """
 
+        assert input  is not None
+
+
+
+        function  = "histo"
+
+        output = kwargs.get('output', None)
+        if output is not None:
+            parameter.parse( 'output', 'text',  2,      True,  output )
+
+
+
+        parameter = parameters()
+        parameter.append(exe,           True,   'name')
+        parameter.append(function,      True,   'name')
+
+        params = {
+            'low'       : { 'name': 'low',       'type': 'num',  'dashes': 2, 'equal': True  }, 
+            'high'      : { 'name': 'high',      'type': 'num',  'dashes': 2, 'equal': True  }, 
+            'increment' : { 'name': 'increment', 'type': 'num',  'dashes': 2, 'equal': True  }, 
+            'threads'   : { 'name': 'threads',   'type': 'num',  'dashes': 2, 'equal': True  }, 
+            'verbose'   : { 'name': 'verbose',   'type': 'bool', 'dashes': 2, 'equal': None  }
+        }
+
+        parameter.parseList(params, kwargs)
+        #def parse(self, name,    type,     dashes, equal, res):
+        parameter.parse( '',       'value', 0,      False, input  )
+
+        self.parameter = parameter
+        self.cmd       = parameter.getCmd()
+
+
 
 class jellyMerge():
-    def __init__(self, input, column=False, tab=False, lower_count=None, upper_count=None):
+    def __init__(self, input=None, **kwargs):
         """
         Usage: jellyfish stats [options] db:path
 
@@ -286,6 +351,38 @@ class jellyMerge():
          -h, --help                               This message
          -V, --version                            Version
         """
+        assert input  is not None
+
+
+
+        function  = "merge"
+
+        output = kwargs.get('output', None)
+        if output is not None:
+            parameter.parse( 'output', 'text',  2,      True,  output )
+
+
+
+        parameter = parameters()
+        parameter.append(exe,           True,   'name')
+        parameter.append(function,      True,   'name')
+
+        params = {
+            'lower_count' : { 'name': 'lower-count', 'type': 'num',  'dashes': 2, 'equal': True  }, 
+            'upper_count' : { 'name': 'upper-count', 'type': 'num',  'dashes': 2, 'equal': True  }, 
+            'column'      : { 'name': 'column',      'type': 'bool', 'dashes': 2, 'equal': True  }, 
+            'tab'         : { 'name': 'tab',         'type': 'bool', 'dashes': 2, 'equal': True  }, 
+            'verbose'     : { 'name': 'verbose',     'type': 'bool', 'dashes': 2, 'equal': None  }
+        }
+
+        parameter.parseList(params, kwargs)
+        #def parse(self, name,    type,     dashes, equal, res):
+        parameter.parse( '',       'value', 0,      False, input  )
+
+        self.parameter = parameter
+        self.cmd       = parameter.getCmd()
+
+
 
 if __name__ == "__main__":
     fn = '/mnt/nexenta/aflit001/nobackup/Data/F5/F5_Illumina/F5_Illumina_GOG18L3_pairedend_300/110126_SN132_B_s_3_1_seq_GOG-18.fastq'
