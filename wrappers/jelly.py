@@ -130,8 +130,10 @@ class jellyCount(sampleWrapper):
         print "  INITING JELLY COUNT CMD " + self.cmd
         print "    INPUTS : "
         for inp in self.inputs:
-            print input + "\n"
-        print "    OUTPUTS: " + "\n".join( self.outputs )
+            print str(inp) + "\n"
+        print "    OUTPUTS: "
+        for out in self.outputs:
+            print str(out) + "\n"
 
 
 
