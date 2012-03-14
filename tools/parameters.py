@@ -39,9 +39,13 @@ class io():
         return stats
 
     def __repr__(self):
-        stats = self.getStats()
         files = self.getFiles()
-        return "#FILES " + str(stats['numfiles']) + " SIZE " + str(stats['size']) + " " + " ".join(files)
+        res = "#FILES " + str(len(files))
+        if self.exists():
+            stats = self.getStats()
+            res += " SIZE " + str(stats['size'])
+        res += " " + " ".join(files)
+        return res
 
 class paramPair():
     def __init__(self):
