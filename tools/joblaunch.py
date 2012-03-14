@@ -503,7 +503,7 @@ class Core(threading.Thread):
             job = self.queue.get()
             self.last = job
             job()
-
+            job.printer.printGraph()
             if not job.getReturn():
                 self.__addPreparedJobsToQueue(job)
                 self.numJobsLeft.decrement()
@@ -677,11 +677,13 @@ def createJobs(commands, G, jobsOrder, checks):
         uJob.successors.add(vJob)
         vJob.predecessors.add(uJob)
 
+
     # add jobs not listed in the dependency list (jobs that don't depend on
     # other jobs nor others depend on them)
     for jobId in commands:
         if jobId not in jobs:
             jobs[jobId] = Job(jobId, commands[jobId], checks[jobId], priority=jobsOrder[jobId])
+            jobs[jobId].printer = jobs.printer
 
     assert len(commands) == len(jobs)
 
@@ -975,17 +977,22 @@ def mainLib(jobsData, **kwargs):
 
     # parse input file
 
-    #jobs  = jobsList()
-    jobs  = jobsList()
+
+    jobs            = jobsList()
+
     for jobId in jobsData.keys():
         job         = jobsData[jobId]
         jobs[jobId] = job
 
-    G = checkGraph(jobs, force=force)
+    G               = checkGraph(jobs, force=force)
+    jobs.G          = G
+    printer         = printG(G, jobs)
+    jobs.printer    = printer
 
-    jobs.G         = G
-    printer        = printG(G, jobs)
-    jobs.printer   = printer
+    for jobId in jobs:
+        job = jobs[jobId]
+        job.printer = jobs.printer
+
 
     jobs.printer.printGraph()
     # begin working
