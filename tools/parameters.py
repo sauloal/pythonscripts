@@ -106,6 +106,7 @@ class parameters():
             text += ' '
 
         if res is not None:
+            #print "APPENDING " + name + " RES " + str(res)
             self.append(text, res, type)
         else:
             #print "RES IS NONE FOR NAME " + str(name)

@@ -86,22 +86,26 @@ class jellyCount(sampleWrapper):
         output = kwargs.get('output', None)
         if output is None:
             output          = input + "_mer_counts"
+            print "NO OUTPUT GIVEN " + output
 
         mer_len = kwargs.get('mer_len', None)
         if mer_len is None:
             kwargs['mer_len'] = 31
+            print "NO MER LEN " + str(kwargs['mer_len'])
 
 
-        mer_len = kwargs.get('mer_len', None)
-        if mer_len is None:
-            mer_len          = 31
+        hashsize = kwargs.get('size', None)
+        if hashsize is None:
+            kwargs['size']    = 100000
+            print "NO SIZE GIVEN " + str(kwargs['size'])
+
 
         parameter = parameters()
         parameter.append(exe,           True,   'name')
         parameter.append(function,      True,   'name')
 
         params = {
-            'mer_len'         : { 'type': 'num',  'dashes': 2, 'equal': True  },
+            'mer-len'         : { 'type': 'num',  'dashes': 2, 'equal': True  },
             'size'            : { 'type': 'num',  'dashes': 2, 'equal': True  },
             'threads'         : { 'type': 'num',  'dashes': 2, 'equal': True  },
             'counter-len'     : { 'type': 'num',  'dashes': 2, 'equal': True  },
