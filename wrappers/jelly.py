@@ -13,6 +13,9 @@ if __name__ == "__main__":
     #print "PATH " + str(sys.path)
 
 from tools import *
+from tools.parameters import parameters
+from sampleWrapper import sampleWrapper
+
 """
     sample class showing how to create a sample program wrapper
     the class/function has to accept a messaging class which contains:
@@ -36,131 +39,11 @@ from tools import *
 
 
 
-class sampleWrapper():
-    def __init__(self, name):
-        self.name     = name
-        self.exitCode = 255 #not run
-
-    def __call__(self, messaging):
-        self.messaging = messaging
-
-        print "RUNNING WRAPPER NAMED " + self.name
-        print "GOT STATUS " + str(self.messaging.status)
-        self.messaging.status = joblaunch.FINISH
-        print "RETURNING STATUS " + str(self.messaging.status)
-        print "EXIT STATUS ORIGINAL " + str(self.messaging.exitCode)
-        self.messaging.exitCode = 0
-        print "EXIT STATUS NEW " + str(self.messaging.exitCode)
-        
-    def selfTest(self, messaging):
-        messaging.addError("SAMPLE WRAPPER")
-        messaging.addError("  SAMPLE SELF TEST")
-        messaging.addError("    " + str(self))
-        messaging.stdout(self.name, "SAMPLE WRAPPER\n")
-        messaging.stderr(self.name, "  SELF TESTING\n")
-        messaging.stdout(self.name, str(self) + "\n")
-        messaging.status = joblaunch.FINISH
-
-
-
-def sample(messaging):
-    name       = "SaMpLeFuNcTiOn"
-
-    messaging.stdout(name, "RUNNING SAMPLE FUNCTION NAMED " + name + "\n")
-
-    messaging.stdout(name, "GOT STATUS " + str(messaging.status) + "\n")
-    messaging.status = joblaunch.FINISH
-    messaging.stdout(name, "RETURNING STATUS " + str(messaging.status) + "\n")
-
-    
-    messaging.stdout(name, "EXIT STATUS ORIGINAL " + str(messaging.exitCode) + "\n")
-    messaging.exitCode = 255 #not run
-    messaging.exitCode = 0
-    messaging.stdout(name, "EXIT STATUS NEW " + str(messaging.exitCode) + "\n")
-
-
-#sample = sampleWrapper("watever0")
-
 
 exe="/home/aflit001/bin/jellyfish"
 
 
-class parameters():
-    def __init__(self):
-        self.pairs = []
-        self.cmd   = []
-
-    class paramPair():
-        def __init__(self):
-            self.name  = ""
-            self.value = ""
-            self.type  = ""
-            self.cmd   = ""
-
-
-    def add(self, pos, name, value, type):
-        pair = [name, value, type]
-        self.pairs[pos] = pair
-
-    def append(self, name, value, type):
-        #print " appending name " + str(name) + " value " + str(value) + " type " + str(type)
-        pair       = self.paramPair()
-        pair.name  = name
-        pair.value = value
-        pair.type  = type 
-
-        if   type == 'bool':
-            pair.cmd = name
-        elif type == 'text':
-            pair.cmd = name + "'" + str(value) + "'"
-        elif type == 'num':
-            pair.cmd = name + str(value)
-        elif type == 'name':
-            pair.cmd = name
-        elif type == 'value':
-            pair.cmd = value
-        else:
-            print "type " + str(type) + " is unknown"
-
-        self.pairs.append(pair)
-        self.cmd.append(pair.cmd)
-
-
-    def parse(self, name, type, dashes, equal, res):
-        text    = '-'*dashes
-        text   += name
-
-        if equal is True:
-            text += '='
-        if equal is False:
-            text += ' '
-        else:
-            text += ''
-
-        if res is not None:
-            self.append(text, res, type)
-        else:
-            #print "RES IS NONE FOR NAME " + str(name)
-            #exit(1)
-            pass
-
-
-    def parseList(self, data, kwargs):
-        for key in data.keys():
-            values = data[key]
-            #'buffer_size':     { 'name': 'buffer-size',     'type': 'num',  'dashes': 2, 'equal': True  },
-            name   = values.get('name',   None)
-            type   = values.get('type',   None)
-            dashes = values.get('dashes', None)
-            equal  = values.get('equal',  None)
-            res    = kwargs.get(key,      None)
-            self.parse(name, type, dashes, equal, res)
-
-    def getCmd(self):
-        return " ".join(self.cmd)
-
-
-class jellyCount():
+class jellyCount(sampleWrapper):
     def __init__(self, input=None, **kwargs):
         """
         Usage: jellyfish merge [options] input:c_string+
@@ -209,7 +92,7 @@ class jellyCount():
         self.cmd       = parameter.getCmd()
 
         
-class jellyStats():
+class jellyStats(sampleWrapper):
     def __init__(self, input=None, **kwargs):
         """
         Usage: jellyfish stats [options] db:path
@@ -267,7 +150,7 @@ class jellyStats():
 
 
 
-class jellyHisto():
+class jellyHisto(sampleWrapper):
     def __init__(self, input=None, **kwargs):
         """
         Usage: jellyfish histo [options] db:path
@@ -330,7 +213,7 @@ class jellyHisto():
 
 
 
-class jellyMerge():
+class jellyMerge(sampleWrapper):
     def __init__(self, input=None, **kwargs):
         """
         Usage: jellyfish stats [options] db:path
