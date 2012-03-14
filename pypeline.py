@@ -34,7 +34,12 @@ for lib in setup.ldataset:
 
 
             
-sw = sampleWrapper.sampleWrapper("watever0")
+sw         = sampleWrapper.sampleWrapper("watever0")
+
+fn         = '/mnt/nexenta/aflit001/nobackup/Data/F5/F5_Illumina/F5_Illumina_GOG18L3_pairedend_300/110126_SN132_B_s_3_1_seq_GOG-18.fastq'
+ou         = '/tmp/110126_SN132_B_s_3_1_seq_GOG-18.fastq'
+jellyCount = jelly.jellyCount(fn,         output=ou,   buffer_size=1000, out_counter_len=4, out_buffer_size=10000000, verbose=False)
+
 #TODO. MUST HAVE A __RUN__ FUNCTION TO BE CALLED WHEN RUN. CANT BE SENT INSTANTIATED 
 #FUNCTION ANYMORE DUE TO PICLKING
 
@@ -43,7 +48,7 @@ sw = sampleWrapper.sampleWrapper("watever0")
 
 f0 = joblaunch.Job('f0', [sw                      ], selfTester=sw )
 f1 = joblaunch.Job('f1', [sampleWrapper.sample    ], deps=[f0] )
-f2 = joblaunch.Job('f2', [['sleep  3;', 'echo f2']], deps=[f0] )
+f2 = joblaunch.Job('f2', [jellyCount              ], deps=[f0] )
 f3 = joblaunch.Job('f3', [['sleep  4;', 'echo f3']], deps=[f0] )
 l1 = joblaunch.Job('l1', [['sleep  5;', 'echo l1 err;', 'exit 1']], deps=[f1, f2, f3] )
 f4 = joblaunch.Job('f4', [['sleep  6;', 'echo f4']], deps=[f0] )

@@ -1,15 +1,15 @@
+class paramPair():
+    def __init__(self):
+        self.name  = ""
+        self.value = ""
+        self.type  = ""
+        self.cmd   = ""
+
+
 class parameters():
     def __init__(self):
         self.pairs = []
         self.cmd   = []
-
-    class paramPair():
-        def __init__(self):
-            self.name  = ""
-            self.value = ""
-            self.type  = ""
-            self.cmd   = ""
-
 
     def add(self, pos, name, value, type):
         pair = [name, value, type]
@@ -17,7 +17,7 @@ class parameters():
 
     def append(self, name, value, type):
         #print " appending name " + str(name) + " value " + str(value) + " type " + str(type)
-        pair       = self.paramPair()
+        pair       = paramPair()
         pair.name  = name
         pair.value = value
         pair.type  = type 

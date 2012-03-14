@@ -14,7 +14,7 @@ if __name__ == "__main__":
 
 from tools import *
 from tools.parameters import parameters
-from sampleWrapper import sampleWrapper
+from sampleWrapper    import sampleWrapper
 
 """
     sample class showing how to create a sample program wrapper
@@ -40,7 +40,8 @@ from sampleWrapper import sampleWrapper
 
 
 
-exe="/home/aflit001/bin/jellyfish"
+exe       = "/home/aflit001/bin/jellyfish"
+className = 'jelly'
 
 
 class jellyCount(sampleWrapper):
@@ -63,9 +64,8 @@ class jellyCount(sampleWrapper):
         assert input  is not None
 
 
-
         function  = "count"
-
+        sampleWrapper.__init__(self, className + "_" + function + "_" + input)
 
 
         output = kwargs.get('output', None)

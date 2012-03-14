@@ -1,5 +1,6 @@
 #!/usr/bin/python
-
+import subprocess
+import constants
 
 def runString(id, cmdFinal, messaging):
     try:
@@ -21,8 +22,8 @@ def runString(id, cmdFinal, messaging):
             #print "WAITING"
             messaging.exitCode = p.wait()
             if messaging.exitCode:
-                print "JOB :: " + id + " :: CMD ARR {" + str(cmd) + "} STR {" + cmdFinal + "} :: RETURNED: " + str(messaging.exitCode) + " THEREFORE FAILED "
-                messaging.status = FAILED
+                print "JOB :: " + id + " :: STR {" + cmdFinal + "} :: RETURNED: " + str(messaging.exitCode) + " THEREFORE FAILED "
+                messaging.status = constants.FAILED
                 messaging.addError("FAILED TO RUN " + cmdFinal + " :: RETURNED: " + str(messaging.exitCode) + " THEREFORE FAILED ")
                 return messaging.exitCode
             #print "FINISHED"
@@ -30,21 +31,21 @@ def runString(id, cmdFinal, messaging):
             #print "FINISHED RUNNING CMD " + cmdFinal + " WRITING"
             #Job.outputFileWriter.write(id, p.stdout)
             #print "FINISHED RUNNING CMD " + cmdFinal + " WROTE"
-            print "JOB :: " + id + " :: REACHED END. FINISHING WITH STATUS " + STATUSES[messaging.status] + " " + str(messaging.exitCode)
-            messaging.status   = FINISH
+            print "JOB :: " + id + " :: REACHED END. FINISHING WITH STATUS " + constants.STATUSES[messaging.status] + " " + str(messaging.exitCode)
+            messaging.status   = constants.FINISH
             messaging.exitCode = 0
             return messaging.exitCode
 
         except Exception, e:
             print "Exception (Job__launch_out): ", e
-            messaging.status = FAILED
+            messaging.status = constants.FAILED
             messaging.addError("FAILED TO RUN " + cmdFinal + " EXCEPTION " + str(e))
             messaging.exitCode = 252
             return messaging.exitCode
 
     except Exception, e:
         print "Exception (Job__launch): ", e
-        messaging.status = FAILED
+        messaging.status = constants.FAILED
         messaging.addError("FAILED TO RUN " + cmdFinal + " EXCEPTION " + str(e))
         messaging.exitCode = 253
         return messaging.exitCode

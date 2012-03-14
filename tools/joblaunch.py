@@ -45,7 +45,6 @@ import sys
 import time
 import optparse
 import logging
-import subprocess
 import threading
 import multiprocessing
 import collections

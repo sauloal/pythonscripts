@@ -47,6 +47,7 @@ class sampleWrapper():
 
         print "RUNNING WRAPPER NAMED " + self.name
         print "GOT STATUS " + str(self.messaging.status)
+        run.runString()
         self.messaging.status = constants.FINISH
         print "RETURNING STATUS " + str(self.messaging.status)
         print "EXIT STATUS ORIGINAL " + str(self.messaging.exitCode)
