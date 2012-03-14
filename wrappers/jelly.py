@@ -110,7 +110,6 @@ class jellyCount(sampleWrapper):
         }
 
         parameter.parseList(params, kwargs)
-        #def parse(self, name,    type,     dashes, equal, res):
         parameter.parse( 'output', 'text',  2,      True,  output )
         parameter.parse( '',       'value', 0,      False, input  )
 
@@ -118,8 +117,7 @@ class jellyCount(sampleWrapper):
         self.cmd       = parameter.getCmd()
         print "  INITING JELLY COUNT CMD " + self.cmd
 
-#    def __call__(self, messaging):
-#        return super(jellyCount, self).__call__(messaging)
+
 
 
 class jellyStats(sampleWrapper):
@@ -163,13 +161,13 @@ class jellyStats(sampleWrapper):
         parameter.append(function,      True,   'name')
 
         params = {
-            'lower_count': { 'name': 'lower-count', 'type': 'num',  'dashes': 2, 'equal': True  },
-            'upper_count': { 'name': 'upper-count', 'type': 'num',  'dashes': 2, 'equal': True  },
-            'verbose':     { 'name': 'verbose',     'type': 'bool', 'dashes': 2, 'equal': None  }
+            'lower-count' : { 'type': 'num',  'dashes': 2, 'equal': True  },
+            'upper-count' : { 'type': 'num',  'dashes': 2, 'equal': True  },
+            'verbose'     : { 'type': 'bool', 'dashes': 2, 'equal': None  }
         }
 
         parameter.parseList(params, kwargs)
-        #def parse(self, name,    type,     dashes, equal, res):
+        parameter.parse( 'output', 'text',  2,      True,  output )
         parameter.parse( '',       'value', 0,      False, input  )
 
         self.parameter = parameter
@@ -224,12 +222,12 @@ class jellyHisto(sampleWrapper):
         parameter.append(function,      True,   'name')
 
         params = {
-            'low'       : { 'name': 'low',       'type': 'num',  'dashes': 2, 'equal': True  },
-            'high'      : { 'name': 'high',      'type': 'num',  'dashes': 2, 'equal': True  },
-            'increment' : { 'name': 'increment', 'type': 'num',  'dashes': 2, 'equal': True  },
-            'threads'   : { 'name': 'threads',   'type': 'num',  'dashes': 2, 'equal': True  },
-            'full'      : { 'name': 'full',      'type': 'bool', 'dashes': 2, 'equal': None  },
-            'verbose'   : { 'name': 'verbose',   'type': 'bool', 'dashes': 2, 'equal': None  }
+            'low'       : { 'type': 'num',  'dashes': 2, 'equal': True  },
+            'high'      : { 'type': 'num',  'dashes': 2, 'equal': True  },
+            'increment' : { 'type': 'num',  'dashes': 2, 'equal': True  },
+            'threads'   : { 'type': 'num',  'dashes': 2, 'equal': True  },
+            'full'      : { 'type': 'bool', 'dashes': 2, 'equal': None  },
+            'verbose'   : { 'type': 'bool', 'dashes': 2, 'equal': None  }
         }
 
         parameter.parseList(params, kwargs)
@@ -280,14 +278,13 @@ class jellyDump(sampleWrapper):
         parameter.append(function,      True,   'name')
 
         params = {
-            'column':      { 'name': 'column',          'type': 'bool', 'dashes': 2, 'equal': None  },
-            'tab':         { 'name': 'tab',             'type': 'bool', 'dashes': 2, 'equal': None  },
-            'lower_count': { 'name': 'lower-count',     'type': 'num',  'dashes': 2, 'equal': True  },
-            'upper_count': { 'name': 'upper-count',     'type': 'num',  'dashes': 2, 'equal': True  },
+            'column'          : { 'type': 'bool', 'dashes': 2, 'equal': None  },
+            'tab'             : { 'type': 'bool', 'dashes': 2, 'equal': None  },
+            'lower-count'     : { 'type': 'num',  'dashes': 2, 'equal': True  },
+            'upper-count'     : { 'type': 'num',  'dashes': 2, 'equal': True  },
         }
 
         parameter.parseList(params, kwargs)
-        #def parse(self, name,    type,     dashes, equal, res):
         parameter.parse( 'output', 'text',  2,      True,  output )
         parameter.parse( '',       'value', 0,      False, input  )
 
@@ -295,8 +292,6 @@ class jellyDump(sampleWrapper):
         self.cmd       = parameter.getCmd()
         print "  INITING JELLY COUNT CMD " + self.cmd
 
-#    def __call__(self, messaging):
-#        return super(jellyCount, self).__call__(messaging)
 
 
 
@@ -335,23 +330,19 @@ class jellyMerge(sampleWrapper):
         parameter.append(function,      True,   'name')
 
         params = {
-            'buffer_size':     { 'name': 'buffer-size',     'type': 'num',  'dashes': 2, 'equal': True  },
-            'out_counter_len': { 'name': 'out-counter-len', 'type': 'num',  'dashes': 2, 'equal': True  },
-            'out_buffer_size': { 'name': 'out-buffer-size', 'type': 'num',  'dashes': 2, 'equal': True  },
-            'verbose':         { 'name': 'verbose',         'type': 'bool', 'dashes': 2, 'equal': None  }
+            'buffer-size'     : { 'type': 'num',  'dashes': 2, 'equal': True  },
+            'out-counter-len' : { 'type': 'num',  'dashes': 2, 'equal': True  },
+            'out-buffer-size' : { 'type': 'num',  'dashes': 2, 'equal': True  },
+            'verbose'         : { 'type': 'bool', 'dashes': 2, 'equal': None  }
         }
 
         parameter.parseList(params, kwargs)
-        #def parse(self, name,    type,     dashes, equal, res):
         parameter.parse( 'output', 'text',  2,      True,  output )
         parameter.parse( '',       'value', 0,      False, input  )
 
         self.parameter = parameter
         self.cmd       = parameter.getCmd()
         print "  INITING JELLY COUNT CMD " + self.cmd
-
-#    def __call__(self, messaging):
-#        return super(jellyCount, self).__call__(messaging)
 
 
 

@@ -1,4 +1,6 @@
 import glob
+import os
+
 class io():
     def __init__(self, fileName, glob=None):
         self.fileName = fileName
@@ -7,11 +9,31 @@ class io():
     def getName(self):
         return self.fileName
 
+    def getGlob(self):
+        return self.glob
+
     def getFiles(self):
-        return glob(self.fileName)
+        if self.glob is not None:
+            return glob(self.glob)
+        else:
+            return [self.fileName]
+
+    def exists(self):
+        for file in self.getFiles():
+            if ( not os.path.exists(file) ):
+                return False
+        return True
 
     def getStats(self):
-        pass
+        stats = {}
+        files = self.getFiles()
+        stats['numfiles'] = length(files)
+        stats['size']     = 0
+
+        for file in files:
+            stats['size'] += os.stat(file).st_size
+
+        return stats
 
 
 class paramPair():
