@@ -95,7 +95,7 @@ class jellyCount(sampleWrapper):
             'size'            : { 'type': 'num',  'dashes': 2, 'equal': True  },
             'threads'         : { 'type': 'num',  'dashes': 2, 'equal': True  },
             'counter-len'     : { 'type': 'num',  'dashes': 2, 'equal': True  },
-            'out_counter-len' : { 'type': 'num',  'dashes': 2, 'equal': True  },
+            'out-counter-len' : { 'type': 'num',  'dashes': 2, 'equal': True  },
             'both-strands'    : { 'type': 'bool'                              },
             'reprobes'        : { 'type': 'num',  'dashes': 2, 'equal': True  },
             'raw'             : { 'type': 'bool'                              },

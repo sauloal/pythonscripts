@@ -1,3 +1,19 @@
+import glob
+class io():
+    def __init__(self, fileName, glob=None):
+        self.fileName = fileName
+        self.glob     = glob
+
+    def getName(self):
+        return self.fileName
+
+    def getFiles(self):
+        return glob(self.fileName)
+
+    def getStats(self):
+        pass
+
+
 class paramPair():
     def __init__(self):
         self.name  = ""
@@ -62,12 +78,14 @@ class parameters():
         for key in data.keys():
             values = data[key]
             #'buffer_size':     { 'name': 'buffer-size',     'type': 'num',  'dashes': 2, 'equal': True  },
-            name   = values.get('name',   None)
             type   = values.get('type',   None)
             dashes = values.get('dashes', None)
             equal  = values.get('equal',  None)
-            res    = kwargs.get(key,      None)
-            self.parse(name, type, dashes, equal, res)
+            kkey   = key
+            kkey   = kkey.replace("-", "_")
+            kkey   = kkey.replace(".", "_")
+            res    = kwargs.get(kkey,     None)
+            self.parse(key, type, dashes, equal, res)
 
     def getCmd(self):
         return " ".join(self.cmd)
