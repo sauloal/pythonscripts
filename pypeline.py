@@ -33,14 +33,14 @@ for lib in setup.ldataset:
             print '    RUN ' + run.getShortName()
 
 
-            
+
 sw         = sampleWrapper.sampleWrapper("watever0")
 
 fn         = '/mnt/nexenta/aflit001/nobackup/Data/F5/F5_Illumina/F5_Illumina_GOG18L3_pairedend_300/110126_SN132_B_s_3_1_seq_GOG-18.fastq'
 ou         = '/tmp/110126_SN132_B_s_3_1_seq_GOG-18.fastq'
 jellyCount = jelly.jellyCount(fn,         output=ou,   buffer_size=1000, out_counter_len=4, out_buffer_size=10000000, verbose=False)
 
-#TODO. MUST HAVE A __RUN__ FUNCTION TO BE CALLED WHEN RUN. CANT BE SENT INSTANTIATED 
+#TODO. MUST HAVE A __RUN__ FUNCTION TO BE CALLED WHEN RUN. CANT BE SENT INSTANTIATED
 #FUNCTION ANYMORE DUE TO PICLKING
 
 #                  ID,   COMMAND                      SELFTEST=               DEPS=
@@ -76,6 +76,8 @@ all=[sw, data]
 dataDump = str(dump(data, Dumper=Dumper))
 print dataDump
 data2 = load(dataDump, Loader=Loader)
+
+
 joblaunch.mainLib(data2, verbose=True)
 
 

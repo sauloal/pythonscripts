@@ -183,6 +183,9 @@ class Graph:
             for v in sorted(self.edges[u]):
                 yield (u, v)
 
+    def pringGraph(self):
+        pass
+
 class AtomicCounter:
     """
     Counter that implements atomic operations to be used in multiple threads.
@@ -630,6 +633,10 @@ def parseInput(inputFilePath):
 
     return (commands, dependencies, jobsOrder, checks)
 
+class jobsList():
+    def __init__(self):
+        pass
+
 def createJobs(commands, G, jobsOrder, checks):
     """
     Create a Job object for each job, filling the successors and predecessors
@@ -637,7 +644,14 @@ def createJobs(commands, G, jobsOrder, checks):
     and the value is the Job object.
     """
 
-    jobs = { }
+    jobs           = jobsList()
+    jobs.G         = G
+    jobs.commands  = commands
+    jobs.jobsOrder = jobsOrder
+    jobs.checks    = checks
+    printer        = printG(G, jobs)
+    jobs.printer   = printer
+
     def getJob(jobId):
         # create a new job or return the existing one
         if jobId not in jobs:
@@ -881,13 +895,12 @@ def main():
     #create jobs
     jobs        = createJobs(commands, G, jobsOrder, checks)
 
+    jobs.printer.printGraph()
+
     # begin working
     start(jobs, options.numThreads)
 
-    graphPrinter = printG(G, jobs)
-    graphPrinter.printGraph()
-
-
+    jobs.printer.printGraph()
 
 
 
@@ -950,6 +963,14 @@ def mainLib(jobs, **kwargs):
 
     # parse input file
     G = checkGraph(jobs, force=force)
+
+    jobs           = jobsList()
+    jobs.G         = G
+    jobs.commands  = commands
+    jobs.jobsOrder = jobsOrder
+    jobs.checks    = checks
+    printer        = printG(G, jobs)
+    jobs.printer   = printer
 
     # begin working
     start(jobs, numThreads)
