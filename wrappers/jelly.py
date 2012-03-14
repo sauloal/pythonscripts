@@ -5,7 +5,7 @@ if __name__ == "__main__":
     fullpath=os.getcwd()
 
     # add parent folder to path
-    
+
     #print "CURRENT PATH " + fullpath
     fullpath=os.path.abspath(fullpath + "/..")
     #print "PREVIOUS PATH " + fullpath
@@ -30,7 +30,7 @@ from sampleWrapper    import sampleWrapper
         RUNNING         = 1
         FAILED          = 2
         FINISH          = 3
-    
+
     Optionally (if used), a class can contain a function called
     "selfTest" which will be called by the end of the execution
     by the job scheduler.
@@ -91,9 +91,9 @@ class jellyCount(sampleWrapper):
         parameter.append(function,      True,   'name')
 
         params = {
-            'buffer_size':     { 'name': 'buffer-size',     'type': 'num',  'dashes': 2, 'equal': True  }, 
-            'out_counter_len': { 'name': 'out-counter-len', 'type': 'num',  'dashes': 2, 'equal': True  }, 
-            'out_buffer_size': { 'name': 'out-buffer-size', 'type': 'num',  'dashes': 2, 'equal': True  }, 
+            'buffer_size':     { 'name': 'buffer-size',     'type': 'num',  'dashes': 2, 'equal': True  },
+            'out_counter_len': { 'name': 'out-counter-len', 'type': 'num',  'dashes': 2, 'equal': True  },
+            'out_buffer_size': { 'name': 'out-buffer-size', 'type': 'num',  'dashes': 2, 'equal': True  },
             'verbose':         { 'name': 'verbose',         'type': 'bool', 'dashes': 2, 'equal': None  }
         }
 
@@ -109,7 +109,7 @@ class jellyCount(sampleWrapper):
 #    def __call__(self, messaging):
 #        return super(jellyCount, self).__call__(messaging)
 
-        
+
 class jellyStats(sampleWrapper):
     def __init__(self, input=None, **kwargs):
         """
@@ -138,13 +138,11 @@ class jellyStats(sampleWrapper):
 
         assert input  is not None
 
-
-
         function  = "stats"
 
         output = kwargs.get('output', None)
-        if output is not None:
-            parameter.parse( 'output', 'text',  2,      True,  output )
+        if output is None:
+            output          = input + ".stats"
 
 
 
@@ -153,8 +151,8 @@ class jellyStats(sampleWrapper):
         parameter.append(function,      True,   'name')
 
         params = {
-            'lower_count': { 'name': 'lower_count', 'type': 'num',  'dashes': 2, 'equal': True  }, 
-            'upper_count': { 'name': 'upper_count', 'type': 'num',  'dashes': 2, 'equal': True  }, 
+            'lower_count': { 'name': 'lower-count', 'type': 'num',  'dashes': 2, 'equal': True  },
+            'upper_count': { 'name': 'upper-count', 'type': 'num',  'dashes': 2, 'equal': True  },
             'verbose':     { 'name': 'verbose',     'type': 'bool', 'dashes': 2, 'equal': None  }
         }
 
@@ -200,30 +198,30 @@ class jellyHisto(sampleWrapper):
 
         assert input  is not None
 
-
-
         function  = "histo"
+        nickName  = className + "_" + function + "_" + input
+        print "  INITING JELLY HISTO" + nickName
+        sampleWrapper.__init__(self, nickName)
 
         output = kwargs.get('output', None)
-        if output is not None:
-            parameter.parse( 'output', 'text',  2,      True,  output )
-
-
+        if output is None:
+            output          = input + ".histo"
 
         parameter = parameters()
         parameter.append(exe,           True,   'name')
         parameter.append(function,      True,   'name')
 
         params = {
-            'low'       : { 'name': 'low',       'type': 'num',  'dashes': 2, 'equal': True  }, 
-            'high'      : { 'name': 'high',      'type': 'num',  'dashes': 2, 'equal': True  }, 
-            'increment' : { 'name': 'increment', 'type': 'num',  'dashes': 2, 'equal': True  }, 
-            'threads'   : { 'name': 'threads',   'type': 'num',  'dashes': 2, 'equal': True  }, 
+            'low'       : { 'name': 'low',       'type': 'num',  'dashes': 2, 'equal': True  },
+            'high'      : { 'name': 'high',      'type': 'num',  'dashes': 2, 'equal': True  },
+            'increment' : { 'name': 'increment', 'type': 'num',  'dashes': 2, 'equal': True  },
+            'threads'   : { 'name': 'threads',   'type': 'num',  'dashes': 2, 'equal': True  },
+            'full'      : { 'name': 'full',      'type': 'bool', 'dashes': 2, 'equal': None  },
             'verbose'   : { 'name': 'verbose',   'type': 'bool', 'dashes': 2, 'equal': None  }
         }
 
         parameter.parseList(params, kwargs)
-        #def parse(self, name,    type,     dashes, equal, res):
+        parameter.parse( 'output', 'text',  2,      True,  output )
         parameter.parse( '',       'value', 0,      False, input  )
 
         self.parameter = parameter
@@ -258,23 +256,22 @@ class jellyDump(sampleWrapper):
 
         function  = "dump"
         nickName  = className + "_" + function + "_" + input
-        print "  INITING JELLY COUNT " + nickName
+        print "  INITING JELLY DUMP" + nickName
         sampleWrapper.__init__(self, nickName)
-
 
         output = kwargs.get('output', None)
         if output is None:
-            output          = input + "_mer_counts"
+            output          = input + ".fasta"
 
         parameter = parameters()
         parameter.append(exe,           True,   'name')
         parameter.append(function,      True,   'name')
 
         params = {
-            'buffer_size':     { 'name': 'buffer-size',     'type': 'num',  'dashes': 2, 'equal': True  }, 
-            'out_counter_len': { 'name': 'out-counter-len', 'type': 'num',  'dashes': 2, 'equal': True  }, 
-            'out_buffer_size': { 'name': 'out-buffer-size', 'type': 'num',  'dashes': 2, 'equal': True  }, 
-            'verbose':         { 'name': 'verbose',         'type': 'bool', 'dashes': 2, 'equal': None  }
+            'column':      { 'name': 'column',          'type': 'bool', 'dashes': 2, 'equal': None  },
+            'tab':         { 'name': 'tab',             'type': 'bool', 'dashes': 2, 'equal': None  },
+            'lower_count': { 'name': 'lower-count',     'type': 'num',  'dashes': 2, 'equal': True  },
+            'upper_count': { 'name': 'upper-count',     'type': 'num',  'dashes': 2, 'equal': True  },
         }
 
         parameter.parseList(params, kwargs)
@@ -326,9 +323,9 @@ class jellyMerge(sampleWrapper):
         parameter.append(function,      True,   'name')
 
         params = {
-            'buffer_size':     { 'name': 'buffer-size',     'type': 'num',  'dashes': 2, 'equal': True  }, 
-            'out_counter_len': { 'name': 'out-counter-len', 'type': 'num',  'dashes': 2, 'equal': True  }, 
-            'out_buffer_size': { 'name': 'out-buffer-size', 'type': 'num',  'dashes': 2, 'equal': True  }, 
+            'buffer_size':     { 'name': 'buffer-size',     'type': 'num',  'dashes': 2, 'equal': True  },
+            'out_counter_len': { 'name': 'out-counter-len', 'type': 'num',  'dashes': 2, 'equal': True  },
+            'out_buffer_size': { 'name': 'out-buffer-size', 'type': 'num',  'dashes': 2, 'equal': True  },
             'verbose':         { 'name': 'verbose',         'type': 'bool', 'dashes': 2, 'equal': None  }
         }
 
