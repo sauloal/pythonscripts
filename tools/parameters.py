@@ -125,3 +125,9 @@ class parameters():
             if pair.name == qry:
                 return True
         return False
+
+    def getValue(self, qry):
+        for pair in self.pairs:
+            if pair.name == qry:
+                return pair.value
+        return False

@@ -117,11 +117,19 @@ class jellyCount(sampleWrapper):
         self.parameter = parameter
         self.cmd       = parameter.getCmd()
 
-        self.inputs  = [io(input)]
-        self.outputs = [io(output)]
-        if ()
+        self.inputs  = ( io(input)  )
+        self.outputs = ( io(output) )
+
+        if (parameter.hasParam('matrix')):
+            self.inputs.append(io(parameter.getValue('matrix')))
+        if (parameter.hasParam('timing')):
+            self.outputs.append(io(parameter.getValue('timing')))
+        if (parameter.hasParam('stats')):
+            self.outputs.append(io(parameter.getValue('stats')))
 
         print "  INITING JELLY COUNT CMD " + self.cmd
+        print "    INPUTS : " + "\n".join( self.inputs  )
+        print "    OUTPUTS: " + "\n".join( self.outputs )
 
 
 
