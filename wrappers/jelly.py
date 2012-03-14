@@ -47,21 +47,33 @@ className = 'jelly'
 class jellyCount(sampleWrapper):
     def __init__(self, input=None, **kwargs):
         """
-        Usage: jellyfish merge [options] input:c_string+
+        Usage: jellyfish count [options] file:path+
 
-        Merge jellyfish databases
+        Count k-mers or qmers in fasta or fastq files
 
         Options (default value in (), *required):
-        -s, --buffer-size=Buffer length          Length in bytes of input buffer (10000000)
-        -o, --output=string                      Output file (mer_counts_merged.jf)
-            --out-counter-len=uint32             Length (in bytes) of counting field in output (4)
-            --out-buffer-size=uint64             Size of output buffer per thread (10000000)
-        -v, --verbose                            Be verbose (false)
-            --usage                              Usage
-        -h, --help                               This message
-        -V, --version                            Version
+         -m, --mer-len=uint32                    *Length of mer
+         -s, --size=uint64                       *Hash size
+         -t, --threads=uint32                     Number of threads (1)
+         -o, --output=string                      Output prefix (mer_counts)
+         -c, --counter-len=Length in bits         Length of counting field (7)
+             --out-counter-len=Length in bytes    Length of counter field in output (4)
+         -C, --both-strands                       Count both strand, canonical representation (false)
+         -p, --reprobes=uint32                    Maximum number of reprobes (62)
+         -r, --raw                                Write raw database (false)
+         -q, --quake                              Quake compatibility mode (false)
+             --quality-start=uint32               Starting ASCII for quality values (64)
+             --min-quality=uint32                 Minimum quality. A base with lesser quality becomes an N (0)
+         -L, --lower-count=uint64                 Don't output k-mer with count < lower-count
+         -U, --upper-count=uint64                 Don't output k-mer with count > upper-count
+             --matrix=Matrix file                 Hash function binary matrix
+             --timing=Timing file                 Print timing information
+             --stats=Stats file                   Print stats
+             --usage                              Usage
+         -h, --help                               This message
+             --full-help                          Detailed help
+         -V, --version                            Version
         """
-        assert input  is not None
 
 
         function  = "count"
@@ -219,7 +231,8 @@ class jellyHisto(sampleWrapper):
 
 
 
-class jellyMerge(sampleWrapper):
+
+class jellyDump(sampleWrapper):
     def __init__(self, input=None, **kwargs):
         """
         Usage: jellyfish stats [options] db:path
@@ -243,33 +256,95 @@ class jellyMerge(sampleWrapper):
         assert input  is not None
 
 
+        function  = "dump"
+        nickName  = className + "_" + function + "_" + input
+        print "  INITING JELLY COUNT " + nickName
+        sampleWrapper.__init__(self, nickName)
 
-        function  = "merge"
 
         output = kwargs.get('output', None)
-        if output is not None:
-            parameter.parse( 'output', 'text',  2,      True,  output )
-
-
+        if output is None:
+            output          = input + "_mer_counts"
 
         parameter = parameters()
         parameter.append(exe,           True,   'name')
         parameter.append(function,      True,   'name')
 
         params = {
-            'lower_count' : { 'name': 'lower-count', 'type': 'num',  'dashes': 2, 'equal': True  }, 
-            'upper_count' : { 'name': 'upper-count', 'type': 'num',  'dashes': 2, 'equal': True  }, 
-            'column'      : { 'name': 'column',      'type': 'bool', 'dashes': 2, 'equal': True  }, 
-            'tab'         : { 'name': 'tab',         'type': 'bool', 'dashes': 2, 'equal': True  }, 
-            'verbose'     : { 'name': 'verbose',     'type': 'bool', 'dashes': 2, 'equal': None  }
+            'buffer_size':     { 'name': 'buffer-size',     'type': 'num',  'dashes': 2, 'equal': True  }, 
+            'out_counter_len': { 'name': 'out-counter-len', 'type': 'num',  'dashes': 2, 'equal': True  }, 
+            'out_buffer_size': { 'name': 'out-buffer-size', 'type': 'num',  'dashes': 2, 'equal': True  }, 
+            'verbose':         { 'name': 'verbose',         'type': 'bool', 'dashes': 2, 'equal': None  }
         }
 
         parameter.parseList(params, kwargs)
         #def parse(self, name,    type,     dashes, equal, res):
+        parameter.parse( 'output', 'text',  2,      True,  output )
         parameter.parse( '',       'value', 0,      False, input  )
 
         self.parameter = parameter
         self.cmd       = parameter.getCmd()
+        print "  INITING JELLY COUNT CMD " + self.cmd
+
+#    def __call__(self, messaging):
+#        return super(jellyCount, self).__call__(messaging)
+
+
+
+class jellyMerge(sampleWrapper):
+    def __init__(self, input=None, **kwargs):
+        """
+        Usage: jellyfish merge [options] input:c_string+
+
+        Merge jellyfish databases
+
+        Options (default value in (), *required):
+        -s, --buffer-size=Buffer length          Length in bytes of input buffer (10000000)
+        -o, --output=string                      Output file (mer_counts_merged.jf)
+            --out-counter-len=uint32             Length (in bytes) of counting field in output (4)
+            --out-buffer-size=uint64             Size of output buffer per thread (10000000)
+        -v, --verbose                            Be verbose (false)
+            --usage                              Usage
+        -h, --help                               This message
+        -V, --version                            Version
+        """
+        assert input  is not None
+
+
+        function  = "merge"
+        nickName  = className + "_" + function + "_" + input
+        print "  INITING JELLY COUNT " + nickName
+        sampleWrapper.__init__(self, nickName)
+
+
+        output = kwargs.get('output', None)
+        if output is None:
+            output          = input + "_mer_counts"
+
+        parameter = parameters()
+        parameter.append(exe,           True,   'name')
+        parameter.append(function,      True,   'name')
+
+        params = {
+            'buffer_size':     { 'name': 'buffer-size',     'type': 'num',  'dashes': 2, 'equal': True  }, 
+            'out_counter_len': { 'name': 'out-counter-len', 'type': 'num',  'dashes': 2, 'equal': True  }, 
+            'out_buffer_size': { 'name': 'out-buffer-size', 'type': 'num',  'dashes': 2, 'equal': True  }, 
+            'verbose':         { 'name': 'verbose',         'type': 'bool', 'dashes': 2, 'equal': None  }
+        }
+
+        parameter.parseList(params, kwargs)
+        #def parse(self, name,    type,     dashes, equal, res):
+        parameter.parse( 'output', 'text',  2,      True,  output )
+        parameter.parse( '',       'value', 0,      False, input  )
+
+        self.parameter = parameter
+        self.cmd       = parameter.getCmd()
+        print "  INITING JELLY COUNT CMD " + self.cmd
+
+#    def __call__(self, messaging):
+#        return super(jellyCount, self).__call__(messaging)
+
+
 
 
 
