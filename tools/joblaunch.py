@@ -13,7 +13,7 @@ __autor__   = "Yassin Ezbakhe <yassin@ezbakhe.es> | Saulo Aflitos <sauloal@gmail
             obtained automatically
         - the number of threads is now limited to the number of requests if
             there are not enough requests
-            
+
     To initialize the mainLib function takes a list of jobs and parameters (
         the same from command line ).
     Each job should be initialized as such:
@@ -21,7 +21,7 @@ __autor__   = "Yassin Ezbakhe <yassin@ezbakhe.es> | Saulo Aflitos <sauloal@gmail
     f0 = joblaunch.Job('f0', [sw                      ],        selfTester=sw )
     f1 = joblaunch.Job('f1', [sampleWrapper.sample    ],        deps=[f0] )
     f2 = joblaunch.Job('f2', [['sleep  3;', 'echo f2']],        deps=[f0] )
-    
+
     classes have to be callable:
         compulsory:
             def __call__(self, messaging)
@@ -31,12 +31,12 @@ __autor__   = "Yassin Ezbakhe <yassin@ezbakhe.es> | Saulo Aflitos <sauloal@gmail
                     status   = contains the current status of the process
                     exitCode = contains the current error message
                     error    = LIST containing all taceback of errors
-                status and err should be returned 
+                status and err should be returned
         optionally:
             def selfTest(self)
     functions mush receive the same parameters:
         def sample(writeOut, writeErr, status, err)
-    strings 
+    strings
 """
 
 
@@ -73,7 +73,7 @@ class programMessaging():
         self.status      = status
         self.exitCode    = exitCode
         self.error       = []
-    
+
     def setFileWriter(self, fileWriter):
         """
         sets a filewriter and creates a job writer which prepends each message
@@ -81,25 +81,25 @@ class programMessaging():
         """
         self.fileWritter = fileWriter
         self.jobWritter  = OutputJobWriter(self.id, fileWriter)
-    
+
     def addError(self, message):
         """
         append de error array with a message prepended with the id
         """
         self.error.append(self.id + " :: " + message)
-        
+
     def getError(self):
         """
         get the error string
         """
         return "\n".join(self.error)
-        
+
     def stdout(self, id, message, **kwargs):
         """
         prints a message to stdout prepending with the parent id and the caller id
         """
         self.jobWritter.writelnOut(id, message, **kwargs)
-        
+
     def stderr(self, id, message, **kwargs):
         """
         prints a message to stderr prepending with the parent id and the caller id
@@ -295,38 +295,38 @@ class OutputJobWriter():
     def __init__(self, className, writer):
         self.className = className
         self.writer    = writer
-        
+
     def write(self, jobId, stdout, **kwargs):
         internal = kwargs.get('internal', None)
         if internal:
             self.writer.write(jobId, stdout)
         else:
             self.writer.write(self.className + " :: " + jobId, stdout)
-        
+
     def writeln(self, jobId, stream, line, **kwargs):
         internal = kwargs.get('internal', None)
         if internal:
             self.writer.writeln(jobId, stream, line)
         else:
             self.writer.writeln(self.className + " :: " + jobId, stream, line)
-    
+
     def writelnOut(self, jobId, line, **kwargs):
         internal = kwargs.get('internal', None)
         if internal:
             self.writer.writelnOut(jobId, line)
         else:
             self.writer.writelnOut(self.className + "<1> :: " + jobId, line)
-        
+
     def writelnErr(self, jobId, line, **kwargs):
         internal = kwargs.get('internal', None)
         if internal:
             self.writer.writelnErr(jobId, line)
         else:
             self.writer.writelnErr(self.className + "<2> :: " + jobId, line)
-        
+
     def close(self):
         self.writer.close()
-        
+
 
 class Job:
     """
@@ -356,9 +356,9 @@ class Job:
         assert not self.predecessors
         logging.info("%s started %s", self.id, threading.currentThread().name)
         begin                   = time.time()
-        
+
         self.messaging.setFileWriter(Job.outputFileWriter)
-        
+
         self.messaging.exitCode = 256
         self.messaging.status   = constants.RUNNING
         res                     = self.__launch()
@@ -378,7 +378,7 @@ class Job:
 
     def getReturn(self):
         return self.messaging.exitCode
-    
+
     def getError(self):
         return self.messaging.getError()
 
@@ -434,7 +434,7 @@ class Job:
 
                 for part in cmd:
                     #print "  PART  '" + str(part) + "'"
-    
+
                     if isinstance(part, types.FunctionType):
                         #print "    FUNCTION"
                         if cmdFinal:
@@ -451,9 +451,9 @@ class Job:
                             cmdFinal += " "
                         cmdFinal += part
                 #print "  CMD F '" + str(cmdFinal) + "'"
-    
+
                 try:
-                    runString(self.id, cmdFinal, self.messaging)    
+                    runString(self.id, cmdFinal, self.messaging)
                     return self.messaging.exitCode
                 except Exception, e:
                     print "Exception (Job__launch): ", e
@@ -461,7 +461,7 @@ class Job:
                     self.messaging.addError("FAILED TO RUN " + cmdFinal + " EXCEPTION " + str(e))
                     self.messaging.exitCode = 253
                     return self.messaging.exitCode
-    
+
                 if self.messaging.exitCode:
                     self.messaging.status = constants.FAILED
                     self.messaging.addError("FAILED TO RUN " + cmdFinal)
@@ -499,7 +499,7 @@ class Core(threading.Thread):
             job = self.queue.get()
             self.last = job
             job()
-            
+
             if not job.getReturn():
                 self.__addPreparedJobsToQueue(job)
                 self.numJobsLeft.decrement()
@@ -763,90 +763,96 @@ def parseArguments(args):
 
     return options
 
-def printG(G, jobs):
-    """
-    Prints a png image of the process and the states they are
-    TODO:   Allow to change the name
-            Allow to append timestamp to create a series of snapshots
-    """
-    #https://docs.google.com/viewer?url=http://www.graphviz.org/pdf/dotguide.pdf
-    #http://pythonhaven.wordpress.com/2009/12/09/generating_graphs_with_pydot/
-    import pydot
-    graph = pydot.Dot(graph_type='digraph')
+class printG:
+    def __init__(self, G, jobs):
+        """
+        Prints a png image of the process and the states they are
+        TODO:   Allow to change the name
+                Allow to append timestamp to create a series of snapshots
+        """
+        #https://docs.google.com/viewer?url=http://www.graphviz.org/pdf/dotguide.pdf
+        #http://pythonhaven.wordpress.com/2009/12/09/generating_graphs_with_pydot/
+        import pydot
 
-    statusColors = { constants.NOT_RUN: ["white",  "black"],
-                     constants.RUNNING: ["yellow", "black"],
-                     constants.FAILED:  ["red",    "black"],
-                     constants.FINISH:  ["green",  "black"]
-                   }
+        self.G        = G
+        self.jobs     = jobs
+
+        self.statusColors = {   constants.NOT_RUN: ["white",  "black"],
+                                constants.RUNNING: ["yellow", "black"],
+                                constants.FAILED:  ["red",    "black"],
+                                constants.FINISH:  ["green",  "black"]
+                            }
+
+    def printGraph(self, fileName='joblaunch_'+constants.timestamp+'.png'):
+        self.graph = pydot.Dot(graph_type='digraph')
+
+        nodes = {}
+        for jobId in self.jobs:
+            job          = self.jobs[jobId]
+            status       = job.getStatus()
+            statusColor  = statusColors[status]
+            node         = pydot.Node(jobId, style="filled", fillcolor=statusColor[0], fontcolor=statusColor[1])
+            graph.add_node(node)
+            nodes[jobId] = node
+
+        for jobId in jobs:
+            job  = jobs[jobId]
+            node = nodes[jobId]
+            DEPS = job.getDeps()
+            #print "ADDING NODE " + jobId + " STATUS: " + str(job.getStatus()) + " RETURN VALUE: " + str(job.getReturn())
+            for DEP in DEPS:
+                depId   = DEP.getId()
+                #print "  DEP " + depId
+                depNode = nodes[depId]
+                graph.add_edge(pydot.Edge(depNode, node))
 
 
-    nodes = {}
-    for jobId in jobs:
-        job          = jobs[jobId]
-        status       = job.getStatus()
-        statusColor  = statusColors[status]
-        node         = pydot.Node(jobId, style="filled", fillcolor=statusColor[0], fontcolor=statusColor[1])
-        graph.add_node(node)
-        nodes[jobId] = node
+        #    str = """
+        #digraph G {
+        #    size ="4,4";
+        #    main [shape=box]; /* this is a comment */
+        #    main -> parse [weight=8];
+        #    parse -> execute;
+        #    main -> init [style=dotted];
+        #    main -> cleanup;
+        #    execute -> { make_string; printf}
+        #    init -> make_string;
+        #    edge [color=red]; // so is this
+        #    main -> printf [style=bold,label="100 times"];
+        #    make_string [label="make a\\nstring"];
+        #    node [shape=box,style=filled,color=".7 .3 1.0"];
+        #    execute -> compare;
+        #}
+        #"""
 
-    for jobId in jobs:
-        job  = jobs[jobId]
-        node = nodes[jobId]
-        DEPS = job.getDeps()
-        #print "ADDING NODE " + jobId + " STATUS: " + str(job.getStatus()) + " RETURN VALUE: " + str(job.getReturn())
-        for DEP in DEPS:
-            depId   = DEP.getId()
-            #print "  DEP " + depId
-            depNode = nodes[depId]
-            graph.add_edge(pydot.Edge(depNode, node))
+        #dot -T svg nato
 
+        #digraph G {
+        #subgraph cluster0 {
+        #node [style=filled,color=white];
+        #style=filled;
+        #color=lightgrey;
+        #a0 -> a1 -> a2 -> a3;
+        #label = "process #1";
+        #}
+        #subgraph cluster1 {
+        #node [style=filled];
+        #b0 -> b1 -> b2 -> b3;
+        #label = "process #2";
+        #color=blue
+        #}
+        #start -> a0;
+        #start -> b0;
+        #a1 -> b3;
+        #b2 -> a3;
+        #a3 -> a0;
+        #a3 -> end;
+        #b3 -> end;
+        #start [shape=Mdiamond];
+        #end [shape=Msquare];
+        #}
 
-    #    str = """
-    #digraph G {
-    #    size ="4,4";
-    #    main [shape=box]; /* this is a comment */
-    #    main -> parse [weight=8];
-    #    parse -> execute;
-    #    main -> init [style=dotted];
-    #    main -> cleanup;
-    #    execute -> { make_string; printf}
-    #    init -> make_string;
-    #    edge [color=red]; // so is this
-    #    main -> printf [style=bold,label="100 times"];
-    #    make_string [label="make a\\nstring"];
-    #    node [shape=box,style=filled,color=".7 .3 1.0"];
-    #    execute -> compare;
-    #}
-    #"""
-    
-    #dot -T svg nato 
-    
-    #digraph G {
-    #subgraph cluster0 {
-    #node [style=filled,color=white];
-    #style=filled;
-    #color=lightgrey;
-    #a0 -> a1 -> a2 -> a3;
-    #label = "process #1";
-    #}
-    #subgraph cluster1 {
-    #node [style=filled];
-    #b0 -> b1 -> b2 -> b3;
-    #label = "process #2";
-    #color=blue
-    #}
-    #start -> a0;
-    #start -> b0;
-    #a1 -> b3;
-    #b2 -> a3;
-    #a3 -> a0;
-    #a3 -> end;
-    #b3 -> end;
-    #start [shape=Mdiamond];
-    #end [shape=Msquare];
-    #}
-    graph.write_png('joblaunch.png')
+        graph.write_png(fileName)
 
 def main():
     print "RUNNING MAIN"
@@ -877,7 +883,7 @@ def main():
 
     # begin working
     start(jobs, options.numThreads)
-    
+
     printG(G, jobs)
 
 
@@ -891,7 +897,7 @@ def checkGraph(jobs, **kwargs):
     """
     Check if graph contains cycle
     """
-    
+
     force      = kwargs.get('force')
     G = Graph()
 

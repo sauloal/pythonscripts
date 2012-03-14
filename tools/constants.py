@@ -1,7 +1,7 @@
 import time
 from   datetime import date
 
-timestamp = date.strftime(format)
+timestamp = date.strftime("%Y_%m_%d_%H_%M_%S")
 
 NOT_RUN           = 0
 RUNNING           = 1
