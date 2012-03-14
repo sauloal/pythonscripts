@@ -35,8 +35,13 @@ class io():
         for file in files:
             stats['size'] += os.stat(file).st_size
 
+        self.stats = stats
         return stats
 
+    def __repr__(self):
+        stats = self.getStats()
+        files = self.getFiles()
+        print "#FILES " + stats['numfiles'] + " SIZE " + stats['size'] + " ".join(files)
 
 class paramPair():
     def __init__(self):
