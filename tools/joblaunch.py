@@ -56,6 +56,21 @@ from run   import runString
 import constants
 
 
+
+import signal
+import sys
+
+#http://stackoverflow.com/questions/4205317/capture-keyboardinterrupt-in-python-without-try-except
+def signal_handler(signal, frame):
+    print '!'*50
+    print "You've sent signal " + str(signal) + ". exiting"
+    print '!'*50
+
+    sys.exit(signal)
+signal.signal(signal.SIGINT, signal_handler)
+
+
+
 debug           = True
 global_priority = 0
 
@@ -738,6 +753,7 @@ def start(jobs, numThreads):
     for core in cores:
         core.join()
     print "START ::   FINISHED JOINING "
+
 
 def getCPUCount():
     """

@@ -4,6 +4,8 @@ import os
 import yaml
 from yaml import load, dump
 
+
+
 try:
     from yaml import CLoader as Loader, CDumper as Dumper
     print "USING YAML C VERSION"
@@ -46,6 +48,9 @@ jellyCount = jelly.jellyCount(fn,         output=ou,   buffer_size=1000, out_cou
 #                  ID,   COMMAND                      SELFTEST=               DEPS=
 
 
+
+
+
 f0 = joblaunch.Job('f0', [sw                      ], selfTester=sw )
 f1 = joblaunch.Job('f1', [sampleWrapper.sample    ], deps=[f0] )
 f2 = joblaunch.Job('f2', [jellyCount              ], deps=[f0] )
@@ -76,8 +81,8 @@ all=[sw, data]
 
 
 dataDump = str(dump(data, Dumper=Dumper))
-#print dataDump
-data2 = load(dataDump, Loader=Loader)
+print dataDump
+data2    = load(dataDump, Loader=Loader)
 
 
 joblaunch.mainLib(data2, verbose=True)
