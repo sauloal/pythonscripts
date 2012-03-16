@@ -317,6 +317,8 @@ class OutputJobWriter():
     def __init__(self, className, writer):
         self.className = className
         self.writer    = writer
+        #idStr = constants.getTimestampHighRes()
+        #fileName = logPath + '/' + idStr + '.png'
 
     def write(self, jobId, stdout, **kwargs):
         internal = kwargs.get('internal', None)
@@ -370,8 +372,8 @@ class Job:
         self.successors   = set()
         self.messaging    = programMessaging(self.id, constants.NOT_RUN, -1)
         self.selfTester   = kwargs.get('selfTester', self)
-        self.priority     = kwargs.get('priority', getPriority())
-        self.deps         = kwargs.get('deps',     [])
+        self.priority     = kwargs.get('priority',   getPriority())
+        self.deps         = kwargs.get('deps',       [])
 
 
     def __call__(self):
@@ -425,8 +427,6 @@ class Job:
     def __launch(self):
         #print "JOB :: " + self.id + " :: COMMANDS " + str(self.commands) + " (" + str(len(self.commands))+ ")"
         # IMPORTANT: In UNIX, Popen uses /bin/sh, whatever the user shell is
-
-        #idStr = constants.getTimestampHighRes()
 
         for cmd in self.commands:
             #print "JOB :: " + self.id + " :: CMD " + str(cmd)
