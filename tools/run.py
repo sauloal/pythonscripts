@@ -1,12 +1,30 @@
 #!/usr/bin/python
 import subprocess
 import constants
+import Queue
+
+def enqueue_pipe(pipe, queue):
+    for line in iter(pipe.readline, b''):
+        queue.put(line)
+    pipe.close()
+
+
 
 def runString(id, cmdFinal, messaging):
     try:
         print "JOB :: " + id + " :: OPENING PROCESS FOR CMD '" + cmdFinal + "'"
         p = subprocess.Popen(cmdFinal, shell = True, executable="/bin/bash", stdout = subprocess.PIPE,
-            stderr = subprocess.STDOUT)
+            stderr = subprocess.PIPE)
+
+        q_out = Queue()
+        t_out = Thread(target=enqueue_pipe, args=(p.stdout, q_out))
+        t_out.daemon = True # thread dies with the program
+        t_out.start()
+        q_err = Queue()
+        t_err = Thread(target=enqueue_pipe, args=(p.stderr, q_err))
+        t_err.daemon = True # thread dies with the program
+        t_err.start()
+
 
         try:
             (stdOut, stdErr) = p.communicate(input=None)
@@ -49,4 +67,3 @@ def runString(id, cmdFinal, messaging):
         messaging.addError("FAILED TO RUN " + cmdFinal + " EXCEPTION " + str(e))
         messaging.exitCode = 253
         return messaging.exitCode
-
