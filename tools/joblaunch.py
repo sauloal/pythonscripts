@@ -42,6 +42,7 @@ __autor__   = "Yassin Ezbakhe <yassin@ezbakhe.es> | Saulo Aflitos <sauloal@gmail
 
 
 import sys
+import os
 import time
 import optparse
 import logging
@@ -68,7 +69,8 @@ def signal_handler(signal, frame):
 
     sys.exit(signal)
 signal.signal(signal.SIGINT, signal_handler)
-
+logPath = 'joblaunch/' + constants.timestamp
+os.mkdir(logPath)
 
 
 debug           = True
@@ -423,6 +425,9 @@ class Job:
     def __launch(self):
         #print "JOB :: " + self.id + " :: COMMANDS " + str(self.commands) + " (" + str(len(self.commands))+ ")"
         # IMPORTANT: In UNIX, Popen uses /bin/sh, whatever the user shell is
+
+        #idStr = constants.getTimestampHighRes()
+
         for cmd in self.commands:
             #print "JOB :: " + self.id + " :: CMD " + str(cmd)
             if   isinstance(cmd, types.FunctionType):
@@ -900,10 +905,10 @@ class printG:
         #}
 
         if fileName is None:
-            idStr = ""
+            idStr = constants.getTimestampHighRes()
             if id is not None:
-                idStr = '_' + constants.getTimestampHighRes() + '_' + id
-            fileName = 'joblaunch/joblaunch_' + constants.timestamp + idStr + '.png'
+                idStr += '_' + id
+            fileName = logPath + '/' + idStr + '.png'
 
         print "EXPORTING GRAPH PNG " + fileName
         self.graph.write_png(fileName)
@@ -974,6 +979,8 @@ def checkGraph(jobs, **kwargs):
     return G
 
 
+
+
 def mainLib(jobsData, **kwargs):
     """
     takes a list of job classes and run them
@@ -997,7 +1004,7 @@ def mainLib(jobsData, **kwargs):
 
     if logFile:
         logging.basicConfig(level    = logging.INFO,
-                            filename = options.logFile,
+                            filename = logfile,
                             format   = "%(asctime)s %(message)s",
                             datefmt  = "%Y-%m-%d %H:%M:%S")
 
