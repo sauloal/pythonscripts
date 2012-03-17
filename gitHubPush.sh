@@ -18,7 +18,7 @@ if [[ ! -z $(git ls-files --deleted) ]]; then
 fi
 
 if [[ ! -z "$DSC" ]]; then
-    NAME = "$NAME $DSC"
+    NAME="$NAME $DSC"
 fi
 
 git commit -am "$NAME"
