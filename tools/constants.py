@@ -26,3 +26,5 @@ STATUSES[RUNNING] = "'RUNNING'"
 STATUSES[FAILED ] = "'FAILED'"
 STATUSES[FINISH ] = "'FINISH'"
 
+logBasePath = 'joblaunch/'
+logPath     = logBasePath + '/' + timestamp

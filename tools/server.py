@@ -1,4 +1,8 @@
 import SocketServer
+import constants
+import os
+import glob
+
 
 class jobServer(SocketServer.BaseRequestHandler):
     """
@@ -8,15 +12,6 @@ class jobServer(SocketServer.BaseRequestHandler):
     override the handle() method to implement communication to the
     client.
     """
-    def __init__(self):
-        self.HOST, self.PORT = "localhost", 9999
-
-        # Create the server, binding to localhost on port 9999
-        self.serverInst = SocketServer.TCPServer((self.HOST, self.PORT), self)
-
-        # Activate the server; this will keep running until you
-        # interrupt the program with Ctrl-C
-        self.serverInst.serve_forever()
 
     def handle(self):
         # self.request is the TCP socket connected to the client
@@ -24,8 +19,49 @@ class jobServer(SocketServer.BaseRequestHandler):
         print "{} wrote:".format(self.client_address[0])
         print self.data
         # just send back the same data, but upper-cased
+        self.request.sendall(self.getHeader())
+        self.request.sendall(self.getTail())
         self.request.sendall(self.data.upper())
 
+    def getAllPaths(self):
+        dirs = []
+        for infile in glob.glob( os.path.join(constants.logBasePath, '*') ):
+            if os.path.isdir(infile):
+                dirs.append(infile)
+        return dirs
+
+    def getHeader(self):
+        header = \
+        """
+<html>
+    <head></head>
+    <body>
+        """
+        print header
+        return header
+
+
+    def getTail(self):
+        tail = \
+        """
+    </body>
+</html>
+        """
+        print tail
+        return tail
+
+
+def start():
+    HOST, PORT = "localhost", 9999
+
+    # Create the server, binding to localhost on port 9999
+    serverInst = SocketServer.TCPServer((HOST, PORT), jobServer)
+
+    # Activate the server; this will keep running until you
+    # interrupt the program with Ctrl-C
+    serverInst.serve_forever()
+
+
 if __name__ == "__main__":
-    server = jobServer()
-    server()
+    start()
+

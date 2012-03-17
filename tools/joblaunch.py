@@ -97,7 +97,6 @@ def signal_handler(signal, frame):
     sys.exit(signal)
 
 signal.signal(signal.SIGINT, signal_handler)
-logPath = 'joblaunch/' + constants.timestamp
 os.mkdir(logPath)
 
 
