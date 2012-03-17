@@ -1,3 +1,4 @@
+DSC=$1
 branch=pypeline
 gituser=sauloal
 gitemail=sauloal@yahoo.com.br
@@ -16,6 +17,10 @@ if [[ ! -z $(git ls-files --deleted) ]]; then
     git rm $(git ls-files --deleted)  2>&1 | tee -a $LOG
 fi
 
-git commit -m "$NAME"
+if [[ ! -z "$DSC" ]]; then
+    NAME = "$NAME $DSC"
+fi
+
+git commit -am "$NAME"
 git push -u $gitnick master:$branch
 

@@ -404,7 +404,7 @@ class Job:
         if self.messaging.status == constants.FINISH:
             if self.selfTester:
                 self.selfTester.selfTest(self.messaging)
-        self.messaging.fileWritter.close()
+        self.messaging.jobWritter.close()
         return res
 
     def selfTest(self, messaging):
