@@ -3,3 +3,6 @@
 *.pyc
 *.zip
 *.png
+*.log
+*.out
+joblaunch/*

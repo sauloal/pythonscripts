@@ -319,8 +319,8 @@ class OutputJobWriter():
         self.writer    = writer
         #Job.outputFileWriter     = OutputFileWriter(options.outputFile, options.verbose)
         #OutputFileWriter(outputFile, verbose)
-        self.writerOut = OutputFileWriter(logPath + "jobLaunch_"+className+".out", True)
-        self.writerErr = OutputFileWriter(logPath + "jobLaunch_"+className+".out", True)
+        self.writerOut = OutputFileWriter(logPath + "/jobLaunch_"+className+".out", True)
+        self.writerErr = OutputFileWriter(logPath + "/jobLaunch_"+className+".out", True)
         #idStr = constants.getTimestampHighRes()
         #fileName = logPath + '/' + idStr + '.png'
 
@@ -345,23 +345,24 @@ class OutputJobWriter():
     def writelnOut(self, jobId, line, **kwargs):
         internal = kwargs.get('internal', None)
         if internal:
-            self.writer.writelnOut(jobId, line)
-            self.writerOut.writeln(jobId, line)
+            self.writer.writelnOut(   jobId, line)
+            self.writerOut.writelnOut(jobId, line)
         else:
-            self.writer.writelnOut(self.className + "<1> :: " + jobId, line)
-            self.writerOut.writeln(self.className + "<1> :: " + jobId, line)
+            self.writer.writelnOut(   self.className + "<1> :: " + jobId, line)
+            self.writerOut.writelnOut(self.className + "<1> :: " + jobId, line)
 
     def writelnErr(self, jobId, line, **kwargs):
         internal = kwargs.get('internal', None)
         if internal:
-            self.writer.writelnErr(jobId, line)
-            self.writerErr.writeln(jobId, line)
+            self.writer.writelnErr(   jobId, line)
+            self.writerErr.writelnErr(jobId, line)
         else:
-            self.writer.writelnErr(self.className + "<2> :: " + jobId, line)
-            self.writerErr.writeln(self.className + "<2> :: " + jobId, line)
+            self.writer.writelnErr(   self.className + "<2> :: " + jobId, line)
+            self.writerErr.writelnErr(self.className + "<2> :: " + jobId, line)
 
     def close(self):
-        self.writer.close()
+        self.writerErr.close()
+        self.writerOut.close()
 
 
 class Job:
@@ -403,6 +404,7 @@ class Job:
         if self.messaging.status == constants.FINISH:
             if self.selfTester:
                 self.selfTester.selfTest(self.messaging)
+        self.messaging.fileWritter.close()
         return res
 
     def selfTest(self, messaging):
@@ -1008,8 +1010,8 @@ def mainLib(jobsData, **kwargs):
     verbose    = kwargs.get('verbose',    False)
     force      = kwargs.get('force',      False)
     numThreads = kwargs.get('threads',    getCPUCount())
-    outputFile = kwargs.get('outfile',    logPath + "jobLaunch.out")
-    logFile    = kwargs.get('logFile',    logPath + "jobLaunch.log")
+    outputFile = kwargs.get('outfile',    logPath + "/jobLaunch.out")
+    logFile    = kwargs.get('logFile',    logPath + "/jobLaunch.log")
 
     #TODO: WRITE TO STRING?
     Job.outputFileWriter     = OutputFileWriter(outputFile, verbose)
