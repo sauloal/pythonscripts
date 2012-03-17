@@ -1,4 +1,3 @@
-import SocketServer
 import threading
 from BaseHTTPServer import HTTPServer, BaseHTTPRequestHandler
 import signal
@@ -9,7 +8,7 @@ import glob
 
 
 
-class jobServer(SocketServer.BaseRequestHandler):
+class jobServer(BaseHTTPRequestHandler):
     """
     The RequestHandler class for our server.
 
@@ -18,12 +17,14 @@ class jobServer(SocketServer.BaseRequestHandler):
     client.
     """
 
-    def handle(self):
+    def do_GET(self):
         # self.request is the TCP socket connected to the client
-        self.data = self.request.recv(1024).strip()
-        print "{} wrote:".format(self.client_address[0])
-        print self.data
+        #self.data = self.request.recv(1024).strip()
+        #print "{} wrote:".format(self.client_address[0])
+        #print self.data
         # just send back the same data, but upper-cased
+        self.send_response(200)
+        self.end_headers()
         self.wfile.write(self.getHeader())
         self.wfile.write(self.getTail()  )
 
@@ -61,7 +62,7 @@ class serverDaemon(threading.Thread):
         self.HOST, self.PORT = "localhost", 9999
 
         # Create the server, binding to localhost on port 9999
-        serverInst      = SocketServer.TCPServer((self.HOST, self.PORT), jobServer)
+        serverInst      = HTTPServer((self.HOST, self.PORT), jobServer)
         self.serverInst = serverInst
 
     def run(self):
