@@ -1,7 +1,7 @@
 import SocketServer
-from threading import Thread
-from SocketServer import ThreadingMixIn
+import threading
 from BaseHTTPServer import HTTPServer, BaseHTTPRequestHandler
+
 
 import constants
 import os
@@ -63,33 +63,26 @@ class Handler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write("Hello World!")
 
-def start():
-    HOST, PORT = "localhost", 9999
+class serverDaemon(threading.Thread):
+    def __init__(self):
+        super(serverDaemon, self).__init__()
+        self.HOST, self.PORT = "localhost", 9999
 
-    # Create the server, binding to localhost on port 9999
-    serverInst = SocketServer.TCPServer((HOST, PORT), jobServer)
+        # Create the server, binding to localhost on port 9999
+        self.serverInst = SocketServer.TCPServer((self.HOST, self.PORT), jobServer)
 
-    # Activate the server; this will keep running until you
-    # interrupt the program with Ctrl-C
-    serverInst.serve_forever()
-    print "i can do stuff me"
+    def run(self):
+        # Activate the server; this will keep running until you
+        # interrupt the program with Ctrl-C
+        self.serverInst.serve_forever()
+        print "i can do stuff me"
 
-
-class ThreadingHTTPServer(ThreadingMixIn, HTTPServer):
-    pass
-
-def serve_on_port(port):
-    HOST, PORT = "localhost", 9999
-    server     = ThreadingHTTPServer((HOST, PORT), Handler)
-    print "starting server"
-    server.serve_forever()
-    print "i can do stuff me"
 
 #Thread(target=serve_on_port, args=[1111]).start()
 #serve_on_port(2222)
 
 
 if __name__ == "__main__":
-    #start()
-    Thread(target=serve_on_port, args=[9999]).start()
+    daemon = serverDaemon()
+    daemon.start()
 
