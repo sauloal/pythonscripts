@@ -52,14 +52,40 @@ import collections
 import Queue
 import traceback
 import types
-import pydot
+import signal
+import sys
+
 from run   import runString
 import constants
 
+try:
+    import pydot
+    usePydot = True
+except ImportError:
+    usePydot = False
+
+try:
+    import yaml
+    from yaml import load, dump
+    useYaml = True
+
+    try:
+        from yaml import CLoader as Loader, CDumper as Dumper
+        print "USING YAML C VERSION"
+    except ImportError:
+        from yaml import Loader, Dumper
+        print "USING YAML PYTHON VERSION"
+except ImportError:
+    useYaml = False
 
 
-import signal
-import sys
+
+debug           = True
+global_priority = 0
+alwaysDump      = True
+
+
+
 
 #http://stackoverflow.com/questions/4205317/capture-keyboardinterrupt-in-python-without-try-except
 def signal_handler(signal, frame):
@@ -68,13 +94,12 @@ def signal_handler(signal, frame):
     print '!'*50
 
     sys.exit(signal)
+
 signal.signal(signal.SIGINT, signal_handler)
 logPath = 'joblaunch/' + constants.timestamp
 os.mkdir(logPath)
 
 
-debug           = True
-global_priority = 0
 
 class programMessaging():
     """
@@ -405,6 +430,10 @@ class Job:
             if self.selfTester:
                 self.selfTester.selfTest(self.messaging)
         self.messaging.jobWritter.close()
+
+        if useYaml and (res or alwaysDump):
+            pass
+
         return res
 
     def selfTest(self, messaging):
@@ -850,6 +879,9 @@ class printG:
                             }
 
     def printGraph(self, fileName=None, id=None):
+        if not usePydot:
+            return
+
         self.graph = pydot.Dot(graph_type='digraph')
 
         nodes = {}
@@ -873,50 +905,50 @@ class printG:
                 self.graph.add_edge(pydot.Edge(depNode, node))
 
 
-        #    str = """
-        #digraph G {
-        #    size ="4,4";
-        #    main [shape=box]; /* this is a comment */
-        #    main -> parse [weight=8];
-        #    parse -> execute;
-        #    main -> init [style=dotted];
-        #    main -> cleanup;
-        #    execute -> { make_string; printf}
-        #    init -> make_string;
-        #    edge [color=red]; // so is this
-        #    main -> printf [style=bold,label="100 times"];
-        #    make_string [label="make a\\nstring"];
-        #    node [shape=box,style=filled,color=".7 .3 1.0"];
-        #    execute -> compare;
-        #}
-        #"""
+            #    str = """
+            #digraph G {
+            #    size ="4,4";
+            #    main [shape=box]; /* this is a comment */
+            #    main -> parse [weight=8];
+            #    parse -> execute;
+            #    main -> init [style=dotted];
+            #    main -> cleanup;
+            #    execute -> { make_string; printf}
+            #    init -> make_string;
+            #    edge [color=red]; // so is this
+            #    main -> printf [style=bold,label="100 times"];
+            #    make_string [label="make a\\nstring"];
+            #    node [shape=box,style=filled,color=".7 .3 1.0"];
+            #    execute -> compare;
+            #}
+            #"""
 
-        #dot -T svg nato
+            #dot -T svg nato
 
-        #digraph G {
-        #subgraph cluster0 {
-        #node [style=filled,color=white];
-        #style=filled;
-        #color=lightgrey;
-        #a0 -> a1 -> a2 -> a3;
-        #label = "process #1";
-        #}
-        #subgraph cluster1 {
-        #node [style=filled];
-        #b0 -> b1 -> b2 -> b3;
-        #label = "process #2";
-        #color=blue
-        #}
-        #start -> a0;
-        #start -> b0;
-        #a1 -> b3;
-        #b2 -> a3;
-        #a3 -> a0;
-        #a3 -> end;
-        #b3 -> end;
-        #start [shape=Mdiamond];
-        #end [shape=Msquare];
-        #}
+            #digraph G {
+            #subgraph cluster0 {
+            #node [style=filled,color=white];
+            #style=filled;
+            #color=lightgrey;
+            #a0 -> a1 -> a2 -> a3;
+            #label = "process #1";
+            #}
+            #subgraph cluster1 {
+            #node [style=filled];
+            #b0 -> b1 -> b2 -> b3;
+            #label = "process #2";
+            #color=blue
+            #}
+            #start -> a0;
+            #start -> b0;
+            #a1 -> b3;
+            #b2 -> a3;
+            #a3 -> a0;
+            #a3 -> end;
+            #b3 -> end;
+            #start [shape=Mdiamond];
+            #end [shape=Msquare];
+            #}
 
         if fileName is None:
             idStr = constants.getTimestampHighRes()
