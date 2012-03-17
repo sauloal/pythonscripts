@@ -344,8 +344,9 @@ class OutputJobWriter():
         self.writer    = writer
         #Job.outputFileWriter     = OutputFileWriter(options.outputFile, options.verbose)
         #OutputFileWriter(outputFile, verbose)
-        self.writerOut = OutputFileWriter(logPath + "/jobLaunch_"+className+".out", True)
-        self.writerErr = OutputFileWriter(logPath + "/jobLaunch_"+className+".out", True)
+        self.baseName  = logPath + "/jobLaunch_"+className
+        self.writerOut = OutputFileWriter(self.baseName+".out", True)
+        self.writerErr = OutputFileWriter(self.baseName+".err", True)
         #idStr = constants.getTimestampHighRes()
         #fileName = logPath + '/' + idStr + '.png'
 
@@ -389,6 +390,14 @@ class OutputJobWriter():
         self.writerErr.close()
         self.writerOut.close()
 
+    def dump(self, data):
+        if useYaml:
+            dataDump = str(dump(data, Dumper=Dumper))
+            fout = open(self.baseName + ".dump", "w")
+            fout.writelines(dataDump)
+            fout.close;
+            #data2    = load(dataDump, Loader=Loader)
+
 
 class Job:
     """
@@ -430,10 +439,8 @@ class Job:
             if self.selfTester:
                 self.selfTester.selfTest(self.messaging)
         self.messaging.jobWritter.close()
-
-        if useYaml and (res or alwaysDump):
-            pass
-
+        if (res or alwaysDump):
+            self.messaging.jobWritter.dump(self)
         return res
 
     def selfTest(self, messaging):

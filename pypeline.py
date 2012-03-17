@@ -1,17 +1,19 @@
 #!/usr/bin/python
 import os
 
-import yaml
-from yaml import load, dump
-
-
-
 try:
-    from yaml import CLoader as Loader, CDumper as Dumper
-    print "USING YAML C VERSION"
+    #import yaml
+    from yaml import load, dump
+    useYaml = True
+
+    try:
+        from yaml import CLoader as Loader, CDumper as Dumper
+        print "USING YAML C VERSION"
+    except ImportError:
+        from yaml import Loader, Dumper
+        print "USING YAML PYTHON VERSION"
 except ImportError:
-    from yaml import Loader, Dumper
-    print "USING YAML PYTHON VERSION"
+    useYaml = False
 
 
 from techs    import *
@@ -78,11 +80,10 @@ data = {'f0': f0,
 
 all=[sw, data]
 
-
-
-dataDump = str(dump(data, Dumper=Dumper))
-print dataDump
-data2    = load(dataDump, Loader=Loader)
+if useYaml:
+    dataDump = str(dump(data, Dumper=Dumper))
+    print dataDump
+    data2    = load(dataDump, Loader=Loader)
 
 
 joblaunch.mainLib(data2, verbose=True)
