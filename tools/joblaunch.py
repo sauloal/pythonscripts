@@ -57,6 +57,7 @@ import sys
 
 from run   import runString
 import constants
+import server
 
 try:
     import pydot
