@@ -36,13 +36,17 @@ def runString(id, cmdFinal, messaging):
         t_err.daemon = True # thread dies with the program
         t_err.start()
 
+        pid           = p.pid
+        messaging.pid = pid
+
         try:
 
             print "JOB :: " + id + " :: CHECKING POOL"
-            while not p.poll():
-                print "JOB :: " + id + " :: TRYING TO READ PIPE"
+            while p.poll() is None:
+                print "JOB :: " + id + " :: TRYING TO READ PIPE (" + str(p.poll()) + ")"
                 try:
-                    lineOut = q_out.get_nowait() # or q.get(timeout=.1)
+                    #lineOut = q_out.get_nowait()
+                    lineOut = q_out.get(timeout=1)
                 except Empty:
                     pass
                     #print('no stderr output yet')
@@ -50,12 +54,14 @@ def runString(id, cmdFinal, messaging):
                     messaging.stdout(id, lineOut, internal=True)
 
                 try:
-                    lineErr = q_err.get_nowait() # or q.get(timeout=.1)
+                    #lineErr = q_err.get_nowait()
+                    lineErr = q_err.get(timeout=1)
                 except Empty:
                     pass
                     #print('no stderr output yet')
                 else: # got line
                     messaging.stderr(id, lineErr, internal=True)
+
 
             print "JOB :: " + id + " :: GETTING RETURN CODE"
             returnCode = p.returncode
