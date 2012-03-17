@@ -3,7 +3,7 @@ from BaseHTTPServer import HTTPServer, BaseHTTPRequestHandler
 import signal
 import os
 import glob
-from urlparse import urlparse
+from urlparse import urlparse, parse_qs
 
 import constants
 qryPath = os.path.abspath("../"+constants.logBasePath) + "/"
@@ -26,27 +26,40 @@ class jobServer(BaseHTTPRequestHandler):
 
     def do_GET(self):
         # self.request is the TCP socket connected to the client
-        #self.data = self.request.recv(1024).strip()
-        #print "{} wrote:".format(self.client_address[0])
-        #print self.data
-        # just send back the same data, but upper-cased
 
-        self.send_response(200)
-        self.send_header("Content-type", "text/html")
+        self.do_HEAD()
+
+        res = []
+        self.getList()
+        res.extend(self.getForm())
 
         req = self.getRequest()
-        res = []
-        res.extend(self.getList())
-        res.append("<br/><hr><br/>")
 
         if len(req) == 0:
             self.printRes(res)
         else:
+            res.extend( self.returnRequestedData(req) )
+
             self.printRes(res)
+
+
+
+    def returnRequestedData(self, req):
+        runName = req.get('runName', None)
+        print "RUN NAME "+str(runName)
+        res = []
+        if runName is None:
+            return res
+
+        runName = runName[0]
+        res.append("RESPONSE TO " + runName)
+
+
+        return res
 
     def printRes(self, res):
         self.wfile.write(self.getHeader())
-        self.end_headers()
+
         for line in res:
             self.wfile.write(line)
             print line
@@ -56,28 +69,11 @@ class jobServer(BaseHTTPRequestHandler):
 
     def getRequest(self):
         # Parse the form data posted
-        #form = cgi.FieldStorage()
-        path          = self.path
-        print "PATH    " + path
+        path  = self.path
         parse = urlparse(path)
-        print "PARSE   " + str(parse)
-        qry = parse.query
-        urlparse.parse_qs(qry)
-        print "QUERY   " + str(qry)
-
-
-        req = {}
-
-        if form.has_key("runName"):
-            print "  RUN NAME PRESENT"
-            # Echo back information about what was posted in the form
-            for field in form.keys():
-                field_item = form[field]
-                if field_item.filename:
-                    pass
-                else:
-                    # Regular form value
-                    req[field] = form[field].value
+        qry   = parse.query
+        req   = parse_qs(qry)
+        print "REQUEST " + str(req)
 
         return req
 
@@ -85,14 +81,26 @@ class jobServer(BaseHTTPRequestHandler):
         dirs = self.getAllPaths()
         #print "dirs" + str(dirs)
 
-        res = []
         if len(dirs) == 0:
-            return res
+            return
 
         lastDir = dirs[-1]
         #print "  lastdir " + lastDir
 
-        res.append("<form id=\"runName\"><select>")
+        self.lenDirs = len(dirs)
+        self.dirs    = dirs
+        self.lastDir = lastDir
+
+    def getForm(self):
+        res     = []
+        dirs    = self.dirs
+        lenDirs = self.lenDirs
+        lastDir = self.lastDir
+
+        if dirs is None or len(dirs) == 0:
+            return res
+
+        res.append("<form id=\"runName\"><select name=\"runName\">")
         #<select>
         #  <option value="volvo">Volvo</option>
         #  <option value="saab">Saab</option>
@@ -109,6 +117,7 @@ class jobServer(BaseHTTPRequestHandler):
 
         res.append("</select>")
         res.append("<input type=\"submit\" method=\"get\" value=\"ok\"></input></form>")
+        res.append("<br/><hr><br/>")
         return res
 
 
