@@ -2,10 +2,13 @@ import threading
 from BaseHTTPServer import HTTPServer, BaseHTTPRequestHandler
 import signal
 import os
+import glob
 import cgi
+import cgitb
+cgitb.enable()
 
 import constants
-import glob
+
 
 
 
@@ -24,9 +27,9 @@ class jobServer(BaseHTTPRequestHandler):
         #print "{} wrote:".format(self.client_address[0])
         #print self.data
         # just send back the same data, but upper-cased
-        req = self.getResquest()
+        req = self.getRequest()
         res = []
-        res.append(self.getList())
+        res.extend(self.getList())
 
         if len(req) == 0:
             self.printRes(res)
@@ -40,33 +43,68 @@ class jobServer(BaseHTTPRequestHandler):
 
         for line in res:
             self.wfile.write(line)
+            print line
 
         self.wfile.write(self.getTail()  )
 
 
-    def getResquest(self):
+    def getRequest(self):
         # Parse the form data posted
-        form = cgi.FieldStorage(
-            fp=self.rfile,
-            headers=self.headers)
-
+        form = cgi.FieldStorage()
         req = {}
-        # Echo back information about what was posted in the form
-        for field in form.keys():
-            field_item = form[field]
-            if field_item.filename:
-                pass
-            else:
-                # Regular form value
-                req[field] = form[field].value
+
+        if "runName" not in form:
+            return req
+        else:
+            # Echo back information about what was posted in the form
+            for field in form.keys():
+                field_item = form[field]
+                if field_item.filename:
+                    pass
+                else:
+                    # Regular form value
+                    req[field] = form[field].value
 
         return req
 
+    def getList(self):
+        dirs = self.getAllPaths()
+        res = []
+        if len(dirs) == 0:
+            return res
+
+        lastDir = dirs[-1]
+
+        res.append("<select>\n")
+        #<select>
+        #  <option value="volvo">Volvo</option>
+        #  <option value="saab">Saab</option>
+        #  <option value="mercedes">Mercedes</option>
+        #  <option value="audi">Audi</option>
+        #</select>
+
+        for dir in dirs:
+            if dir == lastDir:
+                selected = " selected=\"yes\""
+            else:
+                selected = ""
+            res.append("<option value=\""+dir+"\""+selected+">"+dir+"</option>")
+
+        res.append("</select>\n")
+
+
     def getAllPaths(self):
         dirs = []
-        for infile in glob.glob( os.path.join(constants.logBasePath, '*') ):
-            if os.path.isdir(infile):
-                dirs.append(infile)
+        #print "base " + constants.logBasePath
+
+        list = os.listdir(os.path.abspath("../"+constants.logBasePath))
+        list.sort()
+
+        if list is not None:
+            for infile in list:
+                #print "infile " + infile
+                if os.path.isdir(infile):
+                    dirs.append(infile)
         return dirs
 
     def getHeader(self):
@@ -76,7 +114,6 @@ class jobServer(BaseHTTPRequestHandler):
     <head></head>
     <body>
         """
-        print header
         return header
 
 
@@ -86,7 +123,6 @@ class jobServer(BaseHTTPRequestHandler):
     </body>
 </html>
         """
-        print tail
         return tail
 
 
@@ -133,7 +169,7 @@ if __name__ == "__main__":
     daemon.start()
     print "daemon started"
     print "now i can run more stuff"
-    print "including finishing it"
+    #print "including finishing it"
     #daemon.stop()
     #daemon.join()
     #print "finished"
