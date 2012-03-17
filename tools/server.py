@@ -8,7 +8,7 @@ import cgitb
 cgitb.enable()
 
 import constants
-
+qryPath = os.path.abspath("../"+constants.logBasePath) + "/"
 
 
 
@@ -27,9 +27,13 @@ class jobServer(BaseHTTPRequestHandler):
         #print "{} wrote:".format(self.client_address[0])
         #print self.data
         # just send back the same data, but upper-cased
+
+        self.send_response(200)
+
         req = self.getRequest()
         res = []
         res.extend(self.getList())
+        res.append("<br/><hr><br/>")
 
         if len(req) == 0:
             self.printRes(res)
@@ -37,10 +41,8 @@ class jobServer(BaseHTTPRequestHandler):
             self.printRes(res)
 
     def printRes(self, res):
-        self.send_response(200)
-        self.end_headers()
         self.wfile.write(self.getHeader())
-
+        self.end_headers()
         for line in res:
             self.wfile.write(line)
             print line
@@ -51,11 +53,11 @@ class jobServer(BaseHTTPRequestHandler):
     def getRequest(self):
         # Parse the form data posted
         form = cgi.FieldStorage()
+        print "FORM "+ str(form)
         req = {}
 
-        if "runName" not in form:
-            return req
-        else:
+        if form.has_key("runName"):
+            print "  RUN NAME PRESENT"
             # Echo back information about what was posted in the form
             for field in form.keys():
                 field_item = form[field]
@@ -69,13 +71,16 @@ class jobServer(BaseHTTPRequestHandler):
 
     def getList(self):
         dirs = self.getAllPaths()
+        #print "dirs" + str(dirs)
+
         res = []
         if len(dirs) == 0:
             return res
 
         lastDir = dirs[-1]
+        #print "  lastdir " + lastDir
 
-        res.append("<select>\n")
+        res.append("<form id=\"runName\"><select>")
         #<select>
         #  <option value="volvo">Volvo</option>
         #  <option value="saab">Saab</option>
@@ -90,20 +95,22 @@ class jobServer(BaseHTTPRequestHandler):
                 selected = ""
             res.append("<option value=\""+dir+"\""+selected+">"+dir+"</option>")
 
-        res.append("</select>\n")
+        res.append("</select>")
+        res.append("<input type=\"submit\" method=\"get\" value=\"ok\"></input></form>")
+        return res
 
 
     def getAllPaths(self):
         dirs = []
         #print "base " + constants.logBasePath
 
-        list = os.listdir(os.path.abspath("../"+constants.logBasePath))
+        list = os.listdir(qryPath)
         list.sort()
 
         if list is not None:
             for infile in list:
                 #print "infile " + infile
-                if os.path.isdir(infile):
+                if os.path.isdir(qryPath + infile):
                     dirs.append(infile)
         return dirs
 
