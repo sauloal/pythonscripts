@@ -1,6 +1,6 @@
 import SocketServer
 
-class server(SocketServer.BaseRequestHandler):
+class jobServer(SocketServer.BaseRequestHandler):
     """
     The RequestHandler class for our server.
 
@@ -8,6 +8,15 @@ class server(SocketServer.BaseRequestHandler):
     override the handle() method to implement communication to the
     client.
     """
+    def __init__(self):
+        self.HOST, self.PORT = "localhost", 9999
+
+        # Create the server, binding to localhost on port 9999
+        self.serverInst = SocketServer.TCPServer((self.HOST, self.PORT), self)
+
+        # Activate the server; this will keep running until you
+        # interrupt the program with Ctrl-C
+        self.serverInst.serve_forever()
 
     def handle(self):
         # self.request is the TCP socket connected to the client
@@ -18,11 +27,5 @@ class server(SocketServer.BaseRequestHandler):
         self.request.sendall(self.data.upper())
 
 if __name__ == "__main__":
-    HOST, PORT = "localhost", 9999
-
-    # Create the server, binding to localhost on port 9999
-    serverInst = SocketServer.TCPServer((HOST, PORT), server)
-
-    # Activate the server; this will keep running until you
-    # interrupt the program with Ctrl-C
-    serverInst.serve_forever()
+    server = jobServer()
+    server()
