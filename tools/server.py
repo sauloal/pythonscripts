@@ -3,9 +3,7 @@ from BaseHTTPServer import HTTPServer, BaseHTTPRequestHandler
 import signal
 import os
 import glob
-import cgi
-import cgitb
-cgitb.enable()
+from urlparse import urlparse
 
 import constants
 qryPath = os.path.abspath("../"+constants.logBasePath) + "/"
@@ -21,6 +19,11 @@ class jobServer(BaseHTTPRequestHandler):
     client.
     """
 
+    def do_HEAD(s):
+        s.send_response(200)
+        s.send_header("Content-type", "text/html")
+        s.end_headers()
+
     def do_GET(self):
         # self.request is the TCP socket connected to the client
         #self.data = self.request.recv(1024).strip()
@@ -29,6 +32,7 @@ class jobServer(BaseHTTPRequestHandler):
         # just send back the same data, but upper-cased
 
         self.send_response(200)
+        self.send_header("Content-type", "text/html")
 
         req = self.getRequest()
         res = []
@@ -52,8 +56,16 @@ class jobServer(BaseHTTPRequestHandler):
 
     def getRequest(self):
         # Parse the form data posted
-        form = cgi.FieldStorage()
-        print "FORM "+ str(form)
+        #form = cgi.FieldStorage()
+        path          = self.path
+        print "PATH    " + path
+        parse = urlparse(path)
+        print "PARSE   " + str(parse)
+        qry = parse.query
+        urlparse.parse_qs(qry)
+        print "QUERY   " + str(qry)
+
+
         req = {}
 
         if form.has_key("runName"):
