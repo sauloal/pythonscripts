@@ -52,10 +52,31 @@ class jobServer(BaseHTTPRequestHandler):
             return res
 
         runName = runName[0]
-        res.append("RESPONSE TO " + runName)
-
+        res.append("<h1>RESPONSE TO " + runName + "</h1>")
+        files = self.getFilesInRun(runName)
+        if len(files) != 0:
+            res.append("<ul>")
+            for file in files:
+                res.append("<li>"+file+"</li>")
+            res.append("</ul>")
 
         return res
+
+    def getFilesInRun(self, runName):
+        files = []
+        #print "base " + constants.logBasePath
+
+        runPath = os.path.join(qryPath, runName)
+        list    = os.listdir(runPath)
+        list.sort()
+
+        if list is not None:
+            for infile in list:
+                #print "infile " + infile
+                filePath = os.path.join(runPath, infile)
+                if os.path.isfile(filePath):
+                    files.append(infile)
+        return files
 
     def printRes(self, res):
         self.wfile.write(self.getHeader())
