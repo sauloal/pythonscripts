@@ -317,36 +317,48 @@ class OutputJobWriter():
     def __init__(self, className, writer):
         self.className = className
         self.writer    = writer
+        #Job.outputFileWriter     = OutputFileWriter(options.outputFile, options.verbose)
+        #OutputFileWriter(outputFile, verbose)
+        self.writerOut = OutputFileWriter(logPath + "jobLaunch_"+className+".out", True)
+        self.writerErr = OutputFileWriter(logPath + "jobLaunch_"+className+".out", True)
         #idStr = constants.getTimestampHighRes()
         #fileName = logPath + '/' + idStr + '.png'
 
     def write(self, jobId, stdout, **kwargs):
         internal = kwargs.get('internal', None)
         if internal:
-            self.writer.write(jobId, stdout)
+            self.writer.write(   jobId, stdout)
+            self.writerOut.write(jobId, stdout)
         else:
-            self.writer.write(self.className + " :: " + jobId, stdout)
+            self.writer.write(   self.className + " :: " + jobId, stdout)
+            self.writerOut.write(self.className + " :: " + jobId, stdout)
 
     def writeln(self, jobId, stream, line, **kwargs):
         internal = kwargs.get('internal', None)
         if internal:
-            self.writer.writeln(jobId, stream, line)
+            self.writer.writeln(   jobId, stream, line)
+            self.writerOut.writeln(jobId, stream, line)
         else:
-            self.writer.writeln(self.className + " :: " + jobId, stream, line)
+            self.writer.writeln(   self.className + " :: " + jobId, stream, line)
+            self.writerOut.writeln(self.className + " :: " + jobId, stream, line)
 
     def writelnOut(self, jobId, line, **kwargs):
         internal = kwargs.get('internal', None)
         if internal:
             self.writer.writelnOut(jobId, line)
+            self.writerOut.writeln(jobId, line)
         else:
             self.writer.writelnOut(self.className + "<1> :: " + jobId, line)
+            self.writerOut.writeln(self.className + "<1> :: " + jobId, line)
 
     def writelnErr(self, jobId, line, **kwargs):
         internal = kwargs.get('internal', None)
         if internal:
             self.writer.writelnErr(jobId, line)
+            self.writerErr.writeln(jobId, line)
         else:
             self.writer.writelnErr(self.className + "<2> :: " + jobId, line)
+            self.writerErr.writeln(self.className + "<2> :: " + jobId, line)
 
     def close(self):
         self.writer.close()
@@ -996,15 +1008,15 @@ def mainLib(jobsData, **kwargs):
     verbose    = kwargs.get('verbose',    False)
     force      = kwargs.get('force',      False)
     numThreads = kwargs.get('threads',    getCPUCount())
-    outputFile = kwargs.get('outfile',    '-')
-    logFile    = kwargs.get('logFile',    None)
+    outputFile = kwargs.get('outfile',    logPath + "jobLaunch.out")
+    logFile    = kwargs.get('logFile',    logPath + "jobLaunch.log")
 
     #TODO: WRITE TO STRING?
     Job.outputFileWriter     = OutputFileWriter(outputFile, verbose)
 
     if logFile:
         logging.basicConfig(level    = logging.INFO,
-                            filename = logfile,
+                            filename = logFile,
                             format   = "%(asctime)s %(message)s",
                             datefmt  = "%Y-%m-%d %H:%M:%S")
 
