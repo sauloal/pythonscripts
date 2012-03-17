@@ -2,6 +2,7 @@ import threading
 from BaseHTTPServer import HTTPServer, BaseHTTPRequestHandler
 import signal
 import os
+import cgi
 
 import constants
 import glob
@@ -23,10 +24,43 @@ class jobServer(BaseHTTPRequestHandler):
         #print "{} wrote:".format(self.client_address[0])
         #print self.data
         # just send back the same data, but upper-cased
+        req = self.getResquest()
+        res = []
+        res.append(self.getList())
+
+        if len(req) == 0:
+            self.printRes(res)
+        else:
+            self.printRes(res)
+
+    def printRes(self, res):
         self.send_response(200)
         self.end_headers()
         self.wfile.write(self.getHeader())
+
+        for line in res:
+            self.wfile.write(line)
+
         self.wfile.write(self.getTail()  )
+
+
+    def getResquest(self):
+        # Parse the form data posted
+        form = cgi.FieldStorage(
+            fp=self.rfile,
+            headers=self.headers)
+
+        req = {}
+        # Echo back information about what was posted in the form
+        for field in form.keys():
+            field_item = form[field]
+            if field_item.filename:
+                pass
+            else:
+                # Regular form value
+                req[field] = form[field].value
+
+        return req
 
     def getAllPaths(self):
         dirs = []
