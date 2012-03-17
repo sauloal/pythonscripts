@@ -1,7 +1,12 @@
 import SocketServer
+from threading import Thread
+from SocketServer import ThreadingMixIn
+from BaseHTTPServer import HTTPServer, BaseHTTPRequestHandler
+
 import constants
 import os
 import glob
+
 
 
 class jobServer(SocketServer.BaseRequestHandler):
@@ -51,6 +56,13 @@ class jobServer(SocketServer.BaseRequestHandler):
         return tail
 
 
+class Handler(BaseHTTPRequestHandler):
+    def do_GET(self):
+        self.send_response(200)
+        self.send_header("Content-type", "text/plain")
+        self.end_headers()
+        self.wfile.write("Hello World!")
+
 def start():
     HOST, PORT = "localhost", 9999
 
@@ -60,8 +72,24 @@ def start():
     # Activate the server; this will keep running until you
     # interrupt the program with Ctrl-C
     serverInst.serve_forever()
+    print "i can do stuff me"
+
+
+class ThreadingHTTPServer(ThreadingMixIn, HTTPServer):
+    pass
+
+def serve_on_port(port):
+    HOST, PORT = "localhost", 9999
+    server     = ThreadingHTTPServer((HOST, PORT), Handler)
+    print "starting server"
+    server.serve_forever()
+    print "i can do stuff me"
+
+#Thread(target=serve_on_port, args=[1111]).start()
+#serve_on_port(2222)
 
 
 if __name__ == "__main__":
-    start()
+    #start()
+    Thread(target=serve_on_port, args=[9999]).start()
 
