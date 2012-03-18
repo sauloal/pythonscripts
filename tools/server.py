@@ -57,7 +57,7 @@ class jobServer(BaseHTTPRequestHandler):
         if len(files) != 0:
             res.append("<ul>")
             for file in files:
-                res.append("<li>"+file+"</li>")
+                res.append("<li><a href=\"#"+file+"\">"+file+"</a></li>")
             res.append("</ul>")
 
         return res
@@ -222,4 +222,3 @@ if __name__ == "__main__":
     #daemon.stop()
     #daemon.join()
     #print "finished"
-
