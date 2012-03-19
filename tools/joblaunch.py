@@ -57,7 +57,11 @@ import sys
 
 from run   import runString
 import constants
-import server
+try:
+    import server
+    useServer = True
+except ImportError:
+    useServer = False
 
 try:
     import pydot
@@ -94,10 +98,17 @@ def signal_handler(signal, frame):
     print "You've sent signal " + str(signal) + ". exiting"
     print '!'*50
 
+    if useServer:
+            print "finishing server daemon"
+            server.daemon.stop()
+            server.daemon.join()
+            print "server daemon finished"
+            print "run tools/server.py to re-enable it"
+
     sys.exit(signal)
 
 signal.signal(signal.SIGINT, signal_handler)
-os.mkdir(logPath)
+os.mkdir(constants.logPath)
 
 
 
@@ -344,7 +355,7 @@ class OutputJobWriter():
         self.writer    = writer
         #Job.outputFileWriter     = OutputFileWriter(options.outputFile, options.verbose)
         #OutputFileWriter(outputFile, verbose)
-        self.baseName  = logPath + "/jobLaunch_"+className
+        self.baseName  = constants.logPath + "/jobLaunch_"+className
         self.writerOut = OutputFileWriter(self.baseName+".out", True)
         self.writerErr = OutputFileWriter(self.baseName+".err", True)
         #idStr = constants.getTimestampHighRes()
@@ -961,7 +972,7 @@ class printG:
             idStr = constants.getTimestampHighRes()
             if id is not None:
                 idStr += '_' + id
-            fileName = logPath + '/' + idStr + '.png'
+            fileName = constants.logPath + '/' + idStr + '.png'
 
         print "EXPORTING GRAPH PNG " + fileName
         self.graph.write_png(fileName)
@@ -1049,8 +1060,8 @@ def mainLib(jobsData, **kwargs):
     verbose    = kwargs.get('verbose',    False)
     force      = kwargs.get('force',      False)
     numThreads = kwargs.get('threads',    getCPUCount())
-    outputFile = kwargs.get('outfile',    logPath + "/jobLaunch.out")
-    logFile    = kwargs.get('logFile',    logPath + "/jobLaunch.log")
+    outputFile = kwargs.get('outfile',    constants.logPath + "/jobLaunch.out")
+    logFile    = kwargs.get('logFile',    constants.logPath + "/jobLaunch.log")
 
     #TODO: WRITE TO STRING?
     Job.outputFileWriter     = OutputFileWriter(outputFile, verbose)
@@ -1081,10 +1092,25 @@ def mainLib(jobsData, **kwargs):
 
 
     jobs.printer.printGraph()
+
+    if useServer:
+        print "starting server daemon"
+        server.daemon.start()
+        print "server daemon started"
+        print "check it at %s:%s?%s" % (server.HOST, server.PORT, constants.timestamp)
+
     # begin working
     start(jobs, numThreads)
 
+
     jobs.printer.printGraph()
+
+    if useServer:
+        print "finishing server daemon"
+        server.daemon.stop()
+        server.daemon.join()
+        print "server daemon finished"
+        print "run tools/server.py to re-enable it"
 
     return jobs
 

@@ -1,3 +1,4 @@
+#!/usr/bin/python
 import threading
 from BaseHTTPServer import HTTPServer, BaseHTTPRequestHandler
 import signal
@@ -9,9 +10,23 @@ from urlparse import urlparse, parse_qs
 
 import constants
 qryPath      = os.path.abspath("../"+constants.logBasePath) + "/"
+qryPath      = os.path.abspath(constants.logBasePath) + "/"
 jobPrefix    = "jobLaunch"
 textAreaCols = "80"
 textAreaRows = "5"
+HOST, PORT = "localhost", 9999
+
+
+def signal_handler(signal, frame):
+    print '!'*50
+    print "You've sent signal " + str(signal) + ". exiting"
+    print '!'*50
+    daemon.stop()
+    daemon.join()
+    print "finished"
+    sys.exit(signal)
+
+signal.signal(signal.SIGINT, signal_handler)
 
 
 def rblocks(f, blocksize=4096):
@@ -437,10 +452,9 @@ class jobServer(BaseHTTPRequestHandler):
 class serverDaemon(threading.Thread):
     def __init__(self):
         super(serverDaemon, self).__init__()
-        self.HOST, self.PORT = "localhost", 9999
 
         # Create the server, binding to localhost on port 9999
-        serverInst      = HTTPServer((self.HOST, self.PORT), jobServer)
+        serverInst      = HTTPServer((HOST, PORT), jobServer)
         self.serverInst = serverInst
 
     def run(self):
@@ -460,17 +474,6 @@ class serverDaemon(threading.Thread):
 print "starting class"
 daemon = serverDaemon()
 
-
-def signal_handler(signal, frame):
-    print '!'*50
-    print "You've sent signal " + str(signal) + ". exiting"
-    print '!'*50
-    daemon.stop()
-    daemon.join()
-    print "finished"
-    sys.exit(signal)
-
-signal.signal(signal.SIGINT, signal_handler)
 
 if __name__ == "__main__":
     print "starting daemon"
