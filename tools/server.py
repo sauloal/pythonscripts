@@ -4,6 +4,7 @@ import signal
 import os
 import glob
 import re
+import itertools
 from urlparse import urlparse, parse_qs
 
 import constants
@@ -11,6 +12,47 @@ qryPath      = os.path.abspath("../"+constants.logBasePath) + "/"
 jobPrefix    = "jobLaunch"
 textAreaCols = "80"
 textAreaRows = "5"
+
+
+def rblocks(f, blocksize=4096):
+    """Read file as series of blocks from end of file to start.
+
+    The data itself is in normal order, only the order of the blocks is reversed.
+    ie. "hello world" -> ["ld","wor", "lo ", "hel"]
+    Note that the file must be opened in binary mode.
+    """
+    if 'b' not in f.mode.lower():
+        raise Exception("File must be opened using binary mode.")
+    size = os.stat(f.name).st_size
+    fullblocks, lastblock = divmod(size, blocksize)
+
+    # The first(end of file) block will be short, since this leaves 
+    # the rest aligned on a blocksize boundary.  This may be more 
+    # efficient than having the last (first in file) block be short
+    f.seek(-lastblock,2)
+    yield f.read(lastblock)
+
+    for i in range(fullblocks-1,-1, -1):
+        f.seek(i * blocksize)
+        yield f.read(blocksize)
+
+def tail(f, nlines):
+    buf = ''
+    result = []
+    for block in rblocks(f):
+        buf = block + buf
+        lines = buf.splitlines()
+
+        # Return all lines except the first (since may be partial)
+        if lines:
+            result.extend(lines[1:]) # First line may not be complete
+            if(len(result) >= nlines):
+                return result[-nlines:]
+
+            buf = lines[0]
+
+    return ([buf]+result)[-nlines:]
+
 
 class jobServer(BaseHTTPRequestHandler):
     """
@@ -95,7 +137,7 @@ class jobServer(BaseHTTPRequestHandler):
         if self.runName is None:
             return res
 
-        res.append("<h1>RESPONSE TO " + self.runName + "</h1>")
+        res.append("<h1 style='margin: 0px'>RESPONSE TO " + self.runName + "</h1>")
         files     = self.getFilesInRun(     self.runName )
         byProgram = self.groupByProgram(    files        )
 
@@ -129,7 +171,7 @@ class jobServer(BaseHTTPRequestHandler):
         dates        = images['image']
         data         = dates[lastDate]
         file         = data['file']
-        res.append("<h3>"+lastProgName+" - "+lastDate+"</h3>")
+        res.append("<h3 style='margin: 0px'>"+lastProgName+" - "+lastDate+"</h3>")
         res.append("<img src=\"/?runName="+self.runName+"&file="+file+"\"/>")
 
         return res
@@ -137,20 +179,38 @@ class jobServer(BaseHTTPRequestHandler):
     def getLogFilesTable(self, byProgram):
         res = []
         if len(byProgram.keys()) > 1:
-            res.append("<table>")
+            res.append("<table colwidth=1>")
             for prog in byProgram.keys():
                 data = byProgram[prog]
                 out  = data.get('out', None)
                 err  = data.get('err', None)
+                if ( prog == '' ):
+                    prog = "Global"
                 
                 res.append("<tr>")
-                res.append("<td>")
+                res.append("<td colspan=\"2\">")
+                res.append("<a name=\""+prog+"\"></a>")
+                res.append("<h3 style='margin: 0px'>"+prog+"</h3>")
+                res.append("</td>")
+                res.append("</tr>")
+                res.append("<tr>")
+                
+                res.append("<td><h7 style='margin: 0px'>Out</h7></td>")
+                res.append("<td><h7 style='margin: 0px'>Err</h7></td>")
+                res.append("</tr>")
+
+                res.append("<tr>")
+                res.append("<td>")                
+
                 if out is not None:
                     res.extend(self.getFileContent(out))
                 res.append("</td>")
+
                 res.append("<td>")
                 if err is not None:
+
                     res.extend(self.getFileContent(err))
+
                 res.append("</td>")
                 res.append("</tr>")
                 
@@ -184,7 +244,17 @@ class jobServer(BaseHTTPRequestHandler):
         res = []
 
         res.append("<textarea name=\""+fn+"\" cols=\""+textAreaCols+"\" rows=\""+textAreaRows+"\">")
-        res.append("this box will contain the information from " + fn)
+        #res.append("this box will contain the information from " + fn)
+        
+        fullFn = os.path.join(self.runPath, fn)
+        print "   OPENING " + fullFn
+        
+        f=open(fullFn,'rb')
+        for line in tail(f, 20):
+            res.append(line)
+            print line
+        f.close
+        
         res.append("</textarea>")
         return res
 
@@ -224,6 +294,9 @@ class jobServer(BaseHTTPRequestHandler):
         for program in res.keys():
             programOut = jobPrefix + "_" + program + ".out"
             programErr = jobPrefix + "_" + program + ".err"
+            if program == '':
+                programOut = jobPrefix + ".out"
+                programErr = jobPrefix + ".err"
             
             print "  SEARCHING FOR PROGRAM " + program + " OUT " + programOut + " ERR " + programErr
 
@@ -243,8 +316,9 @@ class jobServer(BaseHTTPRequestHandler):
         files = []
         #print "base " + constants.logBasePath
 
-        runPath = os.path.join(qryPath, runName)
-        list    = os.listdir(runPath)
+        runPath      = os.path.join(qryPath, runName)
+        self.runPath = runPath
+        list         = os.listdir(runPath)
         list.sort()
 
         if list is not None:
@@ -323,7 +397,7 @@ class jobServer(BaseHTTPRequestHandler):
 
         res.append("</select>")
         res.append("<input type=\"submit\" method=\"get\" value=\"ok\"></input></form>")
-        res.append("<br/><hr><br/>")
+        res.append("<hr>")
         return res
 
 
