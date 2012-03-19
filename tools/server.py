@@ -14,7 +14,7 @@ qryPath      = os.path.abspath(constants.logBasePath) + "/"
 jobPrefix    = "jobLaunch"
 textAreaCols = "80"
 textAreaRows = "5"
-HOST, PORT = "localhost", 9999
+HOST, PORT   = "localhost", 9999
 
 
 def signal_handler(signal, frame):
@@ -126,28 +126,28 @@ class jobServer(BaseHTTPRequestHandler):
     def returnRequestedData(self):
         res = []
         if self.file is not None:
-            print " FILE DEFINED"
+            #print " FILE DEFINED"
             self.do_PNG()
             self.serveFile()
         else:
-            print " FILE NOT DEFINED"
+            #print " FILE NOT DEFINED"
             res.extend(self.getForm()     )
             if self.runName is not None:
-                print "   RUN NAME DEFINED"
+                #print "   RUN NAME DEFINED"
                 res.extend(self.serveContent())
 
             self.printRes(res)
 
 
     def serveFile(self):
-        print " SERVING FILE :: QRY PATH " + qryPath + " RUN NAME " + self.runName + " FILE " + self.file
+        #print " SERVING FILE :: QRY PATH " + qryPath + " RUN NAME " + self.runName + " FILE " + self.file
         runPath = os.path.join(qryPath, self.runName, self.file)
         f = open(runPath)
         self.wfile.write(f.read())
         f.close()
 
     def serveContent(self):
-        print "RUN NAME "+str(self.runName)
+        #print "RUN NAME "+str(self.runName)
         res = []
         if self.runName is None:
             return res
@@ -262,12 +262,12 @@ class jobServer(BaseHTTPRequestHandler):
         #res.append("this box will contain the information from " + fn)
         
         fullFn = os.path.join(self.runPath, fn)
-        print "   OPENING " + fullFn
+        #print "   OPENING " + fullFn
         
         f=open(fullFn,'rb')
         for line in tail(f, 20):
             res.append(line)
-            print line
+            #print line
         f.close
         
         res.append("</textarea>")
@@ -291,10 +291,10 @@ class jobServer(BaseHTTPRequestHandler):
                     sec       = m.group(7)
                     ms        = m.group(8)
                     program   = m.group(9)
-                    print "FILE " + file + " DATE "+ date +" YEAR " + year + \
-                    " MONTH " + month + " DAY " + day + " HOUR " + hour + \
-                    " MINUTE " + min + " SECOND " + sec + " MICROSECONDS " + ms +\
-                    "  PROGRAM '" + program
+                    #print "FILE " + file + " DATE "+ date +" YEAR " + year + \
+                    #" MONTH " + month + " DAY " + day + " HOUR " + hour + \
+                    #" MINUTE " + min + " SECOND " + sec + " MICROSECONDS " + ms +\
+                    #"  PROGRAM '" + program
 
                     res[program] = {
                         'image': {
@@ -313,15 +313,15 @@ class jobServer(BaseHTTPRequestHandler):
                 programOut = jobPrefix + ".out"
                 programErr = jobPrefix + ".err"
             
-            print "  SEARCHING FOR PROGRAM " + program + " OUT " + programOut + " ERR " + programErr
+            #print "  SEARCHING FOR PROGRAM " + program + " OUT " + programOut + " ERR " + programErr
 
             data = res[program]            
             if programOut in files:
-                print "    OUT " + programOut + " FOUND"
+                #print "    OUT " + programOut + " FOUND"
                 data['out'] = programOut
             
             if programErr in files:
-                print "    ERR " + programErr + " FOUND"
+                #print "    ERR " + programErr + " FOUND"
                 data['err'] = programErr
         
         
@@ -351,7 +351,7 @@ class jobServer(BaseHTTPRequestHandler):
 
         for line in res:
             self.wfile.write(line + "\n")
-            print line
+            #print line
 
         self.wfile.write(self.getTail()  )
 
@@ -362,7 +362,7 @@ class jobServer(BaseHTTPRequestHandler):
         parse = urlparse(path)
         qry   = parse.query
         req   = parse_qs(qry)
-        print "REQUEST " + str(req)
+        #print "REQUEST " + str(req)
         self.req = req
 
         return req
