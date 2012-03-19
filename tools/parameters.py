@@ -7,7 +7,10 @@ __all__ = ["io", "parameters"]
 class io():
     def __init__(self, fileName):
         #print " IO :: FN " + str(fileName)
-        self.fileName = fileName
+        if isinstance(fileName, io):
+            self          = fileName
+        else:
+            self.fileName = fileName
 
     def getFileName(self):
         return self.fileName
@@ -30,7 +33,7 @@ class io():
 
             fileReal = os.path.abspath(os.path.realpath(os.path.normpath(file)))
 
-            if not os.path.isfile(inputFastqReal):
+            if not os.path.isfile(fileReal):
                 print " INPUT FASTQ FILE " + inputFastq + " ("+inputFastqReal+") IS NOT A FILE"
                 filesOut.append(fileReal)
 

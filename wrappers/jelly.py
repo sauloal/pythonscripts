@@ -85,14 +85,13 @@ class jellyCount(sampleWrapper):
         """
 
         function  = "count"
-
         inputBase = os.path.commonprefix( io(input).getFiles() )
-
         nickName  = className + "_" + function + "_" + str(inputBase)
         print "  INITING JELLY COUNT " + nickName
         sampleWrapper.__init__(self, nickName)
         self.input  = input
         self.kwargs = kwargs
+
 
     def getInput(self):
         return self.input
@@ -156,12 +155,10 @@ class jellyCount(sampleWrapper):
 
         self.parameter = parameter
 
-        if isinstance(input, io):
-            self.input   = input
-        else:
-            self.input   = io(input)
 
+        self.input   = io(input)
         self.output  = io(output)
+
         self.inputs  = [ self.input  ]
         self.outputs = [ self.output ]
 
@@ -210,13 +207,25 @@ class jellyStats(sampleWrapper):
         -V, --version                            Version
         """
 
-
-        assert input  is not None
-
         function  = "stats"
-        nickName  = className + "_" + function + "_" + input
-        print "  INITING JELLY STATS" + nickName
+        inputBase = os.path.commonprefix( io(input).getFiles() )
+        nickName  = className + "_" + function + "_" + str(inputBase)
+        print "  INITING JELLY STATS " + nickName
         sampleWrapper.__init__(self, nickName)
+        self.input  = input
+        self.kwargs = kwargs
+
+
+    def getInput(self):
+        return self.input
+
+    def getOutput(self):
+        return self.output
+
+    def __initChild__(self):
+        input  = self.input
+        kwargs = self.kwargs
+
 
         output = kwargs.get('output', None)
         if output is None:
@@ -284,12 +293,26 @@ class jellyHisto(sampleWrapper):
          -V, --version                            Version
         """
 
-        assert input  is not None
-
         function  = "histo"
-        nickName  = className + "_" + function + "_" + input
-        print "  INITING JELLY HISTO" + nickName
+        inputBase = os.path.commonprefix( io(input).getFiles() )
+        nickName  = className + "_" + function + "_" + str(inputBase)
+        print "  INITING JELLY HISTO " + nickName
         sampleWrapper.__init__(self, nickName)
+        self.input  = input
+        self.kwargs = kwargs
+
+
+    def getInput(self):
+        return self.input
+
+    def getOutput(self):
+        return self.output
+
+    def __initChild__(self):
+        input  = self.input
+        kwargs = self.kwargs
+
+
 
         output = kwargs.get('output', None)
         if output is None:
@@ -353,9 +376,23 @@ class jellyDump(sampleWrapper):
 
 
         function  = "dump"
-        nickName  = className + "_" + function + "_" + input
-        print "  INITING JELLY DUMP" + nickName
+        inputBase = os.path.commonprefix( io(input).getFiles() )
+        nickName  = className + "_" + function + "_" + str(inputBase)
+        print "  INITING JELLY DUMP " + nickName
         sampleWrapper.__init__(self, nickName)
+        self.input  = input
+        self.kwargs = kwargs
+
+
+    def getInput(self):
+        return self.input
+
+    def getOutput(self):
+        return self.output
+
+    def __initChild__(self):
+        input  = self.input
+        kwargs = self.kwargs
 
         output = kwargs.get('output', None)
         if output is None:
@@ -413,9 +450,23 @@ class jellyMerge(sampleWrapper):
 
 
         function  = "merge"
-        nickName  = className + "_" + function + "_" + input
-        print "  INITING JELLY COUNT " + nickName
+        inputBase = os.path.commonprefix( io(input).getFiles() )
+        nickName  = className + "_" + function + "_" + str(inputBase)
+        print "  INITING JELLY MERGE " + nickName
         sampleWrapper.__init__(self, nickName)
+        self.input  = input
+        self.kwargs = kwargs
+
+
+    def getInput(self):
+        return self.input
+
+    def getOutput(self):
+        return self.output
+
+    def __initChild__(self):
+        input  = self.input
+        kwargs = self.kwargs
 
 
         output = kwargs.get('output', None)
