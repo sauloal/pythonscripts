@@ -51,16 +51,16 @@ for lib in setup.ldataset:
             print '    FN  ' + run.getFileName()
             #           getJellyPipeline      (inputFastq=None,  outputFolder=None, prefix=None, suffix=None, dependsOn=[], **kwargs):
             jellyPipe = jellypipe.getJellyPipeline([run.getFileName()], '/tmp',           None,        'pipetest',  None,         **jellyParams)
-            
+
             for jobDesc in jellyPipe:
                 data[jobDesc[0]] = jobDesc[1]
-            
+
             pairChildrenJobs.append(jellyPipe[2][1])
-        
+
         print "PAIR CHILDREN JOBS " + str(pairChildrenJobs)
-        
+
         #def getJellyMergePipeline(inputJF=None, outputFolder=None, prefix=None, suffix=None, dependsOn=[], **kwargs):
-        
+
 
 
 
@@ -80,7 +80,7 @@ all=[sw, data]
 
 if useYaml:
     dataDump = str(dump(data, Dumper=Dumper))
-    #print dataDump
+    print dataDump
     data2    = load(dataDump, Loader=Loader)
 
 sys.exit(0)
