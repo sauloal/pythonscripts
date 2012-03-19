@@ -93,11 +93,11 @@ class jobServer(BaseHTTPRequestHandler):
 
         runName = runName[0]
         res.append("<h1>RESPONSE TO " + runName + "</h1>")
-        files     = self.getFilesInRun(runName)
-        byProgram = self.groupByProgram(files)
-        index     = getIndexTable(     byProgram)
-        images    = getImageFilesTable(byProgram)
-        logs      = getLogFilesTable(  byProgram)
+        files     = self.getFilesInRun(     runName  )
+        byProgram = self.groupByProgram(    files    )
+        index     = self.getIndexTable(     byProgram)
+        images    = self.getImageFilesTable(byProgram)
+        logs      = self.getLogFilesTable(  byProgram)
         res.extend(index )
         res.extend(images)
         res.extend(logs  )
@@ -114,11 +114,11 @@ class jobServer(BaseHTTPRequestHandler):
 
     def getIndexTable(self, byProgram):
         res = []
-        if len(files) != 0:
-            res.append("<ul>")
-            for file in files:
-                res.append("<li><a href=\"#"+file+"\">"+file+"</a></li>")
-            res.append("</ul>")
+        #if len(files) != 0:
+        #    res.append("<ul>")
+        #    for file in files:
+        #        res.append("<li><a href=\"#"+file+"\">"+file+"</a></li>")
+        #    res.append("</ul>")
         return res
 
     def groupByProgram(self, files):
@@ -127,19 +127,22 @@ class jobServer(BaseHTTPRequestHandler):
             for file in files:
                 #2012_03_17_16_22_59_369930.png
                 #2012_03_17_16_22_59_505476_f0.png
-                #              Y      Mo     D      H      Min    S      Ms
-                m = re.search('(\d+?)_(\d+?)_(\d+?)_(\d+?)_(\d+?)_(\d+?)_(\d+?)(\S+?)\.([png|log])', file)
+                #              Y     Mo    D     H     Min   S     Ms
+                m = re.search('(\d+)_(\d+)_(\d+)_(\d+)_(\d+)_(\d+)_(\d+)_*(\S*?)\.(png|err|out)', file)
                 if ( m is not None):
-                    year      = m.group(0)
-                    month     = m.group(1)
-                    day       = m.group(2)
-                    hour      = m.group(3)
-                    min       = m.group(4)
-                    sec       = m.group(5)
-                    ms        = m.group(6)
-                    program   = m.group(7)
-                    extension = m.group(8)
-                    print "FILE " + file + " PROGRAM " + program + " EXTENSION " + extension
+                    year      = m.group(1)
+                    month     = m.group(2)
+                    day       = m.group(3)
+                    hour      = m.group(4)
+                    min       = m.group(5)
+                    sec       = m.group(6)
+                    ms        = m.group(7)
+                    program   = m.group(8)
+                    extension = m.group(9)
+                    print "FILE " + file + " YEAR " + year + " MONTH " + month + \
+                    " DAY " + day + " HOUR " + hour + " MINUTE " + min + \
+                    " SECOND " + sec + " MICROSECONDS " + ms + "  PROGRAM " +\
+                    program + " EXTENSION " + extension
         return res
 
     def getFilesInRun(self, runName):
