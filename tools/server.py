@@ -99,7 +99,7 @@ class jobServer(BaseHTTPRequestHandler):
         index     = self.getIndexTable(     byProgram)
         images    = self.getImageFilesTable(byProgram)
         logs      = self.getLogFilesTable(  byProgram)
-        
+
         res.extend(index )
         res.extend(images)
         res.extend(logs  )
@@ -107,7 +107,26 @@ class jobServer(BaseHTTPRequestHandler):
         return res
 
     def getImageFilesTable(self, byProgram):
-        res = []
+        res   = []
+        dates = {}
+
+        if len(byProgram.keys() > 1):
+            for prog in byProgram.keys():
+                dates = byProgram[prog]
+                for date in dates.keys():
+                    data = dates[data]
+                    if data['extension'] == 'png':
+                        dates[date] = prog
+
+        datesNames   = dates.keys()
+        datesNames.sort()
+        lastDate     = datesNames[-1]
+        lastProgName = dates[lastDate]
+        prog         = byProgram[lastProgName]
+        data         = progs[lastDate]
+        file         = data['file']
+        res.append("<h3>"+lastProgName+" - "+lastDate+"</h3>\n<img src=\"\"/>")
+
         return res
 
     def getLogFilesTable(self, byProgram):
@@ -116,11 +135,15 @@ class jobServer(BaseHTTPRequestHandler):
 
     def getIndexTable(self, byProgram):
         res = []
-        #if len(files) != 0:
-        #    res.append("<ul>")
-        #    for file in files:
-        #        res.append("<li><a href=\"#"+file+"\">"+file+"</a></li>")
-        #    res.append("</ul>")
+        res.append("<ul>")
+
+        if len(byProgram.keys() > 1):
+            for prog in byProgram.keys():
+                if prog == '':
+                    continue
+                res.append("<li><a href=\"#"+prog+"\">"+prog+"</a></li>")
+
+        res.append("</ul>")
         return res
 
     def groupByProgram(self, files):
@@ -150,7 +173,8 @@ class jobServer(BaseHTTPRequestHandler):
                     res[program] = {
                         date: {
                             'file'     : file,
-                            'extension': extension
+                            'extension': extension,
+                            'date'     : (year, month, day, hour, min, sec, ms)
                         }
                     }
         return res
