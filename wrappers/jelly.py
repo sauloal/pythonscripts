@@ -54,7 +54,7 @@ className = 'jelly'
 
 
 class jellyCount(sampleWrapper):
-    def __init__(self, input=None, **kwargs):
+    def __init__(self, input=None, _name=None, **kwargs):
         """
         Usage: jellyfish count [options] file:path+
 
@@ -84,10 +84,11 @@ class jellyCount(sampleWrapper):
          -V, --version                            Version
         """
 
+        assert input  is not None
+        assert _name  is not None
         function  = "count"
-        inputBase = os.path.commonprefix( io(input).getFiles() )
-        nickName  = className + "_" + function + "_" + str(inputBase)
-        print "  INITING JELLY COUNT " + nickName
+        nickName  = className + "_" + function + "_" + _name
+        print "  INITING JELLY " + function.upper() + " " + nickName
         sampleWrapper.__init__(self, nickName)
         self.input  = input
         self.kwargs = kwargs
@@ -183,7 +184,7 @@ class jellyCount(sampleWrapper):
 
 
 class jellyStats(sampleWrapper):
-    def __init__(self, input=None, **kwargs):
+    def __init__(self, input=None, _name=None, **kwargs):
         """
         Usage: jellyfish stats [options] db:path
 
@@ -207,10 +208,11 @@ class jellyStats(sampleWrapper):
         -V, --version                            Version
         """
 
+        assert input  is not None
+        assert _name  is not None
         function  = "stats"
-        inputBase = os.path.commonprefix( io(input).getFiles() )
-        nickName  = className + "_" + function + "_" + str(inputBase)
-        print "  INITING JELLY STATS " + nickName
+        nickName  = className + "_" + function + "_" + _name
+        print "  INITING JELLY " + function.upper() + " " + nickName
         sampleWrapper.__init__(self, nickName)
         self.input  = input
         self.kwargs = kwargs
@@ -264,7 +266,7 @@ class jellyStats(sampleWrapper):
 
 
 class jellyHisto(sampleWrapper):
-    def __init__(self, input=None, **kwargs):
+    def __init__(self, input=None, _name=None, **kwargs):
         """
         Usage: jellyfish histo [options] db:path
 
@@ -293,10 +295,11 @@ class jellyHisto(sampleWrapper):
          -V, --version                            Version
         """
 
+        assert input  is not None
+        assert _name  is not None
         function  = "histo"
-        inputBase = os.path.commonprefix( io(input).getFiles() )
-        nickName  = className + "_" + function + "_" + str(inputBase)
-        print "  INITING JELLY HISTO " + nickName
+        nickName  = className + "_" + function + "_" + _name
+        print "  INITING JELLY " + function.upper() + " " + nickName
         sampleWrapper.__init__(self, nickName)
         self.input  = input
         self.kwargs = kwargs
@@ -352,7 +355,7 @@ class jellyHisto(sampleWrapper):
 
 
 class jellyDump(sampleWrapper):
-    def __init__(self, input=None, **kwargs):
+    def __init__(self, input=None, _name=None, **kwargs):
         """
         Usage: jellyfish stats [options] db:path
 
@@ -373,12 +376,10 @@ class jellyDump(sampleWrapper):
          -V, --version                            Version
         """
         assert input  is not None
-
-
+        assert _name  is not None
         function  = "dump"
-        inputBase = os.path.commonprefix( io(input).getFiles() )
-        nickName  = className + "_" + function + "_" + str(inputBase)
-        print "  INITING JELLY DUMP " + nickName
+        nickName  = className + "_" + function + "_" + _name
+        print "  INITING JELLY " + function.upper() + " " + nickName
         sampleWrapper.__init__(self, nickName)
         self.input  = input
         self.kwargs = kwargs
@@ -430,7 +431,7 @@ class jellyDump(sampleWrapper):
 
 
 class jellyMerge(sampleWrapper):
-    def __init__(self, input=None, **kwargs):
+    def __init__(self, input=None, _name=None, **kwargs):
         """
         Usage: jellyfish merge [options] input:c_string+
 
@@ -447,12 +448,10 @@ class jellyMerge(sampleWrapper):
         -V, --version                            Version
         """
         assert input  is not None
-
-
-        function  = "merge"
-        inputBase = os.path.commonprefix( io(input).getFiles() )
-        nickName  = className + "_" + function + "_" + str(inputBase)
-        print "  INITING JELLY MERGE " + nickName
+        assert _name  is not None
+        function  = "count"
+        nickName  = className + "_" + function + "_" + _name
+        print "  INITING JELLY " + function.upper() + " " + nickName
         sampleWrapper.__init__(self, nickName)
         self.input  = input
         self.kwargs = kwargs
