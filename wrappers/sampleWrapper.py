@@ -5,7 +5,7 @@ if __name__ == "__main__":
     fullpath=os.getcwd()
 
     # add parent folder to path
-    
+
     #print "CURRENT PATH " + fullpath
     fullpath=os.path.abspath(fullpath + "/..")
     #print "PREVIOUS PATH " + fullpath
@@ -30,7 +30,7 @@ from tools import constants
         RUNNING         = 1
         FAILED          = 2
         FINISH          = 3
-    
+
     Optionally (if used), a class can contain a function called
     "selfTest" which will be called by the end of the execution
     by the job scheduler.
@@ -51,9 +51,13 @@ class sampleWrapper():
         print "GOT STATUS " + str(messaging.status)
 
 
+        initChild = getattr(self, '__initChild__', None)
+        if initChild is not None:
+            self.__initChild__()
+
+
         #def runString(id, cmdFinal, messaging):
         run.runString(self.name, self.parameter.getCmd(), messaging)
-
 
 
         self.messaging.status = constants.FINISH
@@ -61,7 +65,7 @@ class sampleWrapper():
         print "EXIT STATUS ORIGINAL " + str(self.messaging.exitCode)
         self.messaging.exitCode = 0
         print "EXIT STATUS NEW " + str(self.messaging.exitCode)
-        
+
     def selfTest(self, messaging):
         messaging.addError("SAMPLE WRAPPER")
         messaging.addError("  SAMPLE SELF TEST")
@@ -70,11 +74,11 @@ class sampleWrapper():
         messaging.stderr(self.name, "  SELF TESTING\n")
         messaging.stdout(self.name, str(self) + "\n")
         messaging.status = constants.FINISH
-        
+
     def getInputs(self):
         inputs = getattr(self, 'inputs', None)
         return inputs
-    
+
     def getOutputs(self):
         outputs = getattr(self, 'outputs', None)
         return outputs
@@ -90,7 +94,7 @@ def sample(messaging):
     messaging.status = constants.FINISH
     messaging.stdout(name, "RETURNING STATUS " + str(messaging.status) + "\n")
 
-    
+
     messaging.stdout(name, "EXIT STATUS ORIGINAL " + str(messaging.exitCode) + "\n")
     messaging.exitCode = 255 #not run
     messaging.exitCode = 0
@@ -98,5 +102,3 @@ def sample(messaging):
 
 
 #sample = sampleWrapper("watever0")
-
-    

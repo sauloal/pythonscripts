@@ -88,7 +88,12 @@ class jellyCount(sampleWrapper):
         nickName  = className + "_" + function + "_" + str(input)
         print "  INITING JELLY COUNT " + nickName
         sampleWrapper.__init__(self, nickName)
+        self.input  = input
+        self.kwargs = kwargs
 
+    def __initChild__(self):
+        input  = self.input
+        kwargs = self.kwargs
 
 
         output = kwargs.get('output', None)
@@ -114,6 +119,7 @@ class jellyCount(sampleWrapper):
         parameter.append(exe,           True,   'name')
         parameter.append(function,      True,   'name')
 
+
         params = {
             'mer-len'         : { 'type': 'num',  'dashes': 2, 'equal': True  },
             'size'            : { 'type': 'num',  'dashes': 2, 'equal': True  },
@@ -133,14 +139,18 @@ class jellyCount(sampleWrapper):
             'stats'           : { 'type': 'file', 'dashes': 2, 'equal': True  },
         }
 
+
         parameter.parseList(params, kwargs)
         parameter.parse( 'output', 'file',  2,      True,  io(output) )
         parameter.parse( '',       'file',  0,      False, io(input)  )
 
+
         self.parameter = parameter
+
 
         self.inputs  = [ io(input)  ]
         self.outputs = [ io(output) ]
+
 
         if (parameter.hasParam('matrix')):
             self.inputs.append(io(parameter.getValue('matrix')))
@@ -148,6 +158,7 @@ class jellyCount(sampleWrapper):
             self.outputs.append(io(parameter.getValue('timing')))
         if (parameter.hasParam('stats')):
             self.outputs.append(io(parameter.getValue('stats')))
+
 
         print "  INITING JELLY COUNT CMD " + self.parameter.getCmd()
         print "    INPUTS : "
