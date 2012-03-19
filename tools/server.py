@@ -33,11 +33,17 @@ class jobServer(BaseHTTPRequestHandler):
     def do_GET(self):
         # self.request is the TCP socket connected to the client
 
-        res = []
-        req = self.getRequest()
+        res           = []
+        req           = self.getRequest()
+        self.req      = req
+        runNames      = req.get('runName', None)
+        file          = req.get('file',    None)
+        self.file     = file
+        self.runNames = runNames
+        self.runName  = runNames[0]
 
         if len(req) != 0:
-            self.returnRequestedData(req)
+            self.returnRequestedData()
         else:
             res.extend(self.getForm())
             self.printRes(res)
@@ -51,25 +57,23 @@ class jobServer(BaseHTTPRequestHandler):
         #jobLaunch.log
         #jobLaunch.out
 
-    def returnRequestedData(self, req):
-        runNames      = req.get('runName', None)
-        file          = req.get('file',    None)
-
+    def returnRequestedData(self):
         res = []
-        if file is not None:
-            self.file     = file
+        if self.file is not None:
+            print " FILE DEFINED"
             self.do_PNG()
             self.serveFile()
         else:
-            if runNames is not None:
-                self.runName = runName[0]
-                res.extend(self.getForm())
+            print " FILE NOT DEFINED"
+            res.extend(self.getForm()     )
+            if self.runName is not None:
+                print "   RUN NAME DEFINED"
                 res.extend(self.serveContent())
                 self.printRes(res)
-            else:
-                res.extend(self.getForm())
-                self.printRes(res)
-                
+
+
+            self.printRes(res)
+
 
     def serveFile(self):
         runPath = os.path.join(qryPath, self.runName, self.file)
@@ -98,21 +102,21 @@ class jobServer(BaseHTTPRequestHandler):
         return res
 
     def getImageFilesTable(self, byProgram):
-        res   = []
-        dates = {}
+        res      = []
+        pngDates = {}
 
-        if len(byProgram.keys() > 1):
+        if len(byProgram.keys()) > 1:
             for prog in byProgram.keys():
                 dates = byProgram[prog]
                 for date in dates.keys():
-                    data = dates[data]
+                    data = dates[date]
                     if data['extension'] == 'png':
-                        dates[date] = prog
+                        pngDates[date] = prog
 
-        datesNames   = dates.keys()
+        datesNames   = pngDates.keys()
         datesNames.sort()
         lastDate     = datesNames[-1]
-        lastProgName = dates[lastDate]
+        lastProgName = pngDates[lastDate]
         prog         = byProgram[lastProgName]
         data         = progs[lastDate]
         file         = data['file']
@@ -129,7 +133,7 @@ class jobServer(BaseHTTPRequestHandler):
         res = []
         res.append("<ul>")
 
-        if len(byProgram.keys() > 1):
+        if len(byProgram.keys()) > 1:
             for prog in byProgram.keys():
                 if prog == '':
                     continue
