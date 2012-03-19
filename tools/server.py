@@ -37,41 +37,40 @@ class jobServer(BaseHTTPRequestHandler):
         req = self.getRequest()
 
         if len(req) != 0:
-            res.extend( self.returnRequestedData(req) )
-            self.printRes(res)
+            self.returnRequestedData(req)
         else:
-            self.do_HEAD()
-            self.getList()
             res.extend(self.getForm())
             self.printRes(res)
-            self.serveContent()
 
-#2012_03_17_16_22_59_369930.png
-#2012_03_17_16_22_59_505476_f0.png
-#jobLaunch_f0.dump
-#jobLaunch_f0.err
-#jobLaunch_f0.out
-#jobLaunch.log
-#jobLaunch.out
+
+        #2012_03_17_16_22_59_369930.png
+        #2012_03_17_16_22_59_505476_f0.png
+        #jobLaunch_f0.dump
+        #jobLaunch_f0.err
+        #jobLaunch_f0.out
+        #jobLaunch.log
+        #jobLaunch.out
 
     def returnRequestedData(self, req):
-        runName      = req.get('runName', None)
-        file         = req.get('file',    None)
-        self.runName = runName
-        self.file    = file
-        self.getList()
+        runNames      = req.get('runName', None)
+        file          = req.get('file',    None)
 
+        res = []
         if file is not None:
+            self.file     = file
             self.do_PNG()
-
-
-
-            res.extend( self.returnRequestedData(req) )
             self.serveFile()
         else:
-            self.do_HEAD()
-            res.extend(self.getForm())
-            self.serveContent()
+            if runNames is not None:
+                self.runName = runName[0]
+                res.extend(self.getForm())
+                self.serveContent()
+                self.printRes(res)
+            else:
+                res.extend(self.getForm())
+                self.printRes(res)
+                self.printRes(res)
+                
 
     def serveFile(self):
         runPath = os.path.join(qryPath, self.runName, self.file)
@@ -80,14 +79,13 @@ class jobServer(BaseHTTPRequestHandler):
         f.close()
 
     def serveContent(self):
-        print "RUN NAME "+str(runName)
+        print "RUN NAME "+str(self.runName)
         res = []
-        if runName is None:
+        if self.runName is None:
             return res
 
-        runName   = runName[0]
-        res.append("<h1>RESPONSE TO " + runName + "</h1>")
-        files     = self.getFilesInRun(     runName  )
+        res.append("<h1>RESPONSE TO " + self.runName + "</h1>")
+        files     = self.getFilesInRun(     self.runName  )
         byProgram = self.groupByProgram(    files    )
 
         index     = self.getIndexTable(     byProgram)
@@ -209,6 +207,7 @@ class jobServer(BaseHTTPRequestHandler):
         qry   = parse.query
         req   = parse_qs(qry)
         print "REQUEST " + str(req)
+        self.req = req
 
         return req
 
@@ -228,6 +227,7 @@ class jobServer(BaseHTTPRequestHandler):
 
     def getForm(self):
         res     = []
+        self.getList()
         dirs    = self.dirs
         lenDirs = self.lenDirs
         lastDir = self.lastDir
