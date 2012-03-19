@@ -56,9 +56,9 @@ def getJellyPipeline(inputFastqList=None, outputFolder=None, prefix=None, suffix
     outBaseName = os.path.abspath(os.path.realpath(os.path.normpath(os.path.join(outputFolder, prefix+inBaseName+suffix))))
     outNickName = os.path.basename(outBaseName)
 
-    jc = jellyCount([inputFastq ], output=outBaseName + "_mer_counts", stats=outBaseName + ".stats", **kwargs)
-    jm = jellyMerge([jc.output  ], output=outBaseName + ".jf",                                       **kwargs)
-    jh = jellyHisto([jm.output  ], output=outBaseName + ".histo",                                    **kwargs)
+    jc = jellyCount([inputFastq    ], output=outBaseName + "_mer_counts", stats=outBaseName + ".stats", **kwargs)
+    jm = jellyMerge([jc.getOutput  ], output=outBaseName + ".jf",                                       **kwargs)
+    jh = jellyHisto([jm.getOutput  ], output=outBaseName + ".histo",                                    **kwargs)
 
     f0 = joblaunch.Job(outNickName + '_JellyCount', [ jc ], deps=dependsOn)
     f1 = joblaunch.Job(outNickName + '_JellyMerge', [ jm ], deps=[f0] )

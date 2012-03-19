@@ -91,6 +91,12 @@ class jellyCount(sampleWrapper):
         self.input  = input
         self.kwargs = kwargs
 
+    def getInput(self):
+        return self.input
+
+    def getOutput(self):
+        return self.output
+
     def __initChild__(self):
         input  = self.input
         kwargs = self.kwargs
@@ -147,7 +153,11 @@ class jellyCount(sampleWrapper):
 
         self.parameter = parameter
 
-        self.input   = io(input)
+        if isinstance(input, io):
+            self.input   = input
+        else:
+            self.input   = io(input)
+
         self.output  = io(output)
         self.inputs  = [ self.input  ]
         self.outputs = [ self.output ]
