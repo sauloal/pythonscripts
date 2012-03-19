@@ -25,67 +25,56 @@ class jobServer(BaseHTTPRequestHandler):
         s.send_header("Content-type", "text/html")
         s.end_headers()
 
+    def do_PNG(s):
+        s.send_response(200)
+        s.send_header("Content-type", "image/png")
+        s.end_headers()
+
     def do_GET(self):
         # self.request is the TCP socket connected to the client
 
-        self.do_HEAD()
-
         res = []
-        self.getList()
-        res.extend(self.getForm())
-
         req = self.getRequest()
 
-        if len(req) == 0:
-            self.printRes(res)
-        else:
+        if len(req) != 0:
+            self.getList()
+            res.extend(self.getForm())
+
+
             res.extend( self.returnRequestedData(req) )
-
             self.printRes(res)
-
 
 #2012_03_17_16_22_59_369930.png
 #2012_03_17_16_22_59_505476_f0.png
-#2012_03_17_16_22_59_633211_f1.png
-#2012_03_17_16_23_05_538563_f3.png
-#2012_03_17_16_23_07_527279_f4.png
-#2012_03_17_16_23_10_538911_f5.png
-#2012_03_17_16_23_11_545056_f6.png
-#2012_03_17_16_23_21_718978_l2.png
-#2012_03_17_16_23_37_839226_f2.png
-#2012_03_17_16_23_44_023231_l1.png
 #jobLaunch_f0.dump
 #jobLaunch_f0.err
 #jobLaunch_f0.out
-#jobLaunch_f1.dump
-#jobLaunch_f1.err
-#jobLaunch_f1.out
-#jobLaunch_f2.dump
-#jobLaunch_f2.err
-#jobLaunch_f2.out
-#jobLaunch_f3.dump
-#jobLaunch_f3.err
-#jobLaunch_f3.out
-#jobLaunch_f4.dump
-#jobLaunch_f4.err
-#jobLaunch_f4.out
-#jobLaunch_f5.dump
-#jobLaunch_f5.err
-#jobLaunch_f5.out
-#jobLaunch_f6.dump
-#jobLaunch_f6.err
-#jobLaunch_f6.out
-#jobLaunch_l1.dump
-#jobLaunch_l1.err
-#jobLaunch_l1.out
-#jobLaunch_l2.dump
-#jobLaunch_l2.err
-#jobLaunch_l2.out
 #jobLaunch.log
 #jobLaunch.out
 
     def returnRequestedData(self, req):
-        runName = req.get('runName', None)
+        runName      = req.get('runName', None)
+        file         = req.get('file', None)
+        self.runName = runName
+        self.file    = file
+
+        if file is not None:
+            self.do_PNG()
+            self.serveFile()
+        else:
+            self.do_HEAD()
+            self.serveContent()
+
+    def serveFile(self):
+        runPath = os.path.join(qryPath, self.runName, self.file)
+        f = open(runPath)
+
+        self.wfile.write(f.read())
+        f.close()
+        print file(r"c:\python\random_img\1.png", "rb").read()
+
+
+    def serveContent(self):
         print "RUN NAME "+str(runName)
         res = []
         if runName is None:
@@ -125,7 +114,8 @@ class jobServer(BaseHTTPRequestHandler):
         prog         = byProgram[lastProgName]
         data         = progs[lastDate]
         file         = data['file']
-        res.append("<h3>"+lastProgName+" - "+lastDate+"</h3>\n<img src=\"\"/>")
+        res.append("<h3>"+lastProgName+" - "+lastDate+"</h3>")
+        res.append("<img src=\"/?runName="+self.runName+"&file="+file+"\"/>")
 
         return res
 
@@ -196,6 +186,8 @@ class jobServer(BaseHTTPRequestHandler):
         return files
 
     def printRes(self, res):
+
+        self.do_HEAD()
         self.wfile.write(self.getHeader())
 
         for line in res:
