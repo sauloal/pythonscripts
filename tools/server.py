@@ -95,9 +95,11 @@ class jobServer(BaseHTTPRequestHandler):
         res.append("<h1>RESPONSE TO " + runName + "</h1>")
         files     = self.getFilesInRun(     runName  )
         byProgram = self.groupByProgram(    files    )
+
         index     = self.getIndexTable(     byProgram)
         images    = self.getImageFilesTable(byProgram)
         logs      = self.getLogFilesTable(  byProgram)
+        
         res.extend(index )
         res.extend(images)
         res.extend(logs  )
@@ -128,21 +130,29 @@ class jobServer(BaseHTTPRequestHandler):
                 #2012_03_17_16_22_59_369930.png
                 #2012_03_17_16_22_59_505476_f0.png
                 #              Y     Mo    D     H     Min   S     Ms
-                m = re.search('(\d+)_(\d+)_(\d+)_(\d+)_(\d+)_(\d+)_(\d+)_*(\S*?)\.(png|err|out)', file)
+                m = re.search('((\d+)_(\d+)_(\d+)_(\d+)_(\d+)_(\d+)_(\d+))_*(\S*?)\.(png|err|out)', file)
                 if ( m is not None):
-                    year      = m.group(1)
-                    month     = m.group(2)
-                    day       = m.group(3)
-                    hour      = m.group(4)
-                    min       = m.group(5)
-                    sec       = m.group(6)
-                    ms        = m.group(7)
-                    program   = m.group(8)
-                    extension = m.group(9)
-                    print "FILE " + file + " YEAR " + year + " MONTH " + month + \
+                    date      = m.group(1)
+                    year      = m.group(2)
+                    month     = m.group(3)
+                    day       = m.group(4)
+                    hour      = m.group(5)
+                    min       = m.group(6)
+                    sec       = m.group(7)
+                    ms        = m.group(8)
+                    program   = m.group(9)
+                    extension = m.group(10)
+                    print "FILE " + file + " DATE "+ date +" YEAR " + year + " MONTH " + month + \
                     " DAY " + day + " HOUR " + hour + " MINUTE " + min + \
-                    " SECOND " + sec + " MICROSECONDS " + ms + "  PROGRAM " +\
-                    program + " EXTENSION " + extension
+                    " SECOND " + sec + " MICROSECONDS " + ms + "  PROGRAM '" +\
+                    program + "' EXTENSION '" + extension + "'"
+
+                    res[program] = {
+                        date: {
+                            'file'     : file,
+                            'extension': extension
+                        }
+                    }
         return res
 
     def getFilesInRun(self, runName):
