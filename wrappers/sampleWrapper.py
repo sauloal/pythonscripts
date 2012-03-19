@@ -42,7 +42,7 @@ class sampleWrapper():
         print "INITING SAMPLE WRAPPER " + name
         self.name     = name
         self.exitCode = 255 #not run
-        self.cmd      = 'echo ' + name
+        #self.cmd      = lambda x: 'echo ' + name
 
     def __call__(self, messaging):
         self.messaging = messaging
@@ -52,7 +52,7 @@ class sampleWrapper():
 
 
         #def runString(id, cmdFinal, messaging):
-        run.runString(self.name, self.cmd, messaging)
+        run.runString(self.name, self.parameter.getCmd(), messaging)
 
 
 
@@ -70,6 +70,14 @@ class sampleWrapper():
         messaging.stderr(self.name, "  SELF TESTING\n")
         messaging.stdout(self.name, str(self) + "\n")
         messaging.status = constants.FINISH
+        
+    def getInputs(self):
+        inputs = getattr(self, 'inputs', None)
+        return inputs
+    
+    def getOutputs(self):
+        outputs = getattr(self, 'outputs', None)
+        return outputs
 
 
 

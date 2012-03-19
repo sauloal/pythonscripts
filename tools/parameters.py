@@ -120,9 +120,14 @@ class parameters():
                     cmd = getLine(type, name, el)
                     cmds.append(cmd)
             elif value is FunctionType or value is InstanceType or value is MethodType:
-                el  = value()
-                cmd = getLine(type, name, el)
-                cmds.append(cmd)
+                valueEl  = value()
+                if valueEl is ListType:
+                    for el in valueEl:
+                        cmd = getLine(type, name, el)
+                        cmds.append(cmd)
+                else:
+                    cmd = getLine(type, name, valueEl)
+                    cmds.append(cmd)
             else:
                 cmd = self.getLine(type, name, value)
                 cmds.append(cmd)
