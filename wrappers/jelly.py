@@ -147,9 +147,10 @@ class jellyCount(sampleWrapper):
 
         self.parameter = parameter
 
-
-        self.inputs  = [ io(input)  ]
-        self.outputs = [ io(output) ]
+        self.input   = io(input)
+        self.output  = io(output)
+        self.inputs  = [ self.input  ]
+        self.outputs = [ self.output ]
 
 
         if (parameter.hasParam('matrix')):
