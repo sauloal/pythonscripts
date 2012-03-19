@@ -89,15 +89,17 @@ class jellyCount(sampleWrapper):
         print "  INITING JELLY COUNT " + nickName
         sampleWrapper.__init__(self, nickName)
 
-        if input is StringType:
-            input = glob.glob(input)
-
-        inputBase = os.path.commonprefix(input)
-        
         output = kwargs.get('output', None)
         if output is None:
-            output          = inputBase + "_mer_counts"
+            inputg = input
+            if type(inputg) in StringTypes:
+                inputg = glob.glob(inputg)
+    
+            inputBase  = os.path.commonprefix(inputg)
+            output     = inputBase + "_mer_counts"
             print "NO OUTPUT GIVEN " + output
+
+
 
         mer_len = kwargs.get('mer_len', None)
         if mer_len is None:
@@ -135,14 +137,8 @@ class jellyCount(sampleWrapper):
         }
 
         parameter.parseList(params, kwargs)
-        parameter.parse( 'output', 'file'    ,  2,      True,  output )
-
-
-        if input is StringType:
-            parameter.parse( '',       'file',  0,      False, input  )
-        elif input is ListType:
-            parameter.parse( '',       'fileList',  0,  False, input  )
-
+        parameter.parse( 'output', 'file',  2,      True,  io(output) )
+        parameter.parse( '',       'file',  0,      False, io(input)  )
 
         self.parameter = parameter
 

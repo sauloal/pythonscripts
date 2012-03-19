@@ -6,15 +6,18 @@ __all__ = ["io", "parameters"]
 
 class io():
     def __init__(self, fileName):
+        #print " IO :: FN " + str(fileName)
         self.fileName = fileName
 
     def getName(self):
         return self.fileName
 
     def getFiles(self):
-        if self.fileName is StringType:
-            return glob(self.fileName)
-        elif self.fileName is ListType:
+        if type(self.fileName) in StringTypes:
+            #print "string type"
+            return glob.glob(self.fileName)
+        elif type(self.fileName) is ListType:
+            #print "list type"
             return self.fileName
 
     def exists(self):
@@ -37,6 +40,8 @@ class io():
 
     def __repr__(self):
         files = self.getFiles()
+        print str(files)
+        print self.fileName
         res = "#FILES " + str(len(files))
         if self.exists():
             stats = self.getStats()
@@ -106,26 +111,27 @@ class parameters():
         pairs = self.pairs
         cmds  = []
         for pair in pairs:
-            type  = pair.type
-            name  = pair.name
-            value = pair.value
-            cmd   = ''
+            ptype  = pair.type
+            name   = pair.name
+            value  = pair.value
+            cmd    = ''
             
-            if value is ListType:
+            if type(value) is ListType:
                 for el in value:
-                    cmd = getLine(type, name, el)
+                    cmd = self.getLine(ptype, name, el)
                     cmds.append(cmd)
-            elif value is FunctionType or value is InstanceType or value is MethodType:
+            elif type(value) in (FunctionType, InstanceType, MethodType):
+                #print "VALUE " + str(value) + " IS " + str(type(value))
                 valueEl  = value()
                 if valueEl is ListType:
                     for el in valueEl:
-                        cmd = getLine(type, name, el)
+                        cmd = self.getLine(ptype, name, el)
                         cmds.append(cmd)
                 else:
-                    cmd = getLine(type, name, valueEl)
+                    cmd = self.getLine(ptype, name, valueEl)
                     cmds.append(cmd)
             else:
-                cmd = self.getLine(type, name, value)
+                cmd = self.getLine(ptype, name, value)
                 cmds.append(cmd)
             
         return " ".join(cmds)
@@ -144,9 +150,7 @@ class parameters():
         elif type == 'value':
             cmd = value
         elif type == 'file':
-            cmd = name + str(value)
-        elif type == 'fileList':
-            cmd = name + " ".join(value)
+            cmd = name + " ".join(io(value).getFiles())
         else:
             print "type " + str(type) + " is unknown"
         
