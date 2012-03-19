@@ -3,6 +3,7 @@ from BaseHTTPServer import HTTPServer, BaseHTTPRequestHandler
 import signal
 import os
 import glob
+import re
 from urlparse import urlparse, parse_qs
 
 import constants
@@ -43,6 +44,45 @@ class jobServer(BaseHTTPRequestHandler):
             self.printRes(res)
 
 
+#2012_03_17_16_22_59_369930.png
+#2012_03_17_16_22_59_505476_f0.png
+#2012_03_17_16_22_59_633211_f1.png
+#2012_03_17_16_23_05_538563_f3.png
+#2012_03_17_16_23_07_527279_f4.png
+#2012_03_17_16_23_10_538911_f5.png
+#2012_03_17_16_23_11_545056_f6.png
+#2012_03_17_16_23_21_718978_l2.png
+#2012_03_17_16_23_37_839226_f2.png
+#2012_03_17_16_23_44_023231_l1.png
+#jobLaunch_f0.dump
+#jobLaunch_f0.err
+#jobLaunch_f0.out
+#jobLaunch_f1.dump
+#jobLaunch_f1.err
+#jobLaunch_f1.out
+#jobLaunch_f2.dump
+#jobLaunch_f2.err
+#jobLaunch_f2.out
+#jobLaunch_f3.dump
+#jobLaunch_f3.err
+#jobLaunch_f3.out
+#jobLaunch_f4.dump
+#jobLaunch_f4.err
+#jobLaunch_f4.out
+#jobLaunch_f5.dump
+#jobLaunch_f5.err
+#jobLaunch_f5.out
+#jobLaunch_f6.dump
+#jobLaunch_f6.err
+#jobLaunch_f6.out
+#jobLaunch_l1.dump
+#jobLaunch_l1.err
+#jobLaunch_l1.out
+#jobLaunch_l2.dump
+#jobLaunch_l2.err
+#jobLaunch_l2.out
+#jobLaunch.log
+#jobLaunch.out
 
     def returnRequestedData(self, req):
         runName = req.get('runName', None)
@@ -53,13 +93,53 @@ class jobServer(BaseHTTPRequestHandler):
 
         runName = runName[0]
         res.append("<h1>RESPONSE TO " + runName + "</h1>")
-        files = self.getFilesInRun(runName)
+        files     = self.getFilesInRun(runName)
+        byProgram = self.groupByProgram(files)
+        index     = getIndexTable(     byProgram)
+        images    = getImageFilesTable(byProgram)
+        logs      = getLogFilesTable(  byProgram)
+        res.extend(index )
+        res.extend(images)
+        res.extend(logs  )
+
+        return res
+
+    def getImageFilesTable(self, byProgram):
+        res = []
+        return res
+
+    def getLogFilesTable(self, byProgram):
+        res = []
+        return res
+
+    def getIndexTable(self, byProgram):
+        res = []
         if len(files) != 0:
             res.append("<ul>")
             for file in files:
                 res.append("<li><a href=\"#"+file+"\">"+file+"</a></li>")
             res.append("</ul>")
+        return res
 
+    def groupByProgram(self, files):
+        res = {}
+        if len(files) != 0:
+            for file in files:
+                #2012_03_17_16_22_59_369930.png
+                #2012_03_17_16_22_59_505476_f0.png
+                #              Y      Mo     D      H      Min    S      Ms
+                m = re.search('(\d+?)_(\d+?)_(\d+?)_(\d+?)_(\d+?)_(\d+?)_(\d+?)(\S+?)\.([png|log])', file)
+                if ( m is not None):
+                    year      = m.group(0)
+                    month     = m.group(1)
+                    day       = m.group(2)
+                    hour      = m.group(3)
+                    min       = m.group(4)
+                    sec       = m.group(5)
+                    ms        = m.group(6)
+                    program   = m.group(7)
+                    extension = m.group(8)
+                    print "FILE " + file + " PROGRAM " + program + " EXTENSION " + extension
         return res
 
     def getFilesInRun(self, runName):
