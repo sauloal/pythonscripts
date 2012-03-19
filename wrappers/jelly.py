@@ -1,5 +1,7 @@
 import os
 import sys
+import glob
+from types import *
 
 if __name__ == "__main__":
     fullpath=os.getcwd()
@@ -82,16 +84,19 @@ class jellyCount(sampleWrapper):
          -V, --version                            Version
         """
 
-
         function  = "count"
-        nickName  = className + "_" + function + "_" + input
+        nickName  = className + "_" + function + "_" + str(input)
         print "  INITING JELLY COUNT " + nickName
         sampleWrapper.__init__(self, nickName)
 
+        if input is StringType:
+            input = glob.glob(input)
 
+        inputBase = os.path.commonprefix(input)
+        
         output = kwargs.get('output', None)
         if output is None:
-            output          = input + "_mer_counts"
+            output          = inputBase + "_mer_counts"
             print "NO OUTPUT GIVEN " + output
 
         mer_len = kwargs.get('mer_len', None)
@@ -130,8 +135,14 @@ class jellyCount(sampleWrapper):
         }
 
         parameter.parseList(params, kwargs)
-        parameter.parse( 'output', 'glob',  2,      True,  output )
-        parameter.parse( '',       'glob',  0,      False, input  )
+        parameter.parse( 'output', 'file'    ,  2,      True,  output )
+
+
+        if input is StringType:
+            parameter.parse( '',       'file',  0,      False, input  )
+        elif input is ListType:
+            parameter.parse( '',       'fileList',  0,  False, input  )
+
 
         self.parameter = parameter
 

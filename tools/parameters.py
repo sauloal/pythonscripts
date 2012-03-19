@@ -5,21 +5,17 @@ from types import *
 __all__ = ["io", "parameters"]
 
 class io():
-    def __init__(self, fileName, glob=None):
+    def __init__(self, fileName):
         self.fileName = fileName
-        self.glob     = glob
 
     def getName(self):
         return self.fileName
 
-    def getGlob(self):
-        return self.glob
-
     def getFiles(self):
-        if self.glob is not None:
-            return glob(self.glob)
-        else:
-            return [self.fileName]
+        if self.fileName is StringType:
+            return glob(self.fileName)
+        elif self.fileName is ListType:
+            return self.fileName
 
     def exists(self):
         for file in self.getFiles():
@@ -148,8 +144,6 @@ class parameters():
         elif type == 'value':
             cmd = value
         elif type == 'file':
-            cmd = name + str(value)
-        elif type == 'glob':
             cmd = name + str(value)
         elif type == 'fileList':
             cmd = name + " ".join(value)

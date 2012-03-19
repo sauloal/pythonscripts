@@ -50,7 +50,7 @@ for lib in setup.ldataset:
             print '    RUN ' + run.getShortName()
             print '    FN  ' + run.getFileName()
             #           getJellyPipeline      (inputFastq=None,  outputFolder=None, prefix=None, suffix=None, dependsOn=[], **kwargs):
-            jellyPipe = jelly.getJellyPipeline(run.getFileName(), '/tmp',           None,        'pipetest',  None,         **jellyParams)
+            jellyPipe = jellypipe.getJellyPipeline([run.getFileName()], '/tmp',           None,        'pipetest',  None,         **jellyParams)
             
             for jobDesc in jellyPipe:
                 data[jobDesc[0]] = jobDesc[1]

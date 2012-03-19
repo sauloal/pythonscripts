@@ -1,1 +1,1 @@
-__all__ = ["jelly", "sampleWrapper"]
+__all__ = ["jelly", "sampleWrapper", "jellypipe"]
