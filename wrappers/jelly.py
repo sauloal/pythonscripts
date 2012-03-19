@@ -50,7 +50,7 @@ className = 'jelly'
 
 
 
-    
+
 
 
 class jellyCount(sampleWrapper):
@@ -89,16 +89,13 @@ class jellyCount(sampleWrapper):
         print "  INITING JELLY COUNT " + nickName
         sampleWrapper.__init__(self, nickName)
 
+
+
         output = kwargs.get('output', None)
         if output is None:
-            inputg = input
-            if type(inputg) in StringTypes:
-                inputg = glob.glob(inputg)
-    
-            inputBase  = os.path.commonprefix(inputg)
+            inputBase  = os.path.commonprefix( io(input).getFiles() )
             output     = inputBase + "_mer_counts"
             print "NO OUTPUT GIVEN " + output
-
 
 
         mer_len = kwargs.get('mer_len', None)
@@ -195,7 +192,7 @@ class jellyStats(sampleWrapper):
         nickName  = className + "_" + function + "_" + input
         print "  INITING JELLY STATS" + nickName
         sampleWrapper.__init__(self, nickName)
-        
+
         output = kwargs.get('output', None)
         if output is None:
             output          = input + ".stats"
@@ -220,7 +217,7 @@ class jellyStats(sampleWrapper):
 
         self.inputs  = [ io(input)  ]
         self.outputs = [ io(output) ]
-        
+
         print "  INITING JELLY STATS CMD " + self.parameter.getCmd()
         print "    INPUTS : "
         for inp in self.inputs:
@@ -294,7 +291,7 @@ class jellyHisto(sampleWrapper):
 
         self.inputs  = [ io(input)  ]
         self.outputs = [ io(output) ]
-        
+
         print "  INITING JELLY HISTO CMD " + self.parameter.getCmd()
         print "    INPUTS : "
         for inp in self.inputs:
@@ -358,7 +355,7 @@ class jellyDump(sampleWrapper):
 
         self.inputs  = [ io(input)  ]
         self.outputs = [ io(output) ]
-        
+
         print "  INITING JELLY DUMP CMD " + self.parameter.getCmd()
         print "    INPUTS : "
         for inp in self.inputs:
@@ -416,10 +413,10 @@ class jellyMerge(sampleWrapper):
         parameter.parse( '',       'value', 0,      False, input  )
 
         self.parameter = parameter
-        
+
         self.inputs  = [ io(input ) ]
         self.outputs = [ io(output) ]
-        
+
         print "  INITING JELLY MERGE CMD " + self.parameter.getCmd()
         print "    INPUTS : "
         for inp in self.inputs:
