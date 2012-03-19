@@ -85,7 +85,10 @@ class jellyCount(sampleWrapper):
         """
 
         function  = "count"
-        nickName  = className + "_" + function + "_" + str(input)
+
+        inputBase = os.path.commonprefix( io(input).getFiles() )
+
+        nickName  = className + "_" + function + "_" + str(inputBase)
         print "  INITING JELLY COUNT " + nickName
         sampleWrapper.__init__(self, nickName)
         self.input  = input
