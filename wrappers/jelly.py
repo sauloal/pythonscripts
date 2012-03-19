@@ -45,6 +45,23 @@ exe       = "/home/aflit001/bin/jellyfish"
 className = 'jelly'
 
 
+def getJellyPipeline(inputFastq=None, outputFolder=None, **kwargs):
+    res = []
+    if inputFastq is None:
+        sys.exit(1)
+    if outputFolder is None:
+        sys.exit(1)
+    inputFastq = os.path.abspath(inputFastq)
+    ou = os.path.abspath(inputFastq)
+    jc = jelly.jellyCount(inputFastq, output=ou, buffer_size=1000, out_counter_len=4, out_buffer_size=10000000, verbose=False)
+    
+    #fn         = '/mnt/nexenta/aflit001/nobackup/Data/F5/F5_Illumina/F5_Illumina_GOG18L3_pairedend_300/110126_SN132_B_s_3_1_seq_GOG-18.fastq'
+    #ou         = '/tmp/110126_SN132_B_s_3_1_seq_GOG-18.fastq'
+    #jellyCount = jelly.jellyCount(fn,         output=ou,   buffer_size=1000, out_counter_len=4, out_buffer_size=10000000, verbose=False)
+    
+    pass
+
+
 class jellyCount(sampleWrapper):
     def __init__(self, input=None, **kwargs):
         """
