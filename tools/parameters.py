@@ -1,5 +1,6 @@
 import glob
 import os
+from types import *
 
 __all__ = ["io", "parameters"]
 
@@ -52,13 +53,11 @@ class paramPair():
         self.name  = ""
         self.value = ""
         self.type  = ""
-        self.cmd   = ""
 
 
 class parameters():
     def __init__(self):
         self.pairs = []
-        self.cmd   = []
 
     def add(self, pos, name, value, type):
         pair = [name, value, type]
@@ -71,27 +70,7 @@ class parameters():
         pair.value = value
         pair.type  = type
 
-        if   type == 'bool':
-            pair.cmd = name
-        elif type == 'text':
-            pair.cmd = name + "'" + str(value) + "'"
-        elif type == 'num':
-            pair.cmd = name + str(value)
-        elif type == 'name':
-            pair.cmd = name
-        elif type == 'value':
-            pair.cmd = value
-        elif type == 'file':
-            pair.cmd = name + str(value)
-        elif type == 'glob':
-            pair.cmd = name + str(value)
-        elif type == 'fileList':
-            pair.cmd = name + " ".join(value)
-        else:
-            print "type " + str(type) + " is unknown"
-
         self.pairs.append(pair)
-        self.cmd.append(pair.cmd)
 
 
     def parse(self, name, type, dashes, equal, res):
@@ -128,7 +107,51 @@ class parameters():
             self.parse(key, type, dashes, equal, res)
 
     def getCmd(self):
-        return " ".join(self.cmd)
+        pairs = self.pairs
+        cmds  = []
+        for pair in pairs:
+            type  = pair.type
+            name  = pair.name
+            value = pair.value
+            cmd   = ''
+            
+            if value is ListType:
+                for el in value:
+                    cmd = getLine(type, name, el)
+                    cmds.append(cmd)
+            elif value is FunctionType or value is InstanceType or value is MethodType:
+                el  = value()
+                cmd = getLine(type, name, el)
+                cmds.append(cmd)
+            else:
+                cmd = self.getLine(type, name, value)
+                cmds.append(cmd)
+            
+        return " ".join(cmds)
+
+    def getLine(self, type, name, value):
+        cmd = ""
+        
+        if   type == 'bool':
+            cmd = name
+        elif type == 'text':
+            cmd = name + "'" + str(value) + "'"
+        elif type == 'num':
+            cmd = name + str(value)
+        elif type == 'name':
+            cmd = name
+        elif type == 'value':
+            cmd = value
+        elif type == 'file':
+            cmd = name + str(value)
+        elif type == 'glob':
+            cmd = name + str(value)
+        elif type == 'fileList':
+            cmd = name + " ".join(value)
+        else:
+            print "type " + str(type) + " is unknown"
+        
+        return cmd
 
     def hasParam(self, qry):
         for pair in self.pairs:

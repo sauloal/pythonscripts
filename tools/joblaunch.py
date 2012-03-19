@@ -478,6 +478,9 @@ class Job:
 
     def getDeps(self):
         return self.deps
+    
+    def addDeps(self, deps):
+        self.deps.extend(deps)
 
     def getId(self):
         return self.id

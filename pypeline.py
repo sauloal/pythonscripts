@@ -45,14 +45,21 @@ for lib in setup.ldataset:
     print 'LIB ' + lib.getName()
     for pair in lib:
         print '  PAIR ' + pair.getName() + ' TYPE ' + pair.getType()
-        pairChildren = []
+        pairChildrenJobs = []
         for run in pair:
             print '    RUN ' + run.getShortName()
             print '    FN  ' + run.getFileName()
             jellyPipe = jelly.getJellyPipeline(run.getFileName(), '/tmp', None, 'pipetest', None, **jellyParams)
-            children.append(jellyPipe)
+            
+            for jobDesc in jellyPipe:
+                data[jobDesc[0]] = jobdesc[1]
+            
+            pairChildrenJobs.append(jellyPipe[2][1])
+        
+        print "PAIR CHILDREN JOBS " + str(pairChildrenJobs)
 
 
+sys.exit(0)
 
 
 

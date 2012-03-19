@@ -95,9 +95,9 @@ def getJellyPipeline(inputFastq=None, outputFolder=None, prefix=None, suffix=Non
     f1 = joblaunch.Job(outNickName + '_JellyMerge', [ jm ], deps=[f0] )
     f2 = joblaunch.Job(outNickName + '_JellyHisto', [ jh ], deps=[f1] )
     res = [
-        { outNickName + '_JellyCount': f0 },
-        { outNickName + '_JellyMerge': f1 },
-        { outNickName + '_JellyHisto': f2 }
+        [ outNickName + '_JellyCount', f0 ],
+        [ outNickName + '_JellyMerge', f1 ],
+        [ outNickName + '_JellyHisto', f2 ]
     ]
     return res
     
