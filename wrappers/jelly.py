@@ -45,21 +45,56 @@ exe       = "/home/aflit001/bin/jellyfish"
 className = 'jelly'
 
 
-def getJellyPipeline(inputFastq=None, outputFolder=None, **kwargs):
-    res = []
+def getJellyPipeline(inputFastq=None, outputFolder=None, prefix=None, **kwargs):
     if inputFastq is None:
         sys.exit(1)
     if outputFolder is None:
         sys.exit(1)
-    inputFastq = os.path.abspath(inputFastq)
-    ou = os.path.abspath(inputFastq)
-    jc = jelly.jellyCount(inputFastq, output=ou, buffer_size=1000, out_counter_len=4, out_buffer_size=10000000, verbose=False)
+        
+    if not os.path.exists(inputFastq):
+        print " INPUT FASTQ FILE " + inputFastq + " DOES NOT EXISTS"
+        sys.exit(1)
+
+    if not os.path.exists(outputFolder):
+        print " OUTPUT FOLDER " + outputFolder + " DOES NOT EXISTS"
+        sys.exit(1)
     
-    #fn         = '/mnt/nexenta/aflit001/nobackup/Data/F5/F5_Illumina/F5_Illumina_GOG18L3_pairedend_300/110126_SN132_B_s_3_1_seq_GOG-18.fastq'
-    #ou         = '/tmp/110126_SN132_B_s_3_1_seq_GOG-18.fastq'
-    #jellyCount = jelly.jellyCount(fn,         output=ou,   buffer_size=1000, out_counter_len=4, out_buffer_size=10000000, verbose=False)
+    inputFastqReal   = os.path.abspath(os.path.realpath(os.path.normpath(inputFastq)))
+    outputFolderReal = os.path.abspath(os.path.realpath(os.path.normpath(outputFolder)))
     
-    pass
+    if not os.path.isfile(inputFastqReal):
+        print " INPUT FASTQ FILE " + inputFastq + " ("+inputFastqReal+") IS NOT A FILE"
+        sys.exit(1)
+    
+    if not os.path.isdir(outputFolderReal):
+        print " OUTPUT FOLDER " + outputFolder + " ("+inputFastqReal+") IS NOT A FOLDER"
+        sys.exit(1)
+    
+    
+    if prefix is None:
+        prefix = ""
+        
+    inBaseName  = os.path.basename(inputFile)
+    outBaseName = os.path.abspath(os.path.realpath(os.path.normpath(os.path.join(outputFolder, prefix, inBaseName))))
+    outNickName = os.path.basename(outBaseName)
+    
+    jc = jellyCount(inputFastq,                   output=outBaseName + "_mer_counts", stats=outBaseName + ".stats", **kwargs)
+    jm = jellyMerge(outBaseName + "_mer_counts*", output=outBaseName + ".jf",                                       **kwargs)
+    jh = jellyHisto(outBaseName + ".jf",          output=outBaseName + ".histo",                                    **kwargs)
+    
+    f0 = joblaunch.Job('JellyCount_' + outNickName, [ jc ] )
+    f1 = joblaunch.Job('JellyMerge_' + outNickName, [ jm ], deps=[f0] )
+    f2 = joblaunch.Job('JellyHisto_' + outNickName, [ jh ], deps=[f1] )
+    res = {
+        'JellyCount_' + outNickName: f0,
+        'JellyMerge_' + outNickName: f1,
+        'JellyHisto_' + outNickName: f2,
+    }
+    return res
+    
+    
+    
+    
 
 
 class jellyCount(sampleWrapper):
