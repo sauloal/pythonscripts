@@ -64,11 +64,10 @@ class jobServer(BaseHTTPRequestHandler):
             if runNames is not None:
                 self.runName = runName[0]
                 res.extend(self.getForm())
-                self.serveContent()
+                res.extend(self.serveContent())
                 self.printRes(res)
             else:
                 res.extend(self.getForm())
-                self.printRes(res)
                 self.printRes(res)
                 
 
@@ -85,8 +84,8 @@ class jobServer(BaseHTTPRequestHandler):
             return res
 
         res.append("<h1>RESPONSE TO " + self.runName + "</h1>")
-        files     = self.getFilesInRun(     self.runName  )
-        byProgram = self.groupByProgram(    files    )
+        files     = self.getFilesInRun(     self.runName )
+        byProgram = self.groupByProgram(    files        )
 
         index     = self.getIndexTable(     byProgram)
         images    = self.getImageFilesTable(byProgram)
@@ -244,10 +243,14 @@ class jobServer(BaseHTTPRequestHandler):
         #</select>
 
         for dir in dirs:
-            if dir == lastDir:
-                selected = " selected=\"yes\""
+            selected = ""
+            if self.runName is not None:
+                if dir == self.runName:
+                    selected = " selected=\"yes\""
             else:
-                selected = ""
+                if dir == lastDir:
+                    selected = " selected=\"yes\""
+            
             res.append("<option value=\""+dir+"\""+selected+">"+dir+"</option>")
 
         res.append("</select>")
