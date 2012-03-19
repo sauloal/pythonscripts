@@ -7,9 +7,10 @@ import re
 from urlparse import urlparse, parse_qs
 
 import constants
-qryPath = os.path.abspath("../"+constants.logBasePath) + "/"
-
-
+qryPath      = os.path.abspath("../"+constants.logBasePath) + "/"
+jobPrefix    = "jobLaunch"
+textAreaCols = "80"
+textAreaRows = "5"
 
 class jobServer(BaseHTTPRequestHandler):
     """
@@ -114,18 +115,19 @@ class jobServer(BaseHTTPRequestHandler):
 
         if len(byProgram.keys()) > 1:
             for prog in byProgram.keys():
-                dates = byProgram[prog]
+                data   = byProgram[prog]
+                dates  = data['image']
                 for date in dates.keys():
                     data = dates[date]
-                    if data['extension'] == 'png':
-                        pngDates[date] = prog
+                    pngDates[date] = prog
 
         datesNames   = pngDates.keys()
         datesNames.sort()
         lastDate     = datesNames[-1]
         lastProgName = pngDates[lastDate]
-        progs        = byProgram[lastProgName]
-        data         = progs[lastDate]
+        images       = byProgram[lastProgName]
+        dates        = images['image']
+        data         = dates[lastDate]
         file         = data['file']
         res.append("<h3>"+lastProgName+" - "+lastDate+"</h3>")
         res.append("<img src=\"/?runName="+self.runName+"&file="+file+"\"/>")
@@ -134,26 +136,26 @@ class jobServer(BaseHTTPRequestHandler):
 
     def getLogFilesTable(self, byProgram):
         res = []
-        pngDates = {}
-
         if len(byProgram.keys()) > 1:
+            res.append("<table>")
             for prog in byProgram.keys():
-                dates = byProgram[prog]
-                for date in dates.keys():
-                    data = dates[date]
-                    if data['extension'] == 'png':
-                        pngDates[date] = prog
-
-        datesNames   = pngDates.keys()
-        datesNames.sort()
-        lastDate     = datesNames[-1]
-        lastProgName = pngDates[lastDate]
-        progs        = byProgram[lastProgName]
-        data         = progs[lastDate]
-        file         = data['file']
-        res.append("<h3>"+lastProgName+" - "+lastDate+"</h3>")
-        res.append("<img src=\"/?runName="+self.runName+"&file="+file+"\"/>")
-        
+                data = byProgram[prog]
+                out  = data.get('out', None)
+                err  = data.get('err', None)
+                
+                res.append("<tr>")
+                res.append("<td>")
+                if out is not None:
+                    res.extend(self.getFileContent(out))
+                res.append("</td>")
+                res.append("<td>")
+                if err is not None:
+                    res.extend(self.getFileContent(err))
+                res.append("</td>")
+                res.append("</tr>")
+                
+            res.append("</table>")
+                
         return res
 
     def getIndexTable(self, byProgram):
@@ -178,6 +180,14 @@ class jobServer(BaseHTTPRequestHandler):
         res.append("</tr></table>")
         return res
 
+    def getFileContent(self, fn):
+        res = []
+
+        res.append("<textarea name=\""+fn+"\" cols=\""+textAreaCols+"\" rows=\""+textAreaRows+"\">")
+        res.append("this box will contain the information from " + fn)
+        res.append("</textarea>")
+        return res
+
     def groupByProgram(self, files):
         res = {}
         if len(files) != 0:
@@ -196,24 +206,36 @@ class jobServer(BaseHTTPRequestHandler):
                     sec       = m.group(7)
                     ms        = m.group(8)
                     program   = m.group(9)
-                    extension = m.group(10)
-                    print "FILE " + file + " DATE "+ date +" YEAR " + year + " MONTH " + month + \
-                    " DAY " + day + " HOUR " + hour + " MINUTE " + min + \
-                    " SECOND " + sec + " MICROSECONDS " + ms + "  PROGRAM '" +\
-                    program + "' EXTENSION '" + extension + "'"
+                    print "FILE " + file + " DATE "+ date +" YEAR " + year + \
+                    " MONTH " + month + " DAY " + day + " HOUR " + hour + \
+                    " MINUTE " + min + " SECOND " + sec + " MICROSECONDS " + ms +\
+                    "  PROGRAM '" + program
 
                     res[program] = {
                         'image': {
                             date: {
                                 'file'     : file,
-                                'extension': extension,
                                 'date'     : (year, month, day, hour, min, sec, ms)
                             }
                         }
                     }
             
-        programs = res.keys()
-        if os.path.exists()
+
+        for program in res.keys():
+            programOut = jobPrefix + "_" + program + ".out"
+            programErr = jobPrefix + "_" + program + ".err"
+            
+            print "  SEARCHING FOR PROGRAM " + program + " OUT " + programOut + " ERR " + programErr
+
+            data = res[program]            
+            if programOut in files:
+                print "    OUT " + programOut + " FOUND"
+                data['out'] = programOut
+            
+            if programErr in files:
+                print "    ERR " + programErr + " FOUND"
+                data['err'] = programErr
+        
         
         return res
 
