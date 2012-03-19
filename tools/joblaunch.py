@@ -1060,6 +1060,7 @@ def mainLib(jobsData, **kwargs):
     verbose    = kwargs.get('verbose',    False)
     force      = kwargs.get('force',      False)
     numThreads = kwargs.get('threads',    getCPUCount())
+    justPrint  = kwargs.get('justPrint',  False)
     outputFile = kwargs.get('outfile',    constants.logPath + "/jobLaunch.out")
     logFile    = kwargs.get('logFile',    constants.logPath + "/jobLaunch.log")
 
@@ -1091,26 +1092,28 @@ def mainLib(jobsData, **kwargs):
         job.printer = jobs.printer
 
 
-    jobs.printer.printGraph()
-
-    if useServer:
-        print "starting server daemon"
-        server.daemon.start()
-        print "server daemon started"
-        print "check it at %s:%s?%s" % (server.HOST, server.PORT, constants.timestamp)
-
-    # begin working
-    start(jobs, numThreads)
-
 
     jobs.printer.printGraph()
 
-    if useServer:
-        print "finishing server daemon"
-        server.daemon.stop()
-        server.daemon.join()
-        print "server daemon finished"
-        print "run tools/server.py to re-enable it"
+    if not justPrint:
+        if useServer:
+            print "starting server daemon"
+            server.daemon.start()
+            print "server daemon started"
+            print "check it at http://%s:%s?runName=%s" % (server.HOST, server.PORT, constants.timestamp)
+    
+        # begin working
+        start(jobs, numThreads)
+    
+    
+        jobs.printer.printGraph()
+    
+        if useServer:
+            print "finishing server daemon"
+            server.daemon.stop()
+            server.daemon.join()
+            print "server daemon finished"
+            print "run tools/server.py to re-enable it"
 
     return jobs
 

@@ -86,7 +86,7 @@ if useYaml:
     data2    = load(dataDump, Loader=Loader)
 
 
-joblaunch.mainLib(data2, verbose=True)
+joblaunch.mainLib(data2, verbose=True, justPrint=False)
 
 
 #joblaunch.mainLib(data, verbose=True)

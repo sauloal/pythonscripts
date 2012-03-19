@@ -311,7 +311,7 @@ class jobServer(BaseHTTPRequestHandler):
             programErr = jobPrefix + "_" + program + ".err"
             if program == '':
                 programOut = jobPrefix + ".out"
-                programErr = jobPrefix + ".err"
+                programErr = jobPrefix + ".log"
             
             #print "  SEARCHING FOR PROGRAM " + program + " OUT " + programOut + " ERR " + programErr
 
@@ -479,7 +479,7 @@ if __name__ == "__main__":
     print "starting daemon"
     daemon.start()
     print "daemon started"
-    print "now i can run more stuff"
+    print "check it at http://%s:%s?runName=%s" % (HOST, PORT, constants.timestamp)
     #print "including finishing it"
     #daemon.stop()
     #daemon.join()
