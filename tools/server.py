@@ -37,12 +37,14 @@ class jobServer(BaseHTTPRequestHandler):
         req = self.getRequest()
 
         if len(req) != 0:
-            self.getList()
-            res.extend(self.getForm())
-
-
             res.extend( self.returnRequestedData(req) )
             self.printRes(res)
+        else:
+            self.do_HEAD()
+            self.getList()
+            res.extend(self.getForm())
+            self.printRes(res)
+            self.serveContent()
 
 #2012_03_17_16_22_59_369930.png
 #2012_03_17_16_22_59_505476_f0.png
@@ -54,25 +56,28 @@ class jobServer(BaseHTTPRequestHandler):
 
     def returnRequestedData(self, req):
         runName      = req.get('runName', None)
-        file         = req.get('file', None)
+        file         = req.get('file',    None)
         self.runName = runName
         self.file    = file
+        self.getList()
 
         if file is not None:
             self.do_PNG()
+
+
+
+            res.extend( self.returnRequestedData(req) )
             self.serveFile()
         else:
             self.do_HEAD()
+            res.extend(self.getForm())
             self.serveContent()
 
     def serveFile(self):
         runPath = os.path.join(qryPath, self.runName, self.file)
         f = open(runPath)
-
         self.wfile.write(f.read())
         f.close()
-        print file(r"c:\python\random_img\1.png", "rb").read()
-
 
     def serveContent(self):
         print "RUN NAME "+str(runName)
@@ -80,7 +85,7 @@ class jobServer(BaseHTTPRequestHandler):
         if runName is None:
             return res
 
-        runName = runName[0]
+        runName   = runName[0]
         res.append("<h1>RESPONSE TO " + runName + "</h1>")
         files     = self.getFilesInRun(     runName  )
         byProgram = self.groupByProgram(    files    )
