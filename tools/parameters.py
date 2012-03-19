@@ -1,16 +1,26 @@
-import glob
-import os
+import glob, os, sys
 from types import *
 
 __all__ = ["io", "parameters"]
 
 class io():
     def __init__(self, fileName):
-        #print " IO :: FN " + str(fileName)
+        print " IO :: FN " + str(fileName)
         if isinstance(fileName, io):
-            self          = fileName
-        else:
+            print "  IO :: instance io " + str(fileName)
             self.fileName = fileName
+        elif type(fileName) in (FunctionType, InstanceType, MethodType):
+            res = fileName()
+            print "  IO :: function res " + str(res)
+            self = io(res)
+        elif type(fileName) is ListType:
+            print "  IO :: list " + str(fileName)
+            self.fileName = fileName
+        elif type(fileName) is StringType:
+            print "  IO :: string " + str(fileName)
+            self.fileName = [fileName]
+        else:
+            sys.exit(1)
 
     def getFileName(self):
         return self.fileName
