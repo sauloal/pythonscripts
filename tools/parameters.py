@@ -13,12 +13,28 @@ class io():
         return self.fileName
 
     def getFiles(self):
+        files = []
         if type(self.fileName) in StringTypes:
             #print "string type"
-            return glob.glob(self.fileName)
+            files = glob.glob(self.fileName)
         elif type(self.fileName) is ListType:
             #print "list type"
-            return self.fileName
+            files = self.fileName
+
+        filesOut = []
+        for file in files:
+            if not os.path.exists(file):
+                print " FILE " + file + " DOES NOT EXISTS"
+                filesOut.append(file)
+                continue
+
+            fileReal = os.path.abspath(os.path.realpath(os.path.normpath(file)))
+
+            if not os.path.isfile(inputFastqReal):
+                print " INPUT FASTQ FILE " + inputFastq + " ("+inputFastqReal+") IS NOT A FILE"
+                filesOut.append(fileReal)
+
+        return filesOut
 
     def exists(self):
         for file in self.getFiles():
