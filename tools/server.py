@@ -37,12 +37,20 @@ class jobServer(BaseHTTPRequestHandler):
         req           = self.getRequest()
         self.req      = req
         runNames      = req.get('runName', None)
-        file          = req.get('file',    None)
-        self.file     = file
+        files         = req.get('file',    None)
+        self.files    = files
         self.runNames = runNames
-        self.runName  = runNames[0]
+        if files is not None and len(files) > 0:
+            self.file     = files[0]
+        else:
+            self.file     = None
+            
+        if runNames is not None and len(runNames) > 0:
+            self.runName  = runNames[0]
+        else:
+            self.runName  = None
 
-        if len(req) != 0:
+        if len(req) != 0 and self.runName is not None:
             self.returnRequestedData()
         else:
             res.extend(self.getForm())
@@ -69,13 +77,12 @@ class jobServer(BaseHTTPRequestHandler):
             if self.runName is not None:
                 print "   RUN NAME DEFINED"
                 res.extend(self.serveContent())
-                self.printRes(res)
-
 
             self.printRes(res)
 
 
     def serveFile(self):
+        print " SERVING FILE :: QRY PATH " + qryPath + " RUN NAME " + self.runName + " FILE " + self.file
         runPath = os.path.join(qryPath, self.runName, self.file)
         f = open(runPath)
         self.wfile.write(f.read())
@@ -117,7 +124,7 @@ class jobServer(BaseHTTPRequestHandler):
         datesNames.sort()
         lastDate     = datesNames[-1]
         lastProgName = pngDates[lastDate]
-        prog         = byProgram[lastProgName]
+        progs        = byProgram[lastProgName]
         data         = progs[lastDate]
         file         = data['file']
         res.append("<h3>"+lastProgName+" - "+lastDate+"</h3>")
@@ -127,19 +134,48 @@ class jobServer(BaseHTTPRequestHandler):
 
     def getLogFilesTable(self, byProgram):
         res = []
+        pngDates = {}
+
+        if len(byProgram.keys()) > 1:
+            for prog in byProgram.keys():
+                dates = byProgram[prog]
+                for date in dates.keys():
+                    data = dates[date]
+                    if data['extension'] == 'png':
+                        pngDates[date] = prog
+
+        datesNames   = pngDates.keys()
+        datesNames.sort()
+        lastDate     = datesNames[-1]
+        lastProgName = pngDates[lastDate]
+        progs        = byProgram[lastProgName]
+        data         = progs[lastDate]
+        file         = data['file']
+        res.append("<h3>"+lastProgName+" - "+lastDate+"</h3>")
+        res.append("<img src=\"/?runName="+self.runName+"&file="+file+"\"/>")
+        
         return res
 
     def getIndexTable(self, byProgram):
         res = []
-        res.append("<ul>")
+        res.append("<table>\n<tr>")
+        maxCols = 5
 
+        colCount = 0
         if len(byProgram.keys()) > 1:
             for prog in byProgram.keys():
                 if prog == '':
                     continue
-                res.append("<li><a href=\"#"+prog+"\">"+prog+"</a></li>")
+                colCount += 1
+                res.append("<td><a href=\"#"+prog+"\">"+prog+"</a></td>")
+                if ( colCount % maxCols ) == 0:
+                    res.append("</tr><tr>")
 
-        res.append("</ul>")
+        while ( colCount % maxCols ) != 0:
+            res.append("<td></td>")
+            colCount += 1
+
+        res.append("</tr></table>")
         return res
 
     def groupByProgram(self, files):
@@ -149,7 +185,7 @@ class jobServer(BaseHTTPRequestHandler):
                 #2012_03_17_16_22_59_369930.png
                 #2012_03_17_16_22_59_505476_f0.png
                 #              Y     Mo    D     H     Min   S     Ms
-                m = re.search('((\d+)_(\d+)_(\d+)_(\d+)_(\d+)_(\d+)_(\d+))_*(\S*?)\.(png|err|out)', file)
+                m = re.search('((\d+)_(\d+)_(\d+)_(\d+)_(\d+)_(\d+)_(\d+))_*(\S*?)\.png', file)
                 if ( m is not None):
                     date      = m.group(1)
                     year      = m.group(2)
@@ -167,12 +203,18 @@ class jobServer(BaseHTTPRequestHandler):
                     program + "' EXTENSION '" + extension + "'"
 
                     res[program] = {
-                        date: {
-                            'file'     : file,
-                            'extension': extension,
-                            'date'     : (year, month, day, hour, min, sec, ms)
+                        'image': {
+                            date: {
+                                'file'     : file,
+                                'extension': extension,
+                                'date'     : (year, month, day, hour, min, sec, ms)
+                            }
                         }
                     }
+            
+        programs = res.keys()
+        if os.path.exists()
+        
         return res
 
     def getFilesInRun(self, runName):
@@ -197,7 +239,7 @@ class jobServer(BaseHTTPRequestHandler):
         self.wfile.write(self.getHeader())
 
         for line in res:
-            self.wfile.write(line)
+            self.wfile.write(line + "\n")
             print line
 
         self.wfile.write(self.getTail()  )
