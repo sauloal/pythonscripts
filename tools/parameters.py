@@ -9,7 +9,7 @@ class io():
         #print " IO :: FN " + str(fileName)
         self.fileName = fileName
 
-    def getName(self):
+    def getFileName(self):
         return self.fileName
 
     def getFiles(self):
@@ -115,7 +115,7 @@ class parameters():
             name   = pair.name
             value  = pair.value
             cmd    = ''
-            
+
             if type(value) is ListType:
                 for el in value:
                     cmd = self.getLine(ptype, name, el)
@@ -133,12 +133,12 @@ class parameters():
             else:
                 cmd = self.getLine(ptype, name, value)
                 cmds.append(cmd)
-            
+
         return " ".join(cmds)
 
     def getLine(self, type, name, value):
         cmd = ""
-        
+
         if   type == 'bool':
             cmd = name
         elif type == 'text':
@@ -153,7 +153,7 @@ class parameters():
             cmd = name + " ".join(io(value).getFiles())
         else:
             print "type " + str(type) + " is unknown"
-        
+
         return cmd
 
     def hasParam(self, qry):
