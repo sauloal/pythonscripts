@@ -25,9 +25,11 @@ from tools    import constants
 import setup
 
 
-jellyParams = { 'buffer_size':    100000000,
+jellyParams = { 'buffer_size':    1000000000,
                 'out_counter_len':4,
-                'out_buffer_size':100000000,
+                'out_buffer_size':1000000000,
+                'size':           1000000000,
+                'threads':        20,
                 'verbose':        False }
 
 
