@@ -506,7 +506,7 @@ class Job:
                 print "JOB :: " + self.id + " :: CMD " + str(cmd) + " :: IS INSTANCE"
                 cmd(self.messaging)
                 if self.messaging.exitCode:
-                    print "JOB :: " + self.id + " :: CMD " + str(cmd) + " :: RETURNED: " + str(self.ret) + " THEREFORE FAILED "
+                    print "JOB :: " + self.id + " :: CMD " + str(cmd) + " :: RETURNED: " + str(self.messaging.exitCode) + " THEREFORE FAILED "
                     self.messaging.status = constants.FAILED
                     self.messaging.addError("FAILED TO RUN INSTANCE " + str(cmd))
                     return self.messaging.exitCode
@@ -514,6 +514,7 @@ class Job:
                 print "JOB :: " + self.id + " :: CMD " + str(cmd) + " :: IS METHOD"
                 cmd(self.messaging)
                 if self.messaging.exitCode:
+                    print "JOB :: " + self.id + " :: CMD " + str(cmd) + " :: RETURNED: " + str(self.messaging.exitCode) + " THEREFORE FAILED "
                     self.messaging.status = constants.FAILED
                     self.messaging.addError("FAILED TO RUN METHOD " + str(cmd))
                     return self.messaging.exitCode
@@ -521,6 +522,7 @@ class Job:
                 print "JOB :: " + self.id + " :: CMD " + str(cmd) + " :: IS CLASS"
                 cmd(self.messaging)
                 if self.messaging.exitCode:
+                    print "JOB :: " + self.id + " :: CMD " + str(cmd) + " :: RETURNED: " + str(self.messaging.exitCode) + " THEREFORE FAILED "
                     self.messaging.status = constants.FAILED
                     self.messaging.addError("FAILED TO RUN METHOD " + str(cmd))
                     return self.messaging.exitCode

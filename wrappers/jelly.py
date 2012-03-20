@@ -89,11 +89,13 @@ class jellyCount(sampleWrapper):
         function  = "count"
         nickName  = className + "_" + function + "_" + _name
         print "  INITING JELLY " + function.upper() + " " + nickName
-        super(jellyCount, self).__init__(nickName)
+        #super(jellyCount, self).__init__(nickName)
         #sampleWrapper.__init__(self, nickName)
-        self.input  = input
-        self.kwargs = kwargs
-
+        self.input    = input
+        self.name     = _name
+        self.kwargs   = kwargs
+        self.function = function
+        self.nickName = nickName
 
     def getInput(self):
         return self.input
@@ -101,10 +103,17 @@ class jellyCount(sampleWrapper):
     def getOutput(self):
         return self.output
 
+    def __call__(self, messaging):
+        print "using correct call"
+        sampleWrapper.__call__(self, messaging)
+
     def initChild(self):
         print "RUNNING RIGHT INIT CHILD"
-        input  = self.input
-        kwargs = self.kwargs
+        input    = self.input
+        name     = self.name
+        kwargs   = self.kwargs
+        function = self.function
+        nickName = self.nickName
 
 
         output = kwargs.get('output', None)
@@ -216,9 +225,11 @@ class jellyStats(sampleWrapper):
         nickName  = className + "_" + function + "_" + _name
         print "  INITING JELLY " + function.upper() + " " + nickName
         sampleWrapper.__init__(self, nickName)
-        self.input  = input
-        self.kwargs = kwargs
-
+        self.input    = input
+        self.function = function
+        self.nickName = nickName
+        self.name     = _name
+        self.kwargs   = kwargs
 
     def getInput(self):
         return self.input
@@ -226,9 +237,17 @@ class jellyStats(sampleWrapper):
     def getOutput(self):
         return self.output
 
-    def __initChild__(self):
-        input  = self.input
-        kwargs = self.kwargs
+    def __call__(self, messaging):
+        print "using correct call"
+        sampleWrapper.__call__(self, messaging)
+
+    def initChild(self):
+        print "RUNNING RIGHT INIT CHILD"
+        input    = self.input
+        name     = self.name
+        kwargs   = self.kwargs
+        function = self.function
+        nickName = self.nickName
 
 
         output = kwargs.get('output', None)
@@ -303,9 +322,11 @@ class jellyHisto(sampleWrapper):
         nickName  = className + "_" + function + "_" + _name
         print "  INITING JELLY " + function.upper() + " " + nickName
         sampleWrapper.__init__(self, nickName)
-        self.input  = input
-        self.kwargs = kwargs
-
+        self.input    = input
+        self.function = function
+        self.nickName = nickName
+        self.name     = _name
+        self.kwargs   = kwargs
 
     def getInput(self):
         return self.input
@@ -313,9 +334,17 @@ class jellyHisto(sampleWrapper):
     def getOutput(self):
         return self.output
 
-    def __initChild__(self):
-        input  = self.input
-        kwargs = self.kwargs
+    def __call__(self, messaging):
+        print "using correct call"
+        sampleWrapper.__call__(self, messaging)
+
+    def initChild(self):
+        print "RUNNING RIGHT INIT CHILD"
+        input    = self.input
+        name     = self.name
+        kwargs   = self.kwargs
+        function = self.function
+        nickName = self.nickName
 
 
 
@@ -383,9 +412,11 @@ class jellyDump(sampleWrapper):
         nickName  = className + "_" + function + "_" + _name
         print "  INITING JELLY " + function.upper() + " " + nickName
         sampleWrapper.__init__(self, nickName)
-        self.input  = input
-        self.kwargs = kwargs
-
+        self.input    = input
+        self.function = function
+        self.nickName = nickName
+        self.name     = _name
+        self.kwargs   = kwargs
 
     def getInput(self):
         return self.input
@@ -393,9 +424,17 @@ class jellyDump(sampleWrapper):
     def getOutput(self):
         return self.output
 
-    def __initChild__(self):
-        input  = self.input
-        kwargs = self.kwargs
+    def __call__(self, messaging):
+        print "using correct call"
+        sampleWrapper.__call__(self, messaging)
+
+    def initChild(self):
+        print "RUNNING RIGHT INIT CHILD"
+        input    = self.input
+        name     = self.name
+        kwargs   = self.kwargs
+        function = self.function
+        nickName = self.nickName
 
         output = kwargs.get('output', None)
         if output is None:
@@ -455,9 +494,11 @@ class jellyMerge(sampleWrapper):
         nickName  = className + "_" + function + "_" + _name
         print "  INITING JELLY " + function.upper() + " " + nickName
         sampleWrapper.__init__(self, nickName)
-        self.input  = input
-        self.kwargs = kwargs
-
+        self.input    = input
+        self.function = function
+        self.nickName = nickName
+        self.name     = _name
+        self.kwargs   = kwargs
 
     def getInput(self):
         return self.input
@@ -465,9 +506,17 @@ class jellyMerge(sampleWrapper):
     def getOutput(self):
         return self.output
 
-    def __initChild__(self):
-        input  = self.input
-        kwargs = self.kwargs
+    def __call__(self, messaging):
+        print "using correct call"
+        sampleWrapper.__call__(self, messaging)
+
+    def initChild(self):
+        print "RUNNING RIGHT INIT CHILD"
+        input    = self.input
+        name     = self.name
+        kwargs   = self.kwargs
+        function = self.function
+        nickName = self.nickName
 
 
         output = kwargs.get('output', None)

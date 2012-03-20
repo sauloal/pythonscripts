@@ -31,7 +31,7 @@ jellyParams = { 'buffer_size':    1000,
                 'verbose':        False }
 
 
-sw = sampleWrapper.sampleWrapper("watever0")
+sw = sampleWrapper.sampleWrapper("whatever0", cmd="echo whatever0")
 f0 = joblaunch.Job('f0', [sw                      ], selfTester=sw )
 f1 = joblaunch.Job('f1', [sampleWrapper.sample    ], deps=[f0] )
 

@@ -37,14 +37,18 @@ from tools import constants
 """
 
 
-class sampleWrapper(object):
-    def __init__(self, name):
+class sampleWrapper():
+    def __init__(self, name, **kwargs):
         print "INITING SAMPLE WRAPPER " + name
         self.name     = name
         self.exitCode = 255 #not run
-        #self.cmd      = lambda x: 'echo ' + name
+        
+        cmd = kwargs.get('cmd', None)
+        if cmd is not None:
+            self.cmd      = cmd
 
     def __call__(self, messaging):
+        print "using wrong call"
         self.messaging = messaging
 
         print "RUNNING WRAPPER NAMED " + self.name
@@ -57,15 +61,26 @@ class sampleWrapper(object):
             self.initChild()
         else:
             print "DOESN'T HAVE INIT CHILD"
-            self.initChild()
 
 
-        #def runString(id, cmdFinal, messaging):
-        run.runString(self.name, self.parameter.getCmd(), messaging)
+        cmd = getattr(self, "parameter", None)
+        if cmd is not None:
+            run.runString(self.name, self.parameter.getCmd(), messaging)
+        else:
+            cmd = getattr(self, "cmd", None)
+            if cmd is not None:
+                run.runString(self.name, cmd, messaging)
+            else:
+                print "error. no command to run"
+                self.messaging.status = constants.FAILED
+                print "RETURNING STATUS "     + str(self.messaging.status)
+                print "EXIT STATUS ORIGINAL " + str(self.messaging.exitCode)
+                self.messaging.exitCode = 256
+                print "EXIT STATUS NEW " + str(self.messaging.exitCode)
 
 
         self.messaging.status = constants.FINISH
-        print "RETURNING STATUS " + str(self.messaging.status)
+        print "RETURNING STATUS "     + str(self.messaging.status)
         print "EXIT STATUS ORIGINAL " + str(self.messaging.exitCode)
         self.messaging.exitCode = 0
         print "EXIT STATUS NEW " + str(self.messaging.exitCode)
@@ -78,10 +93,6 @@ class sampleWrapper(object):
         messaging.stderr(self.name, "  SELF TESTING\n")
         messaging.stdout(self.name, str(self) + "\n")
         messaging.status = constants.FINISH
-
-    def initChild(self):
-        print "RUNNING WRONG INIT CHILD"
-        pass
 
     def getInputs(self):
         inputs = getattr(self, 'inputs', None)
