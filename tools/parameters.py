@@ -149,20 +149,29 @@ class parameters():
                 for el in value:
                     cmd = self.getLine(ptype, name, el)
                     cmds.append(cmd)
+            elif type(value) in StringTypes:
+                cmd = self.getLine(ptype, name, value)
+                cmds.append(cmd)
+            elif isinstance(value, io):
+                cmds.extend(value.getFiles())
             elif type(value) in (FunctionType, InstanceType, MethodType):
-                #print "VALUE " + str(value) + " IS " + str(type(value))
+                print "VALUE " + str(value) + " IS " + str(type(value))
                 valueEl  = value()
                 if valueEl is ListType:
                     for el in valueEl:
                         cmd = self.getLine(ptype, name, el)
                         cmds.append(cmd)
-                else:
+                elif type(valueEl) in StringTypes:
                     cmd = self.getLine(ptype, name, valueEl)
                     cmds.append(cmd)
+                elif isinstance(valueEl, io):
+                    cmds.extend(valueEl.getFiles())
+                    
             else:
                 cmd = self.getLine(ptype, name, value)
                 cmds.append(cmd)
 
+        print " CMDS " + str(cmds)
         return " ".join(cmds)
 
     def getLine(self, type, name, value):
