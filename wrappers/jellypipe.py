@@ -1,7 +1,7 @@
 from jelly import *
 from types import *
 
-def getJellyPipeline(inputFastqList=None, outputFolder=None, prefix=None, suffix=None, dependsOn=[], **kwargs):
+def getJellyPipeline(inputFastqList=None, inBaseName=None, outputFolder=None, prefix=None, suffix=None, dependsOn=[], **kwargs):
     if inputFastqList is None:
         sys.exit(1)
     if outputFolder is None:
@@ -52,7 +52,7 @@ def getJellyPipeline(inputFastqList=None, outputFolder=None, prefix=None, suffix
         sys.exit(1)
 
 
-    inBaseName  = os.path.commonprefix(inputBaseNames)
+    #inBaseName  = os.path.commonprefix(inputBaseNames)
     outBaseName = os.path.abspath(os.path.realpath(os.path.normpath(os.path.join(outputFolder, prefix+inBaseName+suffix))))
     outNickName = os.path.basename(outBaseName)
 
@@ -107,7 +107,7 @@ def getJellyMergePipeline(inputJFs=None, inBaseName=None, outputFolder=None, pre
 
     jm = jellyMerge([inputJFs      ], inBaseName, output=outBaseName + ".jf",                                       **kwargs)
     jh = jellyHisto([jm.getOutput  ], inBaseName, output=outBaseName + ".histo",                                    **kwargs)
-    js = jellyHisto([jm.getOutput  ], inBaseName, output=outBaseName + ".stats",                                    **kwargs)
+    js = jellyStats([jm.getOutput  ], inBaseName, output=outBaseName + ".stats",                                    **kwargs)
 
     f0 = joblaunch.Job(outNickName + '_JellyMerge', [ jm ], deps=dependsOn )
     f1 = joblaunch.Job(outNickName + '_JellyHisto', [ jh ], deps=[f0] )
