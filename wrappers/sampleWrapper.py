@@ -37,7 +37,7 @@ from tools import constants
 """
 
 
-class sampleWrapper():
+class sampleWrapper(object):
     def __init__(self, name):
         print "INITING SAMPLE WRAPPER " + name
         self.name     = name
@@ -51,9 +51,13 @@ class sampleWrapper():
         print "GOT STATUS " + str(messaging.status)
 
 
-        initChild = getattr(self, '__initChild__', None)
+        initChild = getattr(self, 'initChild', None)
         if initChild is not None:
-            self.__initChild__()
+            print "HAS INIT CHILD"
+            self.initChild()
+        else:
+            print "DOESN'T HAVE INIT CHILD"
+            self.initChild()
 
 
         #def runString(id, cmdFinal, messaging):
@@ -74,6 +78,10 @@ class sampleWrapper():
         messaging.stderr(self.name, "  SELF TESTING\n")
         messaging.stdout(self.name, str(self) + "\n")
         messaging.status = constants.FINISH
+
+    def initChild(self):
+        print "RUNNING WRONG INIT CHILD"
+        pass
 
     def getInputs(self):
         inputs = getattr(self, 'inputs', None)

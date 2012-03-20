@@ -122,7 +122,7 @@ if useYaml:
     pass
 
 #sys.exit(0)
-joblaunch.mainLib(data, verbose=True, justPrint=True)
+joblaunch.mainLib(data, verbose=True, justPrint=False)
 
 
 #joblaunch.mainLib(data, verbose=True)

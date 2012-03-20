@@ -89,7 +89,8 @@ class jellyCount(sampleWrapper):
         function  = "count"
         nickName  = className + "_" + function + "_" + _name
         print "  INITING JELLY " + function.upper() + " " + nickName
-        sampleWrapper.__init__(self, nickName)
+        super(jellyCount, self).__init__(nickName)
+        #sampleWrapper.__init__(self, nickName)
         self.input  = input
         self.kwargs = kwargs
 
@@ -100,7 +101,8 @@ class jellyCount(sampleWrapper):
     def getOutput(self):
         return self.output
 
-    def __initChild__(self):
+    def initChild(self):
+        print "RUNNING RIGHT INIT CHILD"
         input  = self.input
         kwargs = self.kwargs
 

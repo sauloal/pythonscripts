@@ -517,6 +517,13 @@ class Job:
                     self.messaging.status = constants.FAILED
                     self.messaging.addError("FAILED TO RUN METHOD " + str(cmd))
                     return self.messaging.exitCode
+            elif isinstance(cmd, types.ClassType):
+                print "JOB :: " + self.id + " :: CMD " + str(cmd) + " :: IS CLASS"
+                cmd(self.messaging)
+                if self.messaging.exitCode:
+                    self.messaging.status = constants.FAILED
+                    self.messaging.addError("FAILED TO RUN METHOD " + str(cmd))
+                    return self.messaging.exitCode
             elif isinstance(cmd, types.ListType):
                 cmdFinal = ""
                 #print "JOB :: " + self.id + " :: CMD " + str(cmd) + " :: IS LIST"
@@ -558,7 +565,7 @@ class Job:
                     return self.messaging.exitCode
 
             else:
-                print "JOB :: " + self.id + " :: CMD " + str(cmd) + " :: IS UNKOWN TYPE"
+                print "JOB :: " + self.id + " :: CMD " + str(cmd) + " :: IS UNKOWN TYPE" + str(type(cmd))
                 self.messaging.status = constants.FAILED
                 self.messaging.addError("NOTHING TO RUN " + str(cmd))
                 return self.messaging.exitCode
