@@ -79,12 +79,12 @@ for lib in setup.ldataset:
 all=[sw, data]
 
 if useYaml:
-    dataDump = str(dump(data, Dumper=Dumper))
-    print dataDump
-    data2    = load(dataDump, Loader=Loader)
+    #dataDump = str(dump(data, Dumper=Dumper))
+    #print dataDump
+    pass
 
-sys.exit(0)
-joblaunch.mainLib(data2, verbose=True, justPrint=True)
+#sys.exit(0)
+joblaunch.mainLib(data, verbose=True, justPrint=True)
 
 
 #joblaunch.mainLib(data, verbose=True)
