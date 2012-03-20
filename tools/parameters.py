@@ -5,22 +5,8 @@ __all__ = ["io", "parameters"]
 
 class io():
     def __init__(self, fileName):
-        #print " IO :: FN " + str(fileName)
-        if isinstance(fileName, io):
-            #print "  IO :: instance io " + str(fileName)
-            self.fileName = fileName
-        elif type(fileName) in (FunctionType, InstanceType, MethodType):
-            res = fileName()
-            #print "  IO :: function res " + str(res)
-            self = io(res)
-        elif type(fileName) is ListType:
-            #print "  IO :: list " + str(fileName)
-            self.fileName = fileName
-        elif type(fileName) is StringType:
-            #print "  IO :: string " + str(fileName)
-            self.fileName = [fileName]
-        else:
-            sys.exit(1)
+        print " IO :: FN " + str(fileName)
+        self.fileName = fileName
 
     def getFileName(self):
         return self.fileName
@@ -29,10 +15,11 @@ class io():
         files = []
         
         if type(self.fileName) in StringTypes:
-            #print "string type"
+            print "string type"
             files = glob.glob(self.fileName)
+
         elif type(self.fileName) is ListType:
-            #print "list type"
+            print "list type"
             files = self.fileName
         
         files = decovolute(files)
@@ -40,11 +27,9 @@ class io():
         filesOut = []
         for file in files:
             if file is not None:
-                #print " CHEKING FILE " + str(file)
+                print " CHEKING FILE " + str(file)
                 if not os.path.exists(file):
-                    #print " FILE " + file + " DOES NOT EXISTS"
-                    filesOut.append(file)
-                    continue
+                    print " FILE " + file + " DOES NOT EXISTS"
             else:
                 print " FILE IN FILES " + str(files) + " IS NONE"
                 sys.exit(1)
@@ -52,8 +37,12 @@ class io():
             fileReal = os.path.abspath(os.path.realpath(os.path.normpath(file)))
 
             if not os.path.isfile(fileReal):
-                print " INPUT FASTQ FILE " + inputFastq + " ("+inputFastqReal+") IS NOT A FILE"
-                filesOut.append(fileReal)
+                print " INPUT FILE " + file + " ("+fileReal+") IS NOT A FILE"
+            else:
+                print " INPUT FILE " + file + " ("+fileReal+") IS A FILE"
+            
+            print " INPUT FILE " + file + " ("+fileReal+") APPENDING"
+            filesOut.append(fileReal)
 
         return filesOut
 

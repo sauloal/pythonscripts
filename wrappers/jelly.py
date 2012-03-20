@@ -102,7 +102,7 @@ class jellyCount(sampleWrapper):
         return self.input
 
     def getOutput(self):
-        return self.output
+        return io(self.output)
 
     def __call__(self, messaging):
         #print "using correct call"
@@ -161,16 +161,16 @@ class jellyCount(sampleWrapper):
         }
 
 
+        self.input     = io(input)
+        self.output    = output
+
         parameter.parseList(params, kwargs)
-        parameter.parse( 'output', 'file',  2,      True,  io(output) )
-        parameter.parse( '',       'file',  0,      False, io(input)  )
+        parameter.parse( 'output', 'file',  2,      True,  self.output )
+        parameter.parse( '',       'file',  0,      False, self.input  )
 
 
         self.parameter = parameter
 
-
-        self.input     = io(input)
-        self.output    = io(output)
 
         self.inputs    = [ self.input  ]
         self.outputs   = [ self.output ]
@@ -185,10 +185,12 @@ class jellyCount(sampleWrapper):
 
 
         print "  INITING JELLY COUNT CMD " + self.parameter.getCmd()
-        print "    INPUTS : "
+
+        print "    INPUTS : " + str(input)
         for inp in self.inputs:
             print str(inp) + "\n"
-        print "    OUTPUTS: "
+            
+        print "    OUTPUTS: " + str(output)
         for out in self.outputs:
             print str(out) + "\n"
 
@@ -236,7 +238,7 @@ class jellyStats(sampleWrapper):
         return self.input
 
     def getOutput(self):
-        return self.output
+        return io(self.output)
 
     def __call__(self, messaging):
         #print "using correct call"
@@ -268,23 +270,26 @@ class jellyStats(sampleWrapper):
         }
 
         parameter.parseList(params, kwargs)
-        parameter.parse( 'output', 'text',  2,      True,  output )
-        parameter.parse( '',       'value', 0,      False, input  )
+        self.input     = io(input)
+        self.output    = output
+
+        parameter.parseList(params, kwargs)
+        parameter.parse( 'output', 'file',  2,      True,  self.output )
+        parameter.parse( '',       'file',  0,      False, self.input  )
+
 
         self.parameter = parameter
-        
-        
-        self.input     = io(input)
-        self.output    = io(output)
+
 
         self.inputs    = [ self.input  ]
         self.outputs   = [ self.output ]
 
         print "  INITING JELLY STATS CMD " + self.parameter.getCmd()
-        print "    INPUTS : "
+        print "    INPUTS : " + str(input)
         for inp in self.inputs:
             print str(inp) + "\n"
-        print "    OUTPUTS: "
+            
+        print "    OUTPUTS: " + str(output)
         for out in self.outputs:
             print str(out) + "\n"
 
@@ -337,7 +342,7 @@ class jellyHisto(sampleWrapper):
         return self.input
 
     def getOutput(self):
-        return self.output
+        return io(self.output)
 
     def __call__(self, messaging):
         #print "using correct call"
@@ -371,25 +376,29 @@ class jellyHisto(sampleWrapper):
         }
 
         parameter.parseList(params, kwargs)
-        parameter.parse( 'output', 'text',  2,      True,  output )
-        parameter.parse( '',       'value', 0,      False, input  )
+        self.input     = io(input)
+        self.output    = output
+
+        parameter.parseList(params, kwargs)
+        parameter.parse( 'output', 'file',  2,      True,  self.output )
+        parameter.parse( '',       'file',  0,      False, self.input  )
+
 
         self.parameter = parameter
 
-
-        self.input     = io(input)
-        self.output    = io(output)
 
         self.inputs    = [ self.input  ]
         self.outputs   = [ self.output ]
 
         print "  INITING JELLY HISTO CMD " + self.parameter.getCmd()
-        print "    INPUTS : "
+        print "    INPUTS : " + str(input)
         for inp in self.inputs:
             print str(inp) + "\n"
-        print "    OUTPUTS: "
+            
+        print "    OUTPUTS: " + str(output)
         for out in self.outputs:
             print str(out) + "\n"
+
 
 
 
@@ -461,25 +470,29 @@ class jellyDump(sampleWrapper):
         }
 
         parameter.parseList(params, kwargs)
-        parameter.parse( 'output', 'text',  2,      True,  output )
-        parameter.parse( '',       'value', 0,      False, input  )
+        self.input     = io(input)
+        self.output    = output
+
+        parameter.parseList(params, kwargs)
+        parameter.parse( 'output', 'file',  2,      True,  self.output )
+        parameter.parse( '',       'file',  0,      False, self.input  )
+
 
         self.parameter = parameter
 
-
-        self.input     = io(input)
-        self.output    = io(output)
 
         self.inputs    = [ self.input  ]
         self.outputs   = [ self.output ]
 
         print "  INITING JELLY DUMP CMD " + self.parameter.getCmd()
-        print "    INPUTS : "
+        print "    INPUTS : " + str(input)
         for inp in self.inputs:
             print str(inp) + "\n"
-        print "    OUTPUTS: "
+            
+        print "    OUTPUTS: " + str(output)
         for out in self.outputs:
             print str(out) + "\n"
+
 
 
 
@@ -517,7 +530,7 @@ class jellyMerge(sampleWrapper):
         return self.input
 
     def getOutput(self):
-        return self.output
+        return io(self.output)
 
     def __call__(self, messaging):
         #print "using correct call"
@@ -548,25 +561,29 @@ class jellyMerge(sampleWrapper):
         }
 
         parameter.parseList(params, kwargs)
-        parameter.parse( 'output', 'text',  2,      True,  output )
-        parameter.parse( '',       'value', 0,      False, input  )
+        self.input     = io(input)
+        self.output    = output
+
+        parameter.parseList(params, kwargs)
+        parameter.parse( 'output', 'file',  2,      True,  self.output )
+        parameter.parse( '',       'file',  0,      False, self.input  )
+
 
         self.parameter = parameter
 
-
-        self.input     = io(input)
-        self.output    = io(output)
 
         self.inputs    = [ self.input  ]
         self.outputs   = [ self.output ]
 
         print "  INITING JELLY MERGE CMD " + self.parameter.getCmd()
-        print "    INPUTS : "
+        print "    INPUTS : " + str(input)
         for inp in self.inputs:
             print str(inp) + "\n"
-        print "    OUTPUTS: "
+            
+        print "    OUTPUTS: " + str(output)
         for out in self.outputs:
             print str(out) + "\n"
+
 
 
 

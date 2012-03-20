@@ -61,13 +61,13 @@ def getJellyPipeline(inputFastqList=None, inBaseName=None, outputFolder=None, pr
     jh = jellyHisto([jm.getOutput  ], inBaseName, output=outBaseName + ".histo",                                    **kwargs)
 
     f0 = joblaunch.Job(outNickName + '_JellyCount', [ jc ], deps=dependsOn)
-    f1 = joblaunch.Job(outNickName + '_JellyMerge', [ jm ], deps=[f0] )
-    f2 = joblaunch.Job(outNickName + '_JellyHisto', [ jh ], deps=[f1] )
+    #f1 = joblaunch.Job(outNickName + '_JellyMerge', [ jm ], deps=[f0] )
+    #f2 = joblaunch.Job(outNickName + '_JellyHisto', [ jh ], deps=[f1] )
 
     res = [
         [ f0.getId(), f0 , jc ],
-        [ f1.getId(), f1 , jm ],
-        [ f2.getId(), f2 , jh ]
+        #[ f1.getId(), f1 , jm ],
+        #[ f2.getId(), f2 , jh ]
     ]
 
     return res

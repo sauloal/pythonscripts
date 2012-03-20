@@ -77,14 +77,14 @@ class sampleWrapper():
                 print "RETURNING STATUS "     + str(self.messaging.status)
                 print "EXIT STATUS ORIGINAL " + str(self.messaging.exitCode)
                 self.messaging.exitCode = 256
-                print "EXIT STATUS NEW " + str(self.messaging.exitCode)
+                print "EXIT STATUS NEW "      + str(self.messaging.exitCode)
 
 
-        self.messaging.status = constants.FINISH
+        #self.messaging.status = constants.FINISH
         print "RETURNING STATUS "     + str(self.messaging.status)
-        print "EXIT STATUS ORIGINAL " + str(self.messaging.exitCode)
-        self.messaging.exitCode = 0
-        print "EXIT STATUS NEW " + str(self.messaging.exitCode)
+        #print "EXIT STATUS ORIGINAL " + str(self.messaging.exitCode)
+        #self.messaging.exitCode = 0
+        print "EXIT STATUS NEW "      + str(self.messaging.exitCode)
 
     def selfTest(self, messaging):
         messaging.addError("SAMPLE WRAPPER")
