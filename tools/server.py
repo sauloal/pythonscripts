@@ -306,23 +306,37 @@ class jobServer(BaseHTTPRequestHandler):
                     }
             
 
-        for program in res.keys():
-            programOut = jobPrefix + "_" + program + ".out"
-            programErr = jobPrefix + "_" + program + ".err"
-            if program == '':
-                programOut = jobPrefix + ".out"
-                programErr = jobPrefix + ".log"
-            
-            #print "  SEARCHING FOR PROGRAM " + program + " OUT " + programOut + " ERR " + programErr
 
-            data = res[program]            
-            if programOut in files:
-                #print "    OUT " + programOut + " FOUND"
-                data['out'] = programOut
-            
-            if programErr in files:
-                #print "    ERR " + programErr + " FOUND"
-                data['err'] = programErr
+        if len(files) != 0:
+            for file in files:
+                #2012_03_17_16_22_59_369930.png
+                #2012_03_17_16_22_59_505476_f0.png
+                #              Y     Mo    D     H     Min   S     Ms
+                m = re.search(jobPrefix+'(_*(\S*?))\.(out|err)', file)
+                if ( m is not None):
+                    programFull = m.group(1)
+                    program     = m.group(2)
+                    ext         = m.group(3)
+
+                    if   ext == 'out':
+                        programOut = file
+                    elif ext == 'err':
+                        programErr = file
+                        
+                    if program == '':
+                        programOut = jobPrefix + ".out"
+                        programErr = jobPrefix + ".log"
+                    
+                    #print "  SEARCHING FOR PROGRAM " + program + " OUT " + programOut + " ERR " + programErr
+        
+                    data = res[program]            
+                    if programOut in files:
+                        #print "    OUT " + programOut + " FOUND"
+                        data['out'] = programOut
+                    
+                    if programErr in files:
+                        #print "    ERR " + programErr + " FOUND"
+                        data['err'] = programErr
         
         
         return res

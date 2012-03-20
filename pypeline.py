@@ -25,9 +25,9 @@ from tools    import constants
 import setup
 
 
-jellyParams = { 'buffer_size':    10000000,
+jellyParams = { 'buffer_size':    100000000,
                 'out_counter_len':4,
-                'out_buffer_size':10000000,
+                'out_buffer_size':100000000,
                 'verbose':        False }
 
 
