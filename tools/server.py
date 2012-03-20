@@ -127,7 +127,6 @@ class jobServer(BaseHTTPRequestHandler):
         res = []
         if self.file is not None:
             #print " FILE DEFINED"
-            self.do_PNG()
             self.serveFile()
         else:
             #print " FILE NOT DEFINED"
@@ -141,6 +140,8 @@ class jobServer(BaseHTTPRequestHandler):
 
     def serveFile(self):
         #print " SERVING FILE :: QRY PATH " + qryPath + " RUN NAME " + self.runName + " FILE " + self.file
+        
+        self.do_PNG()
         runPath = os.path.join(qryPath, self.runName, self.file)
         f = open(runPath)
         self.wfile.write(f.read())
@@ -452,6 +453,9 @@ class jobServer(BaseHTTPRequestHandler):
 </html>
         """
         return tail
+    
+    def log_message(self, format, *args):
+        pass
 
 
 class serverDaemon(threading.Thread):
