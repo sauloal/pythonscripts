@@ -25,7 +25,7 @@ from tools    import constants
 import setup
 
 
-jellyParams = { 'buffer_size':    1000,
+jellyParams = { 'buffer_size':    10000000,
                 'out_counter_len':4,
                 'out_buffer_size':10000000,
                 'verbose':        False }
@@ -35,6 +35,7 @@ sw = sampleWrapper.sampleWrapper("whatever0", cmd="echo whatever0")
 f0 = joblaunch.Job('f0', [sw                      ], selfTester=sw )
 f1 = joblaunch.Job('f1', [sampleWrapper.sample    ], deps=[f0] )
 
+outFolder = os.path.realpath(os.path.abspath('./tmp'))
 
 data = {'f0': f0,
         'f1': f1}
@@ -55,7 +56,7 @@ for lib in setup.ldataset:
             print '    RUN ' + run.getShortName()
             print '    FN  ' + run.getFileName()
             #           getJellyPipeline      (inputFastq=None,  outputFolder=None, prefix=None, suffix=None, dependsOn=[], **kwargs):
-            jellyPipe = jellypipe.getJellyPipeline([run.getFileName()], run.getShortName(), '/tmp',           None,        'pipetest',  None,         **jellyParams)
+            jellyPipe = jellypipe.getJellyPipeline([run.getFileName()], run.getShortName(), outFolder,           None,        'pipetest',  None,         **jellyParams)
 
             for jobDesc in jellyPipe:
                 data[jobDesc[0]] = jobDesc[1]
