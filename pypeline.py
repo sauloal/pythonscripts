@@ -46,6 +46,7 @@ for lib in setup.ldataset:
     for pair in lib:
         print '  PAIR ' + pair.getName() + ' TYPE ' + pair.getType()
         pairChildrenJobs = []
+        pairChildrenFunc = []
         for run in pair:
             print '    RUN ' + run.getShortName()
             print '    FN  ' + run.getFileName()
@@ -56,10 +57,14 @@ for lib in setup.ldataset:
                 data[jobDesc[0]] = jobDesc[1]
 
             pairChildrenJobs.append(jellyPipe[2][1])
+            pairChildrenFunc.append(jellyPipe[2][2])
 
         print "PAIR CHILDREN JOBS " + str(pairChildrenJobs)
-
-        #def getJellyMergePipeline(inputJF=None, outputFolder=None, prefix=None, suffix=None, dependsOn=[], **kwargs):
+        pairChildrenJobsFiles = []
+        for func in pairChildrenFunc:
+            pairChildrenJobsFiles.append(func.getOutput)
+        #def getJellyMergePipeline(    inputJFs=None,          inBaseName=None, outputFolder=None, prefix=None, suffix=None, dependsOn=[],     **kwargs):
+        jellypipe.getJellyMergePipeline(pairChildrenJobsFiles, pair,            '/tmp',            None,        'pipetest',  pairChildrenJobs, **jellyParams)
 
 
 

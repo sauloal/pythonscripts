@@ -65,16 +65,16 @@ def getJellyPipeline(inputFastqList=None, outputFolder=None, prefix=None, suffix
     f2 = joblaunch.Job(outNickName + '_JellyHisto', [ jh ], deps=[f1] )
 
     res = [
-        [ f0.getId(), f0 ],
-        [ f1.getId(), f1 ],
-        [ f2.getId(), f2 ]
+        [ f0.getId(), f0 , jc ],
+        [ f1.getId(), f1 , jm ],
+        [ f2.getId(), f2 , jh ]
     ]
 
     return res
 
 
-def getJellyMergePipeline(inputMergers=None, outputFolder=None, prefix=None, suffix=None, dependsOn=[], **kwargs):
-    if inputMergers is None:
+def getJellyMergePipeline(inputJFs=None, inBaseName=None, outputFolder=None, prefix=None, suffix=None, dependsOn=[], **kwargs):
+    if inputJFs is None:
         sys.exit(1)
     if outputFolder is None:
         sys.exit(1)
@@ -101,3 +101,22 @@ def getJellyMergePipeline(inputMergers=None, outputFolder=None, prefix=None, suf
 
     if dependsOn is None:
         dependsOn = []
+
+    outBaseName = os.path.abspath(os.path.realpath(os.path.normpath(os.path.join(outputFolder, prefix+inBaseName+suffix))))
+    outNickName = os.path.basename(outBaseName)
+
+    jm = jellyMerge([inputJFs      ], inBaseName, output=outBaseName + ".jf",                                       **kwargs)
+    jh = jellyHisto([jm.getOutput  ], inBaseName, output=outBaseName + ".histo",                                    **kwargs)
+    js = jellyHisto([jm.getOutput  ], inBaseName, output=outBaseName + ".stats",                                    **kwargs)
+
+    f0 = joblaunch.Job(outNickName + '_JellyMerge', [ jm ], deps=dependsOn )
+    f1 = joblaunch.Job(outNickName + '_JellyHisto', [ jh ], deps=[f0] )
+    f2 = joblaunch.Job(outNickName + '_JellyStats', [ js ], deps=[f0] )
+
+    res = [
+        [ f0.getId(), f0 , jm ],
+        [ f1.getId(), f1 , jh ],
+        [ f2.getId(), f2 , js ]
+    ]
+
+    return res
