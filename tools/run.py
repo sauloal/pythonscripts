@@ -2,6 +2,7 @@
 import subprocess
 import constants
 from threading  import Thread
+import sys, traceback
 try:
     from Queue import Queue, Empty
 except ImportError:
@@ -32,8 +33,8 @@ def runString(id, cmdFinal, messaging):
         t_err = Thread(target=enqueue_pipe, args=(p.stderr, q_err))
         t_err.daemon = True # thread dies with the program
         t_err.start()
-        
-        t_out = Thread(target=enqueue_pipe, args=(p.stdout, q_out)).start
+
+        t_out = Thread(target=enqueue_pipe, args=(p.stdout, q_out))
         t_out.daemon = True # thread dies with the program
         t_out.start()
 
@@ -50,20 +51,22 @@ def runString(id, cmdFinal, messaging):
                 try:
                     #lineOut = q_out.get_nowait()
                     lineOut = q_out.get(timeout=1)
+                    messaging.stdout(id, lineOut, internal=True)
                 except Empty:
                     pass
                     #print('no stderr output yet')
-                else: # got line
-                    messaging.stdout(id, lineOut, internal=True)
+                #else: # got line
+                    
 
                 try:
                     #lineErr = q_err.get_nowait()
                     lineErr = q_err.get(timeout=1)
+                    messaging.stderr(id, lineErr, internal=True)
                 except Empty:
                     pass
                     #print('no stderr output yet')
-                else: # got line
-                    messaging.stderr(id, lineErr, internal=True)
+                #else: # got line
+                    
 
 
             print "JOB :: " + id + " :: GETTING RETURN CODE"
@@ -74,6 +77,11 @@ def runString(id, cmdFinal, messaging):
             messaging.exitCode = returnCode
             p.wait()
             
+            while not q_out.empty():
+                messaging.stdout(id, q_out.get_nowait(), internal=True)
+            while not q_err.empty():
+                messaging.stderr(id, q_err.get_nowait(), internal=True)
+                
             q_err.join()
             q_out.join()
             t_err.join()
@@ -83,6 +91,7 @@ def runString(id, cmdFinal, messaging):
                 print "JOB :: " + id + " :: STR {" + cmdFinal + "} :: RETURNED: " + str(messaging.exitCode) + " THEREFORE FAILED "
                 messaging.status = constants.FAILED
                 messaging.addError("FAILED TO RUN " + cmdFinal + " :: RETURNED: " + str(messaging.exitCode) + " THEREFORE FAILED ")
+                traceback.print_exc()
                 return messaging.exitCode
             #print "FINISHED"
 
@@ -98,6 +107,7 @@ def runString(id, cmdFinal, messaging):
             print "Exception (Job__launch_out): ", e
             messaging.status = constants.FAILED
             messaging.addError("FAILED TO RUN " + cmdFinal + " EXCEPTION " + str(e))
+            traceback.print_exc()
             messaging.exitCode = 252
             return messaging.exitCode
 
@@ -106,6 +116,7 @@ def runString(id, cmdFinal, messaging):
         messaging.status = constants.FAILED
         messaging.addError("FAILED TO RUN " + cmdFinal + " EXCEPTION " + str(e))
         print "FAILED TO RUN " + cmdFinal + " EXCEPTION " + str(e)
+        traceback.print_exc()
         messaging.exitCode = 253
         return messaging.exitCode
 

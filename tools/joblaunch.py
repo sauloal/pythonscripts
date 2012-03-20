@@ -555,6 +555,7 @@ class Job:
                     return self.messaging.exitCode
                 except Exception, e:
                     print "Exception (Job__launch): ", e
+                    traceback.print_exc()
                     self.messaging.status = constants.FAILED
                     self.messaging.addError("FAILED TO RUN " + cmdFinal + " EXCEPTION " + str(e))
                     self.messaging.exitCode = 253
