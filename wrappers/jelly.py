@@ -89,6 +89,7 @@ class jellyCount(sampleWrapper):
         function  = "count"
         nickName  = className + "_" + function + "_" + _name
         print "  INITING JELLY " + function.upper() + " " + nickName
+        print "    INPUT " + str(input)
         #super(jellyCount, self).__init__(nickName)
         #sampleWrapper.__init__(self, nickName)
         self.input    = input
@@ -104,11 +105,11 @@ class jellyCount(sampleWrapper):
         return self.output
 
     def __call__(self, messaging):
-        print "using correct call"
+        #print "using correct call"
         sampleWrapper.__call__(self, messaging)
 
     def initChild(self):
-        print "RUNNING RIGHT INIT CHILD"
+        #print "RUNNING RIGHT INIT CHILD"
         input    = self.input
         name     = self.name
         kwargs   = self.kwargs
@@ -168,11 +169,11 @@ class jellyCount(sampleWrapper):
         self.parameter = parameter
 
 
-        self.input   = io(input)
-        self.output  = io(output)
+        self.input     = io(input)
+        self.output    = io(output)
 
-        self.inputs  = [ self.input  ]
-        self.outputs = [ self.output ]
+        self.inputs    = [ self.input  ]
+        self.outputs   = [ self.output ]
 
 
         if (parameter.hasParam('matrix')):
@@ -238,11 +239,11 @@ class jellyStats(sampleWrapper):
         return self.output
 
     def __call__(self, messaging):
-        print "using correct call"
+        #print "using correct call"
         sampleWrapper.__call__(self, messaging)
 
     def initChild(self):
-        print "RUNNING RIGHT INIT CHILD"
+        #print "RUNNING RIGHT INIT CHILD"
         input    = self.input
         name     = self.name
         kwargs   = self.kwargs
@@ -271,9 +272,13 @@ class jellyStats(sampleWrapper):
         parameter.parse( '',       'value', 0,      False, input  )
 
         self.parameter = parameter
+        
+        
+        self.input     = io(input)
+        self.output    = io(output)
 
-        self.inputs  = [ io(input)  ]
-        self.outputs = [ io(output) ]
+        self.inputs    = [ self.input  ]
+        self.outputs   = [ self.output ]
 
         print "  INITING JELLY STATS CMD " + self.parameter.getCmd()
         print "    INPUTS : "
@@ -335,11 +340,11 @@ class jellyHisto(sampleWrapper):
         return self.output
 
     def __call__(self, messaging):
-        print "using correct call"
+        #print "using correct call"
         sampleWrapper.__call__(self, messaging)
 
     def initChild(self):
-        print "RUNNING RIGHT INIT CHILD"
+        #print "RUNNING RIGHT INIT CHILD"
         input    = self.input
         name     = self.name
         kwargs   = self.kwargs
@@ -371,8 +376,12 @@ class jellyHisto(sampleWrapper):
 
         self.parameter = parameter
 
-        self.inputs  = [ io(input)  ]
-        self.outputs = [ io(output) ]
+
+        self.input     = io(input)
+        self.output    = io(output)
+
+        self.inputs    = [ self.input  ]
+        self.outputs   = [ self.output ]
 
         print "  INITING JELLY HISTO CMD " + self.parameter.getCmd()
         print "    INPUTS : "
@@ -425,11 +434,11 @@ class jellyDump(sampleWrapper):
         return self.output
 
     def __call__(self, messaging):
-        print "using correct call"
+        #print "using correct call"
         sampleWrapper.__call__(self, messaging)
 
     def initChild(self):
-        print "RUNNING RIGHT INIT CHILD"
+        #print "RUNNING RIGHT INIT CHILD"
         input    = self.input
         name     = self.name
         kwargs   = self.kwargs
@@ -457,8 +466,12 @@ class jellyDump(sampleWrapper):
 
         self.parameter = parameter
 
-        self.inputs  = [ io(input)  ]
-        self.outputs = [ io(output) ]
+
+        self.input     = io(input)
+        self.output    = io(output)
+
+        self.inputs    = [ self.input  ]
+        self.outputs   = [ self.output ]
 
         print "  INITING JELLY DUMP CMD " + self.parameter.getCmd()
         print "    INPUTS : "
@@ -507,11 +520,11 @@ class jellyMerge(sampleWrapper):
         return self.output
 
     def __call__(self, messaging):
-        print "using correct call"
+        #print "using correct call"
         sampleWrapper.__call__(self, messaging)
 
     def initChild(self):
-        print "RUNNING RIGHT INIT CHILD"
+        #print "RUNNING RIGHT INIT CHILD"
         input    = self.input
         name     = self.name
         kwargs   = self.kwargs
@@ -540,8 +553,12 @@ class jellyMerge(sampleWrapper):
 
         self.parameter = parameter
 
-        self.inputs  = [ io(input ) ]
-        self.outputs = [ io(output) ]
+
+        self.input     = io(input)
+        self.output    = io(output)
+
+        self.inputs    = [ self.input  ]
+        self.outputs   = [ self.output ]
 
         print "  INITING JELLY MERGE CMD " + self.parameter.getCmd()
         print "    INPUTS : "

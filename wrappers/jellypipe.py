@@ -56,7 +56,7 @@ def getJellyPipeline(inputFastqList=None, inBaseName=None, outputFolder=None, pr
     outBaseName = os.path.abspath(os.path.realpath(os.path.normpath(os.path.join(outputFolder, prefix+inBaseName+suffix))))
     outNickName = os.path.basename(outBaseName)
 
-    jc = jellyCount([inputFastq    ], inBaseName, output=outBaseName + "_mer_counts", stats=outBaseName + ".stats", **kwargs)
+    jc = jellyCount(inputFastqReals , inBaseName, output=outBaseName + "_mer_counts", stats=outBaseName + ".stats", **kwargs)
     jm = jellyMerge([jc.getOutput  ], inBaseName, output=outBaseName + ".jf",                                       **kwargs)
     jh = jellyHisto([jm.getOutput  ], inBaseName, output=outBaseName + ".histo",                                    **kwargs)
 
@@ -73,8 +73,8 @@ def getJellyPipeline(inputFastqList=None, inBaseName=None, outputFolder=None, pr
     return res
 
 
-def getJellyMergePipeline(inputJFs=None, inBaseName=None, outputFolder=None, prefix=None, suffix=None, dependsOn=[], **kwargs):
-    if inputJFs is None:
+def getJellyMergePipeline(inputJFList=None, inBaseName=None, outputFolder=None, prefix=None, suffix=None, dependsOn=[], **kwargs):
+    if inputJFList is None:
         sys.exit(1)
     if outputFolder is None:
         sys.exit(1)
@@ -105,7 +105,7 @@ def getJellyMergePipeline(inputJFs=None, inBaseName=None, outputFolder=None, pre
     outBaseName = os.path.abspath(os.path.realpath(os.path.normpath(os.path.join(outputFolder, prefix+inBaseName+suffix))))
     outNickName = os.path.basename(outBaseName)
 
-    jm = jellyMerge([inputJFs      ], inBaseName, output=outBaseName + ".jf",                                       **kwargs)
+    jm = jellyMerge(inputJFList     , inBaseName, output=outBaseName + ".jf",                                       **kwargs)
     jh = jellyHisto([jm.getOutput  ], inBaseName, output=outBaseName + ".histo",                                    **kwargs)
     js = jellyStats([jm.getOutput  ], inBaseName, output=outBaseName + ".stats",                                    **kwargs)
 

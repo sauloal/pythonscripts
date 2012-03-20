@@ -59,6 +59,9 @@ for lib in setup.ldataset:
 
             for jobDesc in jellyPipe:
                 data[jobDesc[0]] = jobDesc[1]
+            break
+        break
+    break
 
 #            pairChildrenJobs.append(jellyPipe[1][1])
 #            pairChildrenFunc.append(jellyPipe[1][2])
@@ -122,7 +125,7 @@ if useYaml:
     pass
 
 #sys.exit(0)
-joblaunch.mainLib(data, verbose=True, justPrint=False)
+joblaunch.mainLib(data, verbose=True, justPrint=False, numThreads=3)
 
 
 #joblaunch.mainLib(data, verbose=True)

@@ -39,7 +39,7 @@ from tools import constants
 
 class sampleWrapper():
     def __init__(self, name, **kwargs):
-        print "INITING SAMPLE WRAPPER " + name
+        #print "INITING SAMPLE WRAPPER " + name
         self.name     = name
         self.exitCode = 255 #not run
         
@@ -48,19 +48,20 @@ class sampleWrapper():
             self.cmd      = cmd
 
     def __call__(self, messaging):
-        print "using wrong call"
+        #print "using wrong call"
         self.messaging = messaging
 
         print "RUNNING WRAPPER NAMED " + self.name
-        print "GOT STATUS " + str(messaging.status)
+        #print "GOT STATUS " + str(messaging.status)
 
 
         initChild = getattr(self, 'initChild', None)
         if initChild is not None:
-            print "HAS INIT CHILD"
+            #print "HAS INIT CHILD"
             self.initChild()
         else:
-            print "DOESN'T HAVE INIT CHILD"
+            #print "DOESN'T HAVE INIT CHILD"
+            pass
 
 
         cmd = getattr(self, "parameter", None)
