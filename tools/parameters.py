@@ -12,36 +12,30 @@ class io():
         return self.fileName
 
     def getFiles(self):
-        files = []
-        
-        if type(self.fileName) in StringTypes:
-            print "string type"
-            files = glob.glob(self.fileName)
-
-        elif type(self.fileName) is ListType:
-            print "list type"
-            files = self.fileName
-        
-        files = decovolute(files)
+        #print " ??????? FILES B4  " + str(files) + " " + str(self.fileName)
+        files = decovolute(self.fileName)
+        #print " ??????? FILES DEC " + str(files) + " " + str(self.fileName)
 
         filesOut = []
         for file in files:
             if file is not None:
-                print " CHEKING FILE " + str(file)
+                #print " CHEKING FILE " + str(file)
                 if not os.path.exists(file):
                     print " FILE " + file + " DOES NOT EXISTS"
             else:
-                print " FILE IN FILES " + str(files) + " IS NONE"
+                #print " FILE IN FILES " + str(files) + " IS NONE"
                 sys.exit(1)
 
             fileReal = os.path.abspath(os.path.realpath(os.path.normpath(file)))
 
             if not os.path.isfile(fileReal):
-                print " INPUT FILE " + file + " ("+fileReal+") IS NOT A FILE"
+                #print " INPUT FILE " + file + " ("+fileReal+") IS NOT A FILE"
+                pass
             else:
-                print " INPUT FILE " + file + " ("+fileReal+") IS A FILE"
+                #print " INPUT FILE " + file + " ("+fileReal+") IS A FILE"
+                pass
             
-            print " INPUT FILE " + file + " ("+fileReal+") APPENDING"
+            #print " INPUT FILE " + file + " ("+fileReal+") APPENDING"
             filesOut.append(fileReal)
 
         return filesOut
@@ -209,7 +203,12 @@ def decovolute(value):
 
     elif type(value) in StringTypes:
         #print "VALUE " + str(value) + " IS STRING " + str(type(value))
-        cmds.append(value)
+        
+        files = glob.glob(value)
+        if len(files) == 0:
+            cmds.append(value)
+        else:
+            cmds.extend(files)
 
     elif isinstance(value, io):
         #print "VALUE " + str(value) + " IS IO INSTANCE " + str(type(value))

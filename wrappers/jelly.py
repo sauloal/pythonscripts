@@ -55,7 +55,7 @@ def checkOutput(output):
 
 
 class jellyCount(sampleWrapper):
-    def __init__(self, input=None, _name=None, **kwargs):
+    def __init__(self, **kwargs):
         """
         Usage: jellyfish count [options] file:path+
 
@@ -85,17 +85,21 @@ class jellyCount(sampleWrapper):
          -V, --version                            Version
         """
 
-        assert input  is not None
-        assert _name  is not None
+        self.input    = kwargs.get("_input", None)
+        self.name     = kwargs.get("_name",  None)
+        self.force    = kwargs.get("_force", False)
+        self.kwargs   = kwargs
+        
+        assert self.input is not None
+        assert self.name  is not None
+
         function  = "count"
-        nickName  = className + "_" + function + "_" + _name
+        nickName  = className + "_" + function + "_" + self.name
         print "  INITING JELLY " + function.upper() + " " + nickName
-        print "    INPUT " + str(input)
+        print "    INPUT " + str(self.input)
         #super(jellyCount, self).__init__(nickName)
         #sampleWrapper.__init__(self, nickName)
-        self.input    = input
-        self.name     = _name
-        self.kwargs   = kwargs
+
         self.function = function
         self.nickName = nickName
 

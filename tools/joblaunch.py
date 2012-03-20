@@ -100,7 +100,7 @@ def signal_handler(signal, frame):
 
     if useServer:
             print "finishing server daemon"
-            server.daemon.stop()
+            server.daemon.stopServer()
             server.daemon.join()
             print "server daemon finished"
             print "run tools/server.py to re-enable it"
@@ -574,8 +574,8 @@ class Job:
                 return self.messaging.exitCode
 
         print "JOB :: " + self.id + " :: REACHED END. FINISHING WITH STATUS " + constants.STATUSES[self.messaging.status] + " " + str(self.messaging.exitCode)
-        self.messaging.status   = constants.FINISH
-        self.messaging.exitCode = 0
+        #self.messaging.status   = constants.FINISH
+        #self.messaging.exitCode = 0
         return self.messaging.exitCode
 
 class Core(threading.Thread):
