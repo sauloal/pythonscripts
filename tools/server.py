@@ -173,10 +173,11 @@ class jobServer(BaseHTTPRequestHandler):
         if len(byProgram.keys()) > 1:
             for prog in byProgram.keys():
                 data   = byProgram[prog]
-                dates  = data['image']
-                for date in dates.keys():
-                    data = dates[date]
-                    pngDates[date] = prog
+                if data.has_key('image'):
+                    dates  = data['image']
+                    for date in dates.keys():
+                        data = dates[date]
+                        pngDates[date] = prog
 
         datesNames   = pngDates.keys()
         datesNames.sort()
@@ -312,32 +313,22 @@ class jobServer(BaseHTTPRequestHandler):
                 #2012_03_17_16_22_59_369930.png
                 #2012_03_17_16_22_59_505476_f0.png
                 #              Y     Mo    D     H     Min   S     Ms
-                m = re.search(jobPrefix+'(_*(\S*?))\.(out|err)', file)
+                m = re.search(jobPrefix+'(_*\S*?)\.(out|err|log)', file)
                 if ( m is not None):
-                    programFull = m.group(1)
-                    program     = m.group(2)
-                    ext         = m.group(3)
+                    program = m.group(1)
+                    ext     = m.group(2)
 
-                    if   ext == 'out':
-                        programOut = file
-                    elif ext == 'err':
-                        programErr = file
-                        
-                    if program == '':
-                        programOut = jobPrefix + ".out"
-                        programErr = jobPrefix + ".log"
-                    
-                    #print "  SEARCHING FOR PROGRAM " + program + " OUT " + programOut + " ERR " + programErr
-        
-                    data = res[program]            
-                    if programOut in files:
-                        #print "    OUT " + programOut + " FOUND"
-                        data['out'] = programOut
-                    
-                    if programErr in files:
-                        #print "    ERR " + programErr + " FOUND"
-                        data['err'] = programErr
-        
+                    if program != '':
+                        program   = program[1:]
+
+                    if ext == 'log':
+                        ext = 'err'
+
+                    if res.has_key(program):
+                        data      = res[program]
+                        data[ext] = file
+                    else:
+                        res[program] = { ext: file }
         
         return res
 
