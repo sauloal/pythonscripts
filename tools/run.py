@@ -22,21 +22,21 @@ def runString(id, cmdFinal, messaging):
         q_out = Queue()
         q_err = Queue()
         
-        p = subprocess.Popen(cmdFinal, shell = True,
+        p = subprocess.Popen(cmdFinal, shell=True,
             executable="/bin/bash",
             stdout = subprocess.PIPE,
             stderr = subprocess.PIPE)
 
         #http://stackoverflow.com/questions/375427/non-blocking-read-on-a-subprocess-pipe-in-python
 
-        t_out = Thread(target=enqueue_pipe, args=(p.stdout, q_out))
         t_err = Thread(target=enqueue_pipe, args=(p.stderr, q_err))
-        
-        t_out.daemon = True # thread dies with the program
         t_err.daemon = True # thread dies with the program
-        
-        t_out.start()
         t_err.start()
+        
+        t_out = Thread(target=enqueue_pipe, args=(p.stdout, q_out)).start
+        t_out.daemon = True # thread dies with the program
+        t_out.start()
+
 
 
         pid           = p.pid
@@ -73,6 +73,12 @@ def runString(id, cmdFinal, messaging):
             #print "WAITING"
             messaging.exitCode = returnCode
             p.wait()
+            
+            q_err.join()
+            q_out.join()
+            t_err.join()
+            t_out.join()
+            
             if messaging.exitCode:
                 print "JOB :: " + id + " :: STR {" + cmdFinal + "} :: RETURNED: " + str(messaging.exitCode) + " THEREFORE FAILED "
                 messaging.status = constants.FAILED

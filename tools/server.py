@@ -5,6 +5,7 @@ import os
 import glob
 import re
 import itertools
+import socket
 from urlparse import urlparse, parse_qs
 import signal
 
@@ -452,22 +453,33 @@ class serverDaemon(threading.Thread):
         super(serverDaemon, self).__init__()
 
         # Create the server, binding to localhost on port 9999
-        serverInst      = HTTPServer((HOST, PORT), jobServer)
-        self.serverInst = serverInst
+        
+        #socket.error: [Errno 98] Address already in use
+        try:
+            serverInst      = HTTPServer((HOST, PORT), jobServer)
+            self.serverInst = serverInst
+        except socket.error, msg:
+            self.serverInst = None
+            pass
 
     def run(self):
         # Activate the server; this will keep running until you
         # interrupt the program with Ctrl-C
         print "running server"
-        self.serverInst.serve_forever()
-        print "i can do stuff me"
+        if self.serverInst is not None:
+            self.serverInst.serve_forever()
+            print "i can do stuff me"
+        else:
+            print "skipping"
 
     def stopServer(self):
         print "STOPING SERVER"
         #self.serverInst.close_request()
         #self.serverInst.finish_request()
-        self.serverInst.server_close()
-        self.serverInst.shutdown()
+        if self.serverInst is not None:
+            self.serverInst.server_close()
+            self.serverInst.shutdown()
+            
         print "STOPING THREAD"
         #self.stop()
         self.join()
