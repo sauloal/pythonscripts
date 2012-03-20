@@ -49,7 +49,8 @@ className = 'jelly'
 
 
 
-
+def checkOutput(output):
+    pass
 
 
 
@@ -106,6 +107,7 @@ class jellyCount(sampleWrapper):
 
     def __call__(self, messaging):
         #print "using correct call"
+        
         sampleWrapper.__call__(self, messaging)
 
     def initChild(self):
@@ -115,7 +117,6 @@ class jellyCount(sampleWrapper):
         kwargs   = self.kwargs
         function = self.function
         nickName = self.nickName
-
 
         output = kwargs.get('output', None)
         if output is None:
@@ -132,7 +133,7 @@ class jellyCount(sampleWrapper):
 
         hashsize = kwargs.get('size', None)
         if hashsize is None:
-            kwargs['size']    = 100000
+            kwargs['size']    = 10000000
             print "NO SIZE GIVEN " + str(kwargs['size'])
 
 

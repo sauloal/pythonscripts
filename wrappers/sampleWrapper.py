@@ -87,13 +87,14 @@ class sampleWrapper():
         print "EXIT STATUS NEW "      + str(self.messaging.exitCode)
 
     def selfTest(self, messaging):
-        messaging.addError("SAMPLE WRAPPER")
-        messaging.addError("  SAMPLE SELF TEST")
-        messaging.addError("    " + str(self))
-        messaging.stdout(self.name, "SAMPLE WRAPPER\n")
-        messaging.stderr(self.name, "  SELF TESTING\n")
-        messaging.stdout(self.name, str(self) + "\n")
-        messaging.status = constants.FINISH
+        #messaging.addError("SAMPLE WRAPPER")
+        #messaging.addError("  SAMPLE SELF TEST")
+        #messaging.addError("    " + str(self))
+        #messaging.stdout(self.name, "SAMPLE WRAPPER\n")
+        #messaging.stderr(self.name, "  SELF TESTING\n")
+        #messaging.stdout(self.name, str(self) + "\n")
+        #messaging.status = constants.FINISH
+        pass
 
     def getInputs(self):
         inputs = getattr(self, 'inputs', None)

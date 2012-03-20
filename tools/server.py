@@ -1,12 +1,12 @@
 #!/usr/bin/python
 import threading
 from BaseHTTPServer import HTTPServer, BaseHTTPRequestHandler
-import signal
 import os
 import glob
 import re
 import itertools
 from urlparse import urlparse, parse_qs
+import signal
 
 import constants
 qryPath      = os.path.abspath("../"+constants.logBasePath) + "/"
@@ -16,17 +16,6 @@ textAreaCols = "80"
 textAreaRows = "5"
 HOST, PORT   = "localhost", 9999
 
-
-def signal_handler(signal, frame):
-    print '!'*50
-    print "You've sent signal " + str(signal) + ". exiting"
-    print '!'*50
-    daemon.stop()
-    daemon.join()
-    print "finished"
-    sys.exit(signal)
-
-signal.signal(signal.SIGINT, signal_handler)
 
 
 def rblocks(f, blocksize=4096):
@@ -473,15 +462,34 @@ class serverDaemon(threading.Thread):
         self.serverInst.serve_forever()
         print "i can do stuff me"
 
-    def stop(self):
+    def stopServer(self):
+        print "STOPING SERVER"
         #self.serverInst.close_request()
         #self.serverInst.finish_request()
         self.serverInst.server_close()
         self.serverInst.shutdown()
+        print "STOPING THREAD"
+        self.stop()
+        self.join()
+
+
 
 
 print "starting class"
 daemon = serverDaemon()
+
+def signal_handler(signal, frame):
+    print '!'*50
+    print "You've sent signal " + str(signal) + ". exiting"
+    print '!'*50
+    daemon.stopServer()
+    daemon.stop()
+    daemon.join()
+    print "finished"
+    sys.exit(signal)
+
+signal.signal(signal.SIGINT, signal_handler)
+
 
 
 if __name__ == "__main__":
