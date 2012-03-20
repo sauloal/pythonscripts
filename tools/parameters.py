@@ -145,50 +145,72 @@ class parameters():
             value  = pair.value
             cmd    = ''
 
-            if type(value) is ListType:
-                for el in value:
-                    cmd = self.getLine(ptype, name, el)
-                    cmds.append(cmd)
-            elif type(value) in StringTypes:
-                cmd = self.getLine(ptype, name, value)
-                cmds.append(cmd)
-            elif isinstance(value, io):
-                cmds.extend(value.getFiles())
-            elif type(value) in (FunctionType, InstanceType, MethodType):
-                print "VALUE " + str(value) + " IS " + str(type(value))
-                valueEl  = value()
-                if valueEl is ListType:
-                    for el in valueEl:
-                        cmd = self.getLine(ptype, name, el)
-                        cmds.append(cmd)
-                elif type(valueEl) in StringTypes:
-                    cmd = self.getLine(ptype, name, valueEl)
-                    cmds.append(cmd)
-                elif isinstance(valueEl, io):
-                    cmds.extend(valueEl.getFiles())
-                    
-            else:
-                cmd = self.getLine(ptype, name, value)
-                cmds.append(cmd)
-
+            valueF = self.decovolute(value)
+            print "  VALUE F " + str(valueF)
+            cmd    = self.getLine(ptype, name, valueF)
+            print "  CMD     " + str(cmd)
+            cmds.extend(cmd)
+            
         print " CMDS " + str(cmds)
         return " ".join(cmds)
 
-    def getLine(self, type, name, value):
+    def decovolute(self, value):
+        cmds = []
+        
+        if type(value) is ListType:
+            print "VALUE " + str(value) + " IS LIST " + str(type(value))
+            for el in value:
+                if el in StringTypes:
+                    cmds.append(el)
+                else:
+                    cmd = self.decovolute(el)
+                    cmds.extend(cmd)
+
+        elif type(value) in StringTypes:
+            print "VALUE " + str(value) + " IS STRING " + str(type(value))
+            cmds.append(value)
+
+        elif isinstance(value, io):
+            print "VALUE " + str(value) + " IS IO INSTANCE " + str(type(value))
+            cmds.extend(self.decovolute(value.getFiles()))
+
+        elif type(value) in (FunctionType, InstanceType, MethodType):
+            print "VALUE " + str(value) + " IS FUNCTION " + str(type(value))
+            cmd  = value()
+            cmds.extend(self.decovolute(cmd))
+
+        else:
+            print "UNKNOWN TYPE TO DECOVOLUTE " + str(type(value))
+            cmds.append(value)
+        
+        print "CMDS DEC " + str(cmds)
+        return cmds
+
+    def getLine(self, ptype, name, value):
         cmd = ""
 
-        if   type == 'bool':
+        if type(value) is ListType:
+            print " GETLINE LIST " + str(value)
+            tmpval = ""
+            for val in value:
+                if tmpval != "":
+                    tmpval += " "
+                tmpval += str(val)
+            value = tmpval
+            print " GETLINE LIST VALUE FINAL " + str(value)
+            
+        if   ptype == 'bool':
             cmd = name
-        elif type == 'text':
+        elif ptype == 'text':
             cmd = name + "'" + str(value) + "'"
-        elif type == 'num':
+        elif ptype == 'num':
             cmd = name + str(value)
-        elif type == 'name':
+        elif ptype == 'name':
             cmd = name
-        elif type == 'value':
+        elif ptype == 'value':
             cmd = value
-        elif type == 'file':
-            cmd = name + " ".join(io(value).getFiles())
+        elif ptype == 'file':
+            cmd = name + value
         else:
             print "type " + str(type) + " is unknown"
 

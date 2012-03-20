@@ -60,45 +60,45 @@ for lib in setup.ldataset:
             for jobDesc in jellyPipe:
                 data[jobDesc[0]] = jobDesc[1]
 
-            pairChildrenJobs.append(jellyPipe[1][1])
-            pairChildrenFunc.append(jellyPipe[1][2])
-
-        print "PAIR CHILDREN JOBS " + str(pairChildrenJobs)
-        pairChildrenJobsFiles = []
-        for func in pairChildrenFunc:
-            pairChildrenJobsFiles.append(func.getOutput)
-
-        #def getJellyMergePipeline(    inputJFs=None,          inBaseName=None, outputFolder=None, prefix=None, suffix=None, dependsOn=[],     **kwargs):
-        jellyPairPipe = jellypipe.getJellyMergePipeline(pairChildrenJobsFiles, pair.getName(),  '/tmp',            None,        'pipetest',  pairChildrenJobs, **jellyParams)
-        for jobDesc in jellyPairPipe:
-                data[jobDesc[0]] = jobDesc[1]
-
-        libChildrenJobs.append(jellyPairPipe[0][1])
-        libChildrenFunc.append(jellyPairPipe[0][2])
-
-    print "LIB CHILDREN JOBS " + str(libChildrenJobs)
-    libChildrenJobsFiles = []
-    for func in libChildrenFunc:
-        libChildrenJobsFiles.append(func.getOutput)
-
-    #def getJellyMergePipeline(    inputJFs=None,          inBaseName=None, outputFolder=None, prefix=None, suffix=None, dependsOn=[],     **kwargs):
-    jellyLibPipe = jellypipe.getJellyMergePipeline(libChildrenJobsFiles, lib.getName(),  '/tmp',            None,        'pipetest',  libChildrenJobs, **jellyParams)
-    for jobDesc in jellyLibPipe:
-            data[jobDesc[0]] = jobDesc[1]
-
-    baseChildrenJobs.append(jellyLibPipe[0][1])
-    baseChildrenFunc.append(jellyLibPipe[0][2])
-
-
-print "BASE CHILDREN JOBS " + str(baseChildrenJobs)
-baseChildrenJobsFiles = []
-for func in baseChildrenFunc:
-    baseChildrenJobsFiles.append(func.getOutput)
-
-#def getJellyMergePipeline(    inputJFs=None,          inBaseName=None, outputFolder=None, prefix=None, suffix=None, dependsOn=[],     **kwargs):
-jellyBasePipe = jellypipe.getJellyMergePipeline(baseChildrenJobsFiles, setup.ldataset.getName(),  '/tmp',            None,        'pipetest',  baseChildrenJobs, **jellyParams)
-for jobDesc in jellyBasePipe:
-        data[jobDesc[0]] = jobDesc[1]
+#            pairChildrenJobs.append(jellyPipe[1][1])
+#            pairChildrenFunc.append(jellyPipe[1][2])
+#
+#        print "PAIR CHILDREN JOBS " + str(pairChildrenJobs)
+#        pairChildrenJobsFiles = []
+#        for func in pairChildrenFunc:
+#            pairChildrenJobsFiles.append(func.getOutput)
+#
+#        #def getJellyMergePipeline(    inputJFs=None,          inBaseName=None, outputFolder=None, prefix=None, suffix=None, dependsOn=[],     **kwargs):
+#        jellyPairPipe = jellypipe.getJellyMergePipeline(pairChildrenJobsFiles, pair.getName(),  '/tmp',            None,        'pipetest',  pairChildrenJobs, **jellyParams)
+#        for jobDesc in jellyPairPipe:
+#                data[jobDesc[0]] = jobDesc[1]
+#
+#        libChildrenJobs.append(jellyPairPipe[0][1])
+#        libChildrenFunc.append(jellyPairPipe[0][2])
+#
+#    print "LIB CHILDREN JOBS " + str(libChildrenJobs)
+#    libChildrenJobsFiles = []
+#    for func in libChildrenFunc:
+#        libChildrenJobsFiles.append(func.getOutput)
+#
+#    #def getJellyMergePipeline(    inputJFs=None,          inBaseName=None, outputFolder=None, prefix=None, suffix=None, dependsOn=[],     **kwargs):
+#    jellyLibPipe = jellypipe.getJellyMergePipeline(libChildrenJobsFiles, lib.getName(),  '/tmp',            None,        'pipetest',  libChildrenJobs, **jellyParams)
+#    for jobDesc in jellyLibPipe:
+#            data[jobDesc[0]] = jobDesc[1]
+#
+#    baseChildrenJobs.append(jellyLibPipe[0][1])
+#    baseChildrenFunc.append(jellyLibPipe[0][2])
+#
+#
+#print "BASE CHILDREN JOBS " + str(baseChildrenJobs)
+#baseChildrenJobsFiles = []
+#for func in baseChildrenFunc:
+#    baseChildrenJobsFiles.append(func.getOutput)
+#
+##def getJellyMergePipeline(    inputJFs=None,          inBaseName=None, outputFolder=None, prefix=None, suffix=None, dependsOn=[],     **kwargs):
+#jellyBasePipe = jellypipe.getJellyMergePipeline(baseChildrenJobsFiles, setup.ldataset.getName(),  '/tmp',            None,        'pipetest',  baseChildrenJobs, **jellyParams)
+#for jobDesc in jellyBasePipe:
+#        data[jobDesc[0]] = jobDesc[1]
 
 
 
