@@ -107,8 +107,18 @@ class jellyCount(sampleWrapper):
 
     def __call__(self, messaging):
         #print "using correct call"
-        
-        sampleWrapper.__call__(self, messaging)
+        self.initChild()
+        if not io(self.output).exists():
+            print "RUNNING"
+            sampleWrapper.__call__(self, messaging)
+        else:
+            print "SKIPPING"
+            #print "error. no command to run"
+            messaging.status = constants.SKIPPED
+            print "RETURNING STATUS "     + str(messaging.status)
+            print "EXIT STATUS ORIGINAL " + str(messaging.exitCode)
+            messaging.exitCode = 0
+            print "EXIT STATUS NEW "      + str(messaging.exitCode)
 
     def initChild(self):
         #print "RUNNING RIGHT INIT CHILD"
@@ -517,7 +527,7 @@ class jellyMerge(sampleWrapper):
         """
         assert input  is not None
         assert _name  is not None
-        function  = "count"
+        function  = "merge"
         nickName  = className + "_" + function + "_" + _name
         print "  INITING JELLY " + function.upper() + " " + nickName
         sampleWrapper.__init__(self, nickName)

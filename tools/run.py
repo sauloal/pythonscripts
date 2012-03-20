@@ -18,23 +18,26 @@ def enqueue_pipe(pipe, queue):
 def runString(id, cmdFinal, messaging):
     try:
         print "JOB :: " + id + " :: OPENING PROCESS FOR CMD '" + cmdFinal + "'"
+
+        q_out = Queue()
+        q_err = Queue()
+        
         p = subprocess.Popen(cmdFinal, shell = True,
             executable="/bin/bash",
             stdout = subprocess.PIPE,
             stderr = subprocess.PIPE)
 
         #http://stackoverflow.com/questions/375427/non-blocking-read-on-a-subprocess-pipe-in-python
-        print "JOB :: " + id + " :: OPENING QUEUE OUT"
-        q_out = Queue()
-        t_out = Thread(target=enqueue_pipe, args=(p.stdout, q_out))
-        t_out.daemon = True # thread dies with the program
-        t_out.start()
 
-        print "JOB :: " + id + " :: OPENING QUEUE ERR"
-        q_err = Queue()
+        t_out = Thread(target=enqueue_pipe, args=(p.stdout, q_out))
         t_err = Thread(target=enqueue_pipe, args=(p.stderr, q_err))
+        
+        t_out.daemon = True # thread dies with the program
         t_err.daemon = True # thread dies with the program
+        
+        t_out.start()
         t_err.start()
+
 
         pid           = p.pid
         messaging.pid = pid
@@ -43,7 +46,7 @@ def runString(id, cmdFinal, messaging):
 
             print "JOB :: " + id + " :: CHECKING POOL"
             while p.poll() is None:
-                print "JOB :: " + id + " :: TRYING TO READ PIPE (" + str(p.poll()) + ")"
+                #print "JOB :: " + id + " :: TRYING TO READ PIPE (" + str(p.poll()) + ")"
                 try:
                     #lineOut = q_out.get_nowait()
                     lineOut = q_out.get(timeout=1)

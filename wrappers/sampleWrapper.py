@@ -80,11 +80,10 @@ class sampleWrapper():
                 print "EXIT STATUS NEW "      + str(self.messaging.exitCode)
 
 
-        #self.messaging.status = constants.FINISH
-        print "RETURNING STATUS "     + str(self.messaging.status)
-        #print "EXIT STATUS ORIGINAL " + str(self.messaging.exitCode)
-        #self.messaging.exitCode = 0
-        print "EXIT STATUS NEW "      + str(self.messaging.exitCode)
+        if self.messaging.exitCode != 0:
+            print "RETURNING STATUS "     + str(self.messaging.status)
+            print "EXIT CODE        "     + str(self.messaging.exitCode)
+            print "ERROR            "     + self.messaging.getError()
 
     def selfTest(self, messaging):
         #messaging.addError("SAMPLE WRAPPER")

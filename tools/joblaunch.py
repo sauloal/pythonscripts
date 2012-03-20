@@ -902,10 +902,11 @@ class printG:
         self.G        = G
         self.jobs     = jobs
 
-        self.statusColors = {   constants.NOT_RUN: ["white",  "black"],
-                                constants.RUNNING: ["yellow", "black"],
-                                constants.FAILED:  ["red",    "black"],
-                                constants.FINISH:  ["green",  "black"]
+        self.statusColors = {   constants.NOT_RUN: ["white",      "black"],
+                                constants.RUNNING: ["yellow",     "black"],
+                                constants.FAILED:  ["red",        "black"],
+                                constants.FINISH:  ["green",      "black"],
+                                constants.SKIPPED: ["blueviolet", "black"]
                             }
 
     def printGraph(self, fileName=None, id=None):
@@ -1122,7 +1123,7 @@ def mainLib(jobsData, **kwargs):
     
         if useServer:
             print "finishing server daemon"
-            server.daemon.stop()
+            server.daemon.stopServer()
             server.daemon.join()
             print "server daemon finished"
             print "run tools/server.py to re-enable it"

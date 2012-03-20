@@ -469,7 +469,7 @@ class serverDaemon(threading.Thread):
         self.serverInst.server_close()
         self.serverInst.shutdown()
         print "STOPING THREAD"
-        self.stop()
+        #self.stop()
         self.join()
 
 
@@ -483,7 +483,7 @@ def signal_handler(signal, frame):
     print "You've sent signal " + str(signal) + ". exiting"
     print '!'*50
     daemon.stopServer()
-    daemon.stop()
+    #daemon.stop()
     daemon.join()
     print "finished"
     sys.exit(signal)
