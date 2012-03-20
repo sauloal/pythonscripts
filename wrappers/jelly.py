@@ -108,7 +108,7 @@ class jellyCount(sampleWrapper):
     def __call__(self, messaging):
         #print "using correct call"
         self.initChild()
-        if not io(self.output).exists():
+        if not io(self.outputs).exists():
             print "RUNNING"
             sampleWrapper.__call__(self, messaging)
         else:
@@ -175,6 +175,7 @@ class jellyCount(sampleWrapper):
         self.input     = io(input)
         self.output    = output
 
+        print "!!!!!!!! INPUT " + str(self.input)
         parameter.parseList(params, kwargs)
         parameter.parse( 'output', 'file',  2,      True,  self.output )
         parameter.parse( '',       'file',  0,      False, self.input  )
@@ -183,8 +184,8 @@ class jellyCount(sampleWrapper):
         self.parameter = parameter
 
 
-        self.inputs    = [ self.input  ]
-        self.outputs   = [ self.output ]
+        self.inputs    = [ self.input        ]
+        self.outputs   = [ self.output + '*' ]
 
 
         if (parameter.hasParam('matrix')):
@@ -196,12 +197,11 @@ class jellyCount(sampleWrapper):
 
 
         print "  INITING JELLY COUNT CMD " + self.parameter.getCmd()
-
-        print "    INPUTS : " + str(input)
+        print "    INPUTS : " + str(self.inputs)
         for inp in self.inputs:
             print str(inp) + "\n"
             
-        print "    OUTPUTS: " + str(output)
+        print "    OUTPUTS: " + str(self.outputs)
         for out in self.outputs:
             print str(out) + "\n"
 
@@ -253,7 +253,18 @@ class jellyStats(sampleWrapper):
 
     def __call__(self, messaging):
         #print "using correct call"
-        sampleWrapper.__call__(self, messaging)
+        self.initChild()
+        if not io(self.outputs).exists():
+            print "RUNNING"
+            sampleWrapper.__call__(self, messaging)
+        else:
+            print "SKIPPING"
+            #print "error. no command to run"
+            messaging.status = constants.SKIPPED
+            print "RETURNING STATUS "     + str(messaging.status)
+            print "EXIT STATUS ORIGINAL " + str(messaging.exitCode)
+            messaging.exitCode = 0
+            print "EXIT STATUS NEW "      + str(messaging.exitCode)
 
     def initChild(self):
         #print "RUNNING RIGHT INIT CHILD"
@@ -296,11 +307,11 @@ class jellyStats(sampleWrapper):
         self.outputs   = [ self.output ]
 
         print "  INITING JELLY STATS CMD " + self.parameter.getCmd()
-        print "    INPUTS : " + str(input)
+        print "    INPUTS : " + str(self.inputs)
         for inp in self.inputs:
             print str(inp) + "\n"
             
-        print "    OUTPUTS: " + str(output)
+        print "    OUTPUTS: " + str(self.outputs)
         for out in self.outputs:
             print str(out) + "\n"
 
@@ -357,7 +368,18 @@ class jellyHisto(sampleWrapper):
 
     def __call__(self, messaging):
         #print "using correct call"
-        sampleWrapper.__call__(self, messaging)
+        self.initChild()
+        if not io(self.outputs).exists():
+            print "RUNNING"
+            sampleWrapper.__call__(self, messaging)
+        else:
+            print "SKIPPING"
+            #print "error. no command to run"
+            messaging.status = constants.SKIPPED
+            print "RETURNING STATUS "     + str(messaging.status)
+            print "EXIT STATUS ORIGINAL " + str(messaging.exitCode)
+            messaging.exitCode = 0
+            print "EXIT STATUS NEW "      + str(messaging.exitCode)
 
     def initChild(self):
         #print "RUNNING RIGHT INIT CHILD"
@@ -402,11 +424,11 @@ class jellyHisto(sampleWrapper):
         self.outputs   = [ self.output ]
 
         print "  INITING JELLY HISTO CMD " + self.parameter.getCmd()
-        print "    INPUTS : " + str(input)
+        print "    INPUTS : " + str(self.inputs)
         for inp in self.inputs:
             print str(inp) + "\n"
             
-        print "    OUTPUTS: " + str(output)
+        print "    OUTPUTS: " + str(self.outputs)
         for out in self.outputs:
             print str(out) + "\n"
 
@@ -455,7 +477,18 @@ class jellyDump(sampleWrapper):
 
     def __call__(self, messaging):
         #print "using correct call"
-        sampleWrapper.__call__(self, messaging)
+        self.initChild()
+        if not io(self.outputs).exists():
+            print "RUNNING"
+            sampleWrapper.__call__(self, messaging)
+        else:
+            print "SKIPPING"
+            #print "error. no command to run"
+            messaging.status = constants.SKIPPED
+            print "RETURNING STATUS "     + str(messaging.status)
+            print "EXIT STATUS ORIGINAL " + str(messaging.exitCode)
+            messaging.exitCode = 0
+            print "EXIT STATUS NEW "      + str(messaging.exitCode)
 
     def initChild(self):
         #print "RUNNING RIGHT INIT CHILD"
@@ -496,11 +529,11 @@ class jellyDump(sampleWrapper):
         self.outputs   = [ self.output ]
 
         print "  INITING JELLY DUMP CMD " + self.parameter.getCmd()
-        print "    INPUTS : " + str(input)
+        print "    INPUTS : " + str(self.inputs)
         for inp in self.inputs:
             print str(inp) + "\n"
             
-        print "    OUTPUTS: " + str(output)
+        print "    OUTPUTS: " + str(self.outputs)
         for out in self.outputs:
             print str(out) + "\n"
 
@@ -545,7 +578,18 @@ class jellyMerge(sampleWrapper):
 
     def __call__(self, messaging):
         #print "using correct call"
-        sampleWrapper.__call__(self, messaging)
+        self.initChild()
+        if not io(self.outputs).exists():
+            print "RUNNING"
+            sampleWrapper.__call__(self, messaging)
+        else:
+            print "SKIPPING"
+            #print "error. no command to run"
+            messaging.status = constants.SKIPPED
+            print "RETURNING STATUS "     + str(messaging.status)
+            print "EXIT STATUS ORIGINAL " + str(messaging.exitCode)
+            messaging.exitCode = 0
+            print "EXIT STATUS NEW "      + str(messaging.exitCode)
 
     def initChild(self):
         #print "RUNNING RIGHT INIT CHILD"
@@ -587,11 +631,11 @@ class jellyMerge(sampleWrapper):
         self.outputs   = [ self.output ]
 
         print "  INITING JELLY MERGE CMD " + self.parameter.getCmd()
-        print "    INPUTS : " + str(input)
+        print "    INPUTS : " + str(self.inputs)
         for inp in self.inputs:
             print str(inp) + "\n"
             
-        print "    OUTPUTS: " + str(output)
+        print "    OUTPUTS: " + str(self.outputs)
         for out in self.outputs:
             print str(out) + "\n"
 

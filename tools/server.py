@@ -430,7 +430,7 @@ class jobServer(BaseHTTPRequestHandler):
         header = \
         """
 <html>
-    <head><META HTTP-EQUIV="refresh" CONTENT="05"></head>
+    <head><META HTTP-EQUIV="refresh" CONTENT="15"></head>
     <body>
         """
         return header

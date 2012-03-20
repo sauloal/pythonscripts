@@ -77,21 +77,29 @@ def runString(id, cmdFinal, messaging):
             messaging.exitCode = returnCode
             p.wait()
             
+            print "JOB :: " + id + " :: JOINING THREADS"
+            t_err.join()
+            t_out.join()
+
+            print "JOB :: " + id + " :: EMPTYING QUEUE"
             while not q_out.empty():
                 messaging.stdout(id, q_out.get_nowait(), internal=True)
             while not q_err.empty():
                 messaging.stderr(id, q_err.get_nowait(), internal=True)
-                
-            q_err.join()
-            q_out.join()
-            t_err.join()
-            t_out.join()
             
+            print "JOB :: " + id + " :: QUEUE EMPTY"
+
+            #print "JOB :: " + id + " :: JOINING QUEUES"
+            #q_err.task_done()
+            #q_out.task_done()
+            #q_err.join()
+            #q_out.join()
+            #print "JOB :: " + id + " :: FINISHED"
+
             if messaging.exitCode:
                 print "JOB :: " + id + " :: STR {" + cmdFinal + "} :: RETURNED: " + str(messaging.exitCode) + " THEREFORE FAILED "
                 messaging.status = constants.FAILED
                 messaging.addError("FAILED TO RUN " + cmdFinal + " :: RETURNED: " + str(messaging.exitCode) + " THEREFORE FAILED ")
-                traceback.print_exc()
                 return messaging.exitCode
             #print "FINISHED"
 

@@ -55,14 +55,17 @@ def getJellyPipeline(inputFastqList=None, inBaseName=None, outputFolder=None, pr
     #inBaseName  = os.path.commonprefix(inputBaseNames)
     outBaseName = os.path.abspath(os.path.realpath(os.path.normpath(os.path.join(outputFolder, prefix+inBaseName+suffix))))
     outNickName = os.path.basename(outBaseName)
+    outNickNameC = outNickName + '_JellyCount'
+    outNickNameM = outNickName + '_JellyMerge'
+    outNickNameH = outNickName + '_JellyHisto'
 
-    jc = jellyCount(inputFastqReals , inBaseName, output=outBaseName + "_mer_counts", stats=outBaseName + ".stats", **kwargs)
-    jm = jellyMerge([jc.getOutput  ], inBaseName, output=outBaseName + ".jf",                                       **kwargs)
-    jh = jellyHisto([jm.getOutput  ], inBaseName, output=outBaseName + ".histo",                                    **kwargs)
+    jc = jellyCount(inputFastqReals , outNickNameC, output=outBaseName + "_mer_counts", stats=outBaseName + ".stats", **kwargs)
+    jm = jellyMerge([jc.getOutput  ], outNickNameM, output=outBaseName + ".jf",                                       **kwargs)
+    jh = jellyHisto([jm.getOutput  ], outNickNameH, output=outBaseName + ".histo",                                    **kwargs)
 
-    f0 = joblaunch.Job(outNickName + '_JellyCount', [ jc ], deps=dependsOn)
-    f1 = joblaunch.Job(outNickName + '_JellyMerge', [ jm ], deps=[f0] )
-    f2 = joblaunch.Job(outNickName + '_JellyHisto', [ jh ], deps=[f1] )
+    f0 = joblaunch.Job(outNickNameC, [ jc ], deps=dependsOn)
+    f1 = joblaunch.Job(outNickNameM, [ jm ], deps=[f0] )
+    f2 = joblaunch.Job(outNickNameH, [ jh ], deps=[f1] )
 
     res = [
         [ f0.getId(), f0 , jc ],
